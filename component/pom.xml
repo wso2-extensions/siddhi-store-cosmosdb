@@ -56,10 +56,10 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-cosmosdb</artifactId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

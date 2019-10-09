@@ -29,7 +29,7 @@
     <version>2.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Siddhi Store Cosmosdb Extension Parent</name>
-    <url>https://github.com/siddhi-io/siddhi-store-cosmosdb</url>
+    <url>https://github.com/Tikiri16/siddhi-store-cosmosdb</url>
 
     <profiles>
         <profile>
@@ -60,9 +60,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:https://github.com/siddhi-io/siddhi-store-cosmosdb.git</connection>
-        <url>https://github.com/siddhi-io/siddhi-store-cosmosdb.git</url>
-        <developerConnection>scm:git:https://github.com/siddhi-io/siddhi-store-cosmosdb.git</developerConnection>
+        <connection>git@github.com:Tikiri16/siddhi-store-cosmosdb.git</connection>
+        <url>https://github.com/Tikiri16/siddhi-store-cosmosdb.git</url>
+        <developerConnection>git@github.com:Tikiri16/siddhi-store-cosmosdb.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -102,11 +102,11 @@
                 <artifactId>gson</artifactId>
                 <version>2.3</version>
             </dependency>
-            <dependency>
+            <!--<dependency>
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>azure-cosmosdb</artifactId>
                 <version>2.6.1</version>
-            </dependency>
+            </dependency>-->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
