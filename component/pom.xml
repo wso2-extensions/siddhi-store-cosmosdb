@@ -68,6 +68,25 @@
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-documentdb</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.3.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.json.wso2/json -->
+        <dependency>
+            <groupId>org.json.wso2</groupId>
+            <artifactId>json</artifactId>
+            <version>3.0.0.wso2v1</version>
+        </dependency>
 
 
     </dependencies>
@@ -113,8 +132,8 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
-                            com.cosmosdb.*;
-                            org.bson.*;
+                            com.microsoft.azure.documentdb.*,
+                            org.apache.http.*
                         </Private-Package>
                         <Export-Package>
                             io.siddhi.extension.store.cosmosdb.*
@@ -124,6 +143,7 @@
                             io.siddhi.annotation.*;version="${siddhi.version.range}",
                             io.siddhi.core.*;version="${siddhi.version.range}",
                             io.siddhi.query.api.*;version="${siddhi.version.range}",
+                            org.json.*,
                         </Import-Package>
                         <Include-Resource>
                             META-INF=target/classes/META-INF
