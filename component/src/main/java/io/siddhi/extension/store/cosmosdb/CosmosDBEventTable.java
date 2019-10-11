@@ -17,6 +17,7 @@
  */
 package io.siddhi.extension.store.cosmosdb;
 
+import com.google.gson.Gson;
 import com.microsoft.azure.documentdb.*;
 import io.siddhi.annotation.Example;
 import io.siddhi.annotation.Extension;
@@ -258,15 +259,16 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
 public class CosmosDBEventTable extends AbstractRecordTable {
     private static final Log log = LogFactory.getLog(CosmosDBEventTable.class);
 
-    private String databaseId="TestDatabase";
-    private String collectionId="TestCollection";
+    private static final String HOST = "https://e9bce587-0ee0-4-231-b9ee.documents.azure.com:443/";
+    private static final String MASTER_KEY = "d3XleBPZwqDjNRTqUu7RZp9VFRpt1L5VzwncUP4Nket8WCXWSnbnsNKukjdbwRnn8P6O6gR8VNTnZI0D02RNHg==";
     private List<String> attributeNames;
     private boolean initialCollectionTest;
-    private static final String HOST = "https://5cfa9c0d-0ee0-4-231-b9ee.documents.azure.com:443/";
-    private static final String MASTER_KEY = "RgSspaX6sSQvnHE9hHyOZP5T6t4awzyuOYrMueWm597UloNxMeuZpbLlVFAHwhaZceikoaYksDxKlvlPYcLOFA==";
+    private static Gson gson = new Gson();
+    private String databaseId = "ToDoList";
     private static DocumentClient documentClient;
     private static Database databaseCache;
     private static DocumentCollection collectionCache;
+    private String collectionId = "Items";
 
 
     @Override
@@ -279,7 +281,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
 
         this.initializeConnectionParameters(storeAnnotation, configReader);
-
 
         String customCollectionName = storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
@@ -303,6 +304,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             documentClient = new DocumentClient(HOST, MASTER_KEY,
                     ConnectionPolicy.GetDefault(), ConsistencyLevel.Session);
         }
+
+
     }
 
     @Override
@@ -310,18 +313,17 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
         for (int i=0; i< records.size(); i++) {
             Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(records.get(i), this.attributeNames);
-            Document insertDocument = new Document(String.valueOf(insertMap));
+            Document insertDocument = new Document(gson.toJson(insertMap));
             //insertDocument.set("entityType", "insertItem");
 
             try {
                 // Persist the document using the DocumentClient.
                 insertDocument = documentClient.createDocument(
-                        getTestCollection().getSelfLink(), insertDocument, null,
+                        getItems().getSelfLink(), insertDocument, null,
                         false).getResource();
             } catch (DocumentClientException e) {
                 e.printStackTrace();
             }
-
 
 
         }
@@ -368,7 +370,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     }
 
 
-    private Database getTestDatabase() {
+    private Database getToDoList() {
         if (databaseCache == null) {
             // Get the database if it exists
             List<Database> databaseList = documentClient
@@ -389,11 +391,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     databaseCache = documentClient.createDatabase(
                             databaseDefinition, null).getResource();
                 } catch (DocumentClientException e) {
-                    /*
-                     TODO: Something has gone terribly wrong - the app wasn't
-                     able to query or create the collection.
-                     Verify your connection, endpoint, and key.
-                    */
                     e.printStackTrace();
                 }
             }
@@ -402,12 +399,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         return databaseCache;
     }
 
-    private DocumentCollection getTestCollection() {
+    private DocumentCollection getItems() {
         if (collectionCache == null) {
             // Get the collection if it exists.
             List<DocumentCollection> collectionList = documentClient
                     .queryCollections(
-                            getTestDatabase().getSelfLink(),
+                            getToDoList().getSelfLink(),
                             "SELECT * FROM root r WHERE r.id='" + collectionId
                                     + "'", null).getQueryIterable().toList();
 
@@ -422,14 +419,9 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     collectionDefinition.setId(collectionId);
 
                     collectionCache = documentClient.createCollection(
-                            getTestDatabase().getSelfLink(),
+                            getToDoList().getSelfLink(),
                             collectionDefinition, null).getResource();
                 } catch (DocumentClientException e) {
-                    /*
-                    TODO: Something has gone terribly wrong - the app wasn't
-                     able to query or create the collection.
-                     Verify your connection, endpoint, and key.
-                    */
                     e.printStackTrace();
                 }
             }
