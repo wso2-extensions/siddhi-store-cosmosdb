@@ -63,6 +63,9 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                                 "The options specified in the uri will override any connection options specified in " +
                                 "the deployment yaml file.",
                         type = {DataType.STRING}),
+                @Parameter(name = "cosmosdb.key",
+                        description = "The CosmosDB Master key for the CosmosDB data store.",
+                        type = {DataType.STRING}),
                 @Parameter(name = "collection.name",
                         description = "The name of the collection in the store this Event Table should" +
                                 " be persisted as.",
@@ -258,17 +261,14 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
 )
 public class CosmosDBEventTable extends AbstractRecordTable {
     private static final Log log = LogFactory.getLog(CosmosDBEventTable.class);
-
-    private static final String HOST = "https://e9bce587-0ee0-4-231-b9ee.documents.azure.com:443/";
-    private static final String MASTER_KEY = "d3XleBPZwqDjNRTqUu7RZp9VFRpt1L5VzwncUP4Nket8WCXWSnbnsNKukjdbwRnn8P6O6gR8VNTnZI0D02RNHg==";
-    private List<String> attributeNames;
-    private boolean initialCollectionTest;
     private static Gson gson = new Gson();
-    private String databaseId = "ToDoList";
     private static DocumentClient documentClient;
     private static Database databaseCache;
     private static DocumentCollection collectionCache;
-    private String collectionId = "Items";
+    private List<String> attributeNames;
+    private boolean initialCollectionTest;
+    private String databaseId = "ToDoList";
+    private String collectionId = "Test1";
 
 
     @Override
@@ -295,10 +295,11 @@ public class CosmosDBEventTable extends AbstractRecordTable {
      * @param storeAnnotation the source annotation which contains the needed parameters.
      * @param configReader    {@link ConfigReader} ConfigurationReader.
      * @throws CosmosTableException when store annotation does not contain cosmosdb.uri or contains an illegal
-     *                             argument for cosmosdb.uri
+     *                              argument for cosmosdb.uri
      */
     private void initializeConnectionParameters(Annotation storeAnnotation, ConfigReader configReader) {
-        //String uri = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_URI);
+        final String HOST = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_URI);
+        final String MASTER_KEY = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_MASTERKEY);
 
         if (documentClient == null) {
             documentClient = new DocumentClient(HOST, MASTER_KEY,
@@ -311,18 +312,17 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     @Override
     protected void add(List<Object[]> records) throws ConnectionUnavailableException {
 
-        for (int i=0; i< records.size(); i++) {
+        for (int i = 0; i < records.size(); i++) {
             Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(records.get(i), this.attributeNames);
             Document insertDocument = new Document(gson.toJson(insertMap));
-            //insertDocument.set("entityType", "insertItem");
 
             try {
                 // Persist the document using the DocumentClient.
-                insertDocument = documentClient.createDocument(
-                        getItems().getSelfLink(), insertDocument, null,
+                documentClient.createDocument(
+                        getcollectionId().getSelfLink(), insertDocument, null,
                         false).getResource();
             } catch (DocumentClientException e) {
-                e.printStackTrace();
+                log.error("Failed to add record", e);
             }
 
 
@@ -333,6 +333,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         }).collect(Collectors.toList());
         this.bulkWrite(parsedRecords);*/
     }
+
 
     @Override
     protected RecordIterator<Object[]> find(Map<String, Object> map, CompiledCondition compiledCondition) throws ConnectionUnavailableException {
@@ -345,9 +346,70 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     }
 
     @Override
-    protected void delete(List<Map<String, Object>> list, CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+    protected void delete(List<Map<String, Object>> deleteConditionParameterMaps, CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+        //this.batchProcessDelete(deleteConditionParameterMaps, compiledCondition);
+
+        //for (int i = 0; i < deleteConditionParameterMaps.size(); i++) {
+        try {
+            for (Map<String, Object> deleteConditionParameter : deleteConditionParameterMaps) {
+                String id = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition, deleteConditionParameter);
+                List<Document> toDeleteDocument = documentClient
+                        .queryDocuments(getcollectionId().getSelfLink(),
+                                "SELECT * FROM root r WHERE r.id='" + id + "'", null)
+                        .getQueryIterable().toList();
+
+                if (toDeleteDocument.size() > 0) {
+                    documentClient.deleteDocument(toDeleteDocument.get(0).getSelfLink(), null);
+                }
+                //Document toDeleteDocument = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition, deleteConditionParameter);
+                //Document todeleteDocument = CosmosTableUtils.resolveCondition(todeleteDocument, (CosmosCompiledCondition) compiledCondition,
+                //deleteConditionParameter, 0);
+            }
+        } catch (DocumentClientException e) {
+            throw new CosmosTableException("Error while deleting records from collection : " + collectionId, e);
+        }
 
     }
+
+    /*private void batchProcessDelete(List<Map<String, Object>> deleteConditionParameterMaps,
+                                    CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+        String condition = ((CosmosCompiledCondition) compiledCondition).getCompiledQuery();
+        PreparedStatement stmt = null;
+        try {
+            stmt = CosmosTableUtils.isEmpty(condition) ?
+                    conn.prepareStatement(deleteQuery.replace(PLACEHOLDER_CONDITION, "")) :
+                    conn.prepareStatement(CosmosTableUtils.formatQueryWithCondition(deleteQuery, condition));
+            int counter = 0;
+            for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
+                CosmosTableUtils.resolveCondition(stmt, (CosmosCompiledCondition) compiledCondition,
+                        deleteConditionParameterMap, 0);
+                stmt.addBatch();
+                counter++;
+                if (counter == batchSize) {
+                    stmt.executeBatch();
+                    stmt.clearBatch();
+                    counter = 0;
+                }
+            }
+            if (counter > 0) {
+                stmt.executeBatch();
+            }
+        } catch (SQLException e) {
+            try {
+                if (!conn.isValid(0)) {
+                    throw new ConnectionUnavailableException("Error performing record deletion. Connection is closed " +
+                            "for store: '" + tableName + "'", e);
+                } else {
+                    throw new RDBMSTableException("Error performing record deletion for store '"
+                            + this.tableName + "'", e);
+                }
+            } catch (SQLException e1) {
+                throw new RDBMSTableException("Error performing record deletion for store: '" + tableName + "'", e1);
+            }
+        } finally {
+            RDBMSTableUtils.cleanupConnection(null, stmt, conn);
+        }
+    }*/
 
     @Override
     protected void update(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String, CompiledExpression> map, List<Map<String, Object>> list1) throws ConnectionUnavailableException {
@@ -361,16 +423,20 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected CompiledCondition compileCondition(ExpressionBuilder expressionBuilder) {
-        return null;
+        CosmosExpressionVisitor visitor = new CosmosExpressionVisitor();
+        expressionBuilder.build(visitor);
+        return new CosmosCompiledCondition(visitor.getCompiledCondition(), visitor.getPlaceholders());
     }
 
     @Override
     protected CompiledExpression compileSetAttribute(ExpressionBuilder expressionBuilder) {
-        return null;
+        CosmosSetExpressionVisitor visitor = new CosmosSetExpressionVisitor();
+        expressionBuilder.build(visitor);
+        return new CosmosCompiledCondition(visitor.getCompiledCondition(), visitor.getPlaceholders());
     }
 
 
-    private Database getToDoList() {
+    private Database getdatabaseId() {
         if (databaseCache == null) {
             // Get the database if it exists
             List<Database> databaseList = documentClient
@@ -391,7 +457,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     databaseCache = documentClient.createDatabase(
                             databaseDefinition, null).getResource();
                 } catch (DocumentClientException e) {
-                    e.printStackTrace();
+                    log.error("Failed to create the database", e);
                 }
             }
         }
@@ -399,12 +465,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         return databaseCache;
     }
 
-    private DocumentCollection getItems() {
+    private DocumentCollection getcollectionId() {
         if (collectionCache == null) {
             // Get the collection if it exists.
             List<DocumentCollection> collectionList = documentClient
                     .queryCollections(
-                            getToDoList().getSelfLink(),
+                            getdatabaseId().getSelfLink(),
                             "SELECT * FROM root r WHERE r.id='" + collectionId
                                     + "'", null).getQueryIterable().toList();
 
@@ -419,16 +485,63 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     collectionDefinition.setId(collectionId);
 
                     collectionCache = documentClient.createCollection(
-                            getToDoList().getSelfLink(),
+                            getdatabaseId().getSelfLink(),
                             collectionDefinition, null).getResource();
                 } catch (DocumentClientException e) {
-                    e.printStackTrace();
+                    log.error("Failed to create the collection", e);
                 }
             }
         }
 
         return collectionCache;
     }
+
+    /*private Document getDocumentById(String id) {
+        // Retrieve the document using the DocumentClient.
+        List<Document> documentList = documentClient
+                .queryDocuments(getcollectionId().getSelfLink(),
+                        "SELECT * FROM root r WHERE r.id='" + id + "'", null)
+                .getQueryIterable().toList();
+
+        if (documentList.size() > 0) {
+            return documentList.get(0);
+        } else {
+            return null;
+        }
+    }
+*/
+
+
+    /*
+
+    private void populateStatement(Object[] record, PreparedStatement stmt) throws ConnectionUnavailableException {
+        Attribute attribute = null;
+        try {
+            for (int i = 0; i < this.attributes.size(); i++) {
+                attribute = this.attributes.get(i);
+                Object value = record[i];
+                if (value != null || attribute.getType() == Attribute.Type.STRING) {
+                    CosmosTableUtils.populateStatementWithSingleElement(stmt, i + 1, attribute.getType(), value);
+                } else {
+                    throw new CosmosTableException("Cannot Execute Insert/Update: null value detected for " +
+                            "attribute '" + attribute.getName() + "'");
+                }
+            }
+        } catch (SQLException e) {
+            try {
+                if (!stmt.getConnection().isValid(0)) {
+                    throw new ConnectionUnavailableException("Connection is closed. Could not execute Insert/Update " +
+                            " for store: '" + collectionId + "'", e);
+                } else {
+                    throw new CosmosTableException("Dropping event since value for attribute name " +
+                            attribute.getName() + " cannot be set for store: " + collectionId, e);
+                }
+            } catch (SQLException e1) {
+                throw new CosmosTableException("Could not execute Insert/Update for store: '" + collectionId + "'", e1);
+            }
+        }
+    }
+*/
 
     @Override
     protected void connect() throws ConnectionUnavailableException {
@@ -445,17 +558,4 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     }
 
-
-
-/*
-    @Override
-    protected void disconnect() {
-    }
-
-    @Override
-    protected void destroy() {
-        if (this.cosmosClient != null) {
-            this.cosmosClient.close();
-        }
-    }*/
 }

@@ -8,7 +8,7 @@
 
 <span id="syntax" class="md-typeset" style="display: block; font-weight: bold;">Syntax</span>
 ```
-@Store(type="cosmosdb", cosmosdb.uri="<STRING>", collection.name="<STRING>", secure.connection="<STRING>", trust.store="<STRING>", trust.store.password="<STRING>", key.store="<STRING>", key.store.password="<STRING>")
+@Store(type="cosmosdb", cosmosdb.uri="<STRING>", cosmosdb.key="<STRING>", collection.name="<STRING>", secure.connection="<STRING>", trust.store="<STRING>", trust.store.password="<STRING>", key.store="<STRING>", key.store.password="<STRING>")
 @PrimaryKey("PRIMARY_KEY")
 @Index("INDEX")
 ```
@@ -26,6 +26,14 @@
     <tr>
         <td style="vertical-align: top">cosmosdb.uri</td>
         <td style="vertical-align: top; word-wrap: break-word">The CosmosDB URI for the CosmosDB data store. The uri must be of the format <br>cosmosdb://[username:password@]host1[:port1][,hostN[:portN]][/[database][?options]]<br>The options specified in the uri will override any connection options specified in the deployment yaml file.</td>
+        <td style="vertical-align: top"></td>
+        <td style="vertical-align: top">STRING</td>
+        <td style="vertical-align: top">No</td>
+        <td style="vertical-align: top">No</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top">cosmosdb.key</td>
+        <td style="vertical-align: top; word-wrap: break-word">The CosmosDB Master key for the CosmosDB data store.</td>
         <td style="vertical-align: top"></td>
         <td style="vertical-align: top">STRING</td>
         <td style="vertical-align: top">No</td>

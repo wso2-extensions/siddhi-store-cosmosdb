@@ -17,8 +17,11 @@
  */
 package io.siddhi.extension.store.cosmosdb.util;
 
+import com.microsoft.azure.documentdb.Document;
 import io.siddhi.core.util.config.ConfigReader;
+import io.siddhi.extension.store.cosmosdb.CosmosCompiledCondition;
 import io.siddhi.extension.store.cosmosdb.exception.CosmosTableException;
+import io.siddhi.query.api.definition.Attribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -252,12 +255,12 @@ public class CosmosTableUtils {
      * @param conditionParameterMap the map which contains the runtime value(s) for the condition.
      * @return Document.
      */
-/*    public static Document resolveCondition(CosmosCompiledCondition compiledCondition,
-                                            Map<String, Object> conditionParameterMap) {
+    public static String resolveCondition(CosmosCompiledCondition compiledCondition,
+                                          Map<String, Object> conditionParameterMap) {
         Map<String, Object> parameters = compiledCondition.getPlaceholders();
         String compiledQuery = compiledCondition.getCompiledQuery();
         if (compiledQuery.equalsIgnoreCase("true")) {
-            return new Document();
+            return String.valueOf(new Document());
         }
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {
             Object parameter = entry.getValue();
@@ -273,7 +276,31 @@ public class CosmosTableUtils {
         if (log.isDebugEnabled()) {
             log.debug("The final compiled query : '" + compiledQuery + "'");
         }
-        return Document.parse(compiledQuery);
+        return compiledQuery;
+    }
+
+    //from RDBMS
+    /*public static int resolveCondition(PreparedStatement stmt, CosmosCompiledCondition compiledCondition,
+                                       Map<String, Object> conditionParameterMap, int seed) throws SQLException {
+        int maxOrdinal = 0;
+        SortedMap<Integer, Object> parameters = compiledCondition.getParameters();
+        for (Map.Entry<Integer, Object> entry : parameters.entrySet()) {
+            Object parameter = entry.getValue();
+            int ordinal = entry.getKey();
+            if (ordinal > maxOrdinal) {
+                maxOrdinal = ordinal;
+            }
+            if (parameter instanceof Constant) {
+                Constant constant = (Constant) parameter;
+                populateStatementWithSingleElement(stmt, seed + ordinal, constant.getType(),
+                        constant.getValue());
+            } else {
+                Attribute variable = (Attribute) parameter;
+                populateStatementWithSingleElement(stmt, seed + ordinal, variable.getType(),
+                        conditionParameterMap.get(variable.getName()));
+            }
+        }
+        return maxOrdinal;
     }*/
 
     /**
