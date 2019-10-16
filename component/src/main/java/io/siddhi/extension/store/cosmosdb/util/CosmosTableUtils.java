@@ -49,14 +49,7 @@ public class CosmosTableUtils {
         //Prevent Initialization.
     }
 
-    /**
-     * Utility method which can be used to check if the given primary key is valid i.e. non empty
-     * and is made up of attributes and return an index model when PrimaryKey is valid.
-     *
-     * @param primaryKey     the PrimaryKey annotation which contains the primary key attributes.
-     * @param attributeNames List containing names of the attributes.
-     * @return List of String with primary key attributes.
-     */
+
    /* public static IndexModel extractPrimaryKey(Annotation primaryKey, List<String> attributeNames) {
         if (primaryKey == null) {
             return null;
@@ -76,14 +69,7 @@ public class CosmosTableUtils {
         return new IndexModel(primaryKeyIndex, new IndexOptions().unique(true));
     }*/
 
-    /**
-     * Utility method which can be used to check if the given Indices are valid  and return List of
-     * CosmosDB Index Models when valid.
-     *
-     * @param indices        the IndexBy annotation which contains the indices definitions.
-     * @param attributeNames List containing names of the attributes.
-     * @return List of IndexModel.
-     */
+
    /* public static List<IndexModel> extractIndexModels(Annotation indices, List<String> attributeNames) {
         if (indices == null) {
             return new ArrayList<>();
@@ -114,14 +100,7 @@ public class CosmosTableUtils {
         }).collect(Collectors.toList());
     }
 */
-    /**
-     * Utility method which can be used to create an IndexModel.
-     *
-     * @param fieldName   the attribute on which the index is to be created.
-     * @param sortOrder   the sort order of the index to be created.
-     * @param indexOption json string of the options of the index to be created.
-     * @return IndexModel.
-     */
+
     /*private static IndexModel createIndexModel(String fieldName, Integer sortOrder, String indexOption) {
         Document indexDocument = new Document(fieldName, sortOrder);
         if (indexOption == null) {
@@ -279,7 +258,7 @@ public class CosmosTableUtils {
         return compiledQuery;
     }
 
-    //from RDBMS
+    //from Cosmos
     /*public static int resolveCondition(PreparedStatement stmt, CosmosCompiledCondition compiledCondition,
                                        Map<String, Object> conditionParameterMap, int seed) throws SQLException {
         int maxOrdinal = 0;
@@ -329,13 +308,7 @@ public class CosmosTableUtils {
         return attributesValuesMap;
     }
 
-    /**
-     * Utility method which can be used to check if the existing indices contain the expected indices
-     * defined by the annotation 'PrimaryKey' and 'IndexBy' and log a warning when indices differs.
-     *
-     * @param existingIndices List of indices that the collection contains.
-     * @param expectedIndices List of indices that are defined by the annotations.
-     */
+
    /* public static void checkExistingIndices(List<IndexModel> expectedIndices, CosmosCursor<Document> existingIndices) {
         Map<String, Object> indexOptionsMap = new HashMap<>();
         List<Document> expectedIndexDocuments = expectedIndices.stream().map(expectedIndex -> {

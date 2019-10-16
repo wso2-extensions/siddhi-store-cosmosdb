@@ -312,8 +312,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     @Override
     protected void add(List<Object[]> records) throws ConnectionUnavailableException {
 
-        for (int i = 0; i < records.size(); i++) {
-            Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(records.get(i), this.attributeNames);
+        for (Object[] record : records) {
+            Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(record, this.attributeNames);
             Document insertDocument = new Document(gson.toJson(insertMap));
 
             try {
@@ -348,9 +348,33 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     @Override
     protected void delete(List<Map<String, Object>> deleteConditionParameterMaps, CompiledCondition compiledCondition) throws ConnectionUnavailableException {
         //this.batchProcessDelete(deleteConditionParameterMaps, compiledCondition);
-
         //for (int i = 0; i < deleteConditionParameterMaps.size(); i++) {
-        try {
+        for (Map<String, Object> conditionParams : deleteConditionParameterMaps) {
+            String name = conditionParams.get(((CosmosCompiledCondition) compiledCondition)
+                    .getCompiledQuery()).toString();
+
+            List<Document> documentList = documentClient
+                    .queryDocuments(getcollectionId().getSelfLink(),
+                            "SELECT * FROM root r WHERE r.name='" + name + "'", null)
+                    .getQueryIterable().toList();
+
+            if (documentList.size() > 0) {
+                Document toDeleteDocument = documentList.get(0);
+                try {
+                    documentClient.deleteDocument(toDeleteDocument.getSelfLink(), null);
+                } catch (DocumentClientException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("error");
+            }
+
+
+        }
+
+
+        //Uncomment later
+        /*try {
             for (Map<String, Object> deleteConditionParameter : deleteConditionParameterMaps) {
                 String id = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition, deleteConditionParameter);
                 List<Document> toDeleteDocument = documentClient
@@ -367,7 +391,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             }
         } catch (DocumentClientException e) {
             throw new CosmosTableException("Error while deleting records from collection : " + collectionId, e);
-        }
+        }*/
 
     }
 
@@ -400,14 +424,14 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     throw new ConnectionUnavailableException("Error performing record deletion. Connection is closed " +
                             "for store: '" + tableName + "'", e);
                 } else {
-                    throw new RDBMSTableException("Error performing record deletion for store '"
+                    throw new CosmosTableException("Error performing record deletion for store '"
                             + this.tableName + "'", e);
                 }
             } catch (SQLException e1) {
-                throw new RDBMSTableException("Error performing record deletion for store: '" + tableName + "'", e1);
+                throw new CosmosTableException("Error performing record deletion for store: '" + tableName + "'", e1);
             }
         } finally {
-            RDBMSTableUtils.cleanupConnection(null, stmt, conn);
+            CosmosTableUtils.cleanupConnection(null, stmt, conn);
         }
     }*/
 
