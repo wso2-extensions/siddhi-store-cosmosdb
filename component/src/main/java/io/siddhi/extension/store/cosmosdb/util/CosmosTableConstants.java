@@ -26,33 +26,7 @@ public class CosmosTableConstants {
     public static final String ANNOTATION_ELEMENT_URI = "cosmosdb.uri";
     public static final String ANNOTATION_ELEMENT_MASTERKEY = "cosmosdb.key";
     public static final String ANNOTATION_ELEMENT_COLLECTION_NAME = "collection.name";
-    public static final String ANNOTATION_ELEMENT_KEYSTORE = "key.store";
-    public static final String ANNOTATION_ELEMENT_STOREPASS = "key.store.password";
-    public static final String ANNOTATION_ELEMENT_TRUSTSTORE = "trust.store";
-    public static final String ANNOTATION_ELEMENT_TRUSTSTOREPASS = "trust.store.password";
-    public static final String ANNOTATION_ELEMENT_SECURE_CONNECTION = "secure.connection";
 
-    //Cosmos Operators
-    public static final String COSMOS_COMPARE_LESS_THAN = "$lt";
-    public static final String COSMOS_COMPARE_GREATER_THAN = "$gt";
-    public static final String COSMOS_COMPARE_LESS_THAN_EQUAL = "$lte";
-    public static final String COSMOS_COMPARE_GREATER_THAN_EQUAL = "$gte";
-    public static final String COSMOS_COMPARE_EQUAL = "$eq";
-    public static final String COSMOS_COMPARE_NOT_EQUAL = "$ne";
-    public static final String COSMOS_NOT = "$not";
-
-    //Regex for comparing operands
-    public static final String REG_EXPRESSION = "\\{.*}$";
-    public static final String REG_SIMPLE_EXPRESSION = "^\\{(\\S*):\\{.*}}$";
-    public static final String REG_STREAMVAR_OR_CONST = "^strVar\\d*|^const\\d*";
-    public static final String REG_INDEX_BY = "^(\\S*)(\\s1|\\s-1)?(\\s\\{.*})?$";
-
-    //Cosmos filters for condition builder
-    public static final String COSMOS_AND_FILTER = "{$and:[{{LEFT_OPERAND}},{{RIGHT_OPERAND}}]}";
-    public static final String COSMOS_OR_FILTER = "{$or:[{{LEFT_OPERAND}},{{RIGHT_OPERAND}}]}";
-    public static final String COSMOS_NOT_FILTER = "{{{FIELD_NAME}}:{{OPERAND}}}";
-    public static final String COSMOS_COMPARE_FILTER = "{{{LEFT_OPERAND}}:{{{COMPARE_OPERATOR}}:{{RIGHT_OPERAND}}}}";
-    public static final String COSMOS_IS_NULL_FILTER = "{{{OPERAND}}:{$eq:null}}";
 
     //Placeholders for condition replacements
     public static final String PLACEHOLDER_LEFT_OPERAND = "{{LEFT_OPERAND}}";
@@ -61,34 +35,74 @@ public class CosmosTableConstants {
     public static final String PLACEHOLDER_FIELD_NAME = "{{FIELD_NAME}}";
     public static final String PLACEHOLDER_COMPARE_OPERATOR = "{{COMPARE_OPERATOR}}";
 
-    public static final String CONNECTIONS_PER_HOST = "connectionsPerHost";
-    public static final String HEARTBEAT_SOCKET_TIMEOUT = "heartbeatSocketTimeout";
-    public static final String CONNECT_TIMEOUT = "connectTimeout";
-    public static final String HEARTBEAT_FREQUENCY = "heartbeatFrequency";
-    public static final String READ_CONCERN = "readConcern";
-    public static final String WRITE_CONCERN = "writeConcern";
-    public static final String HEARTBEAT_CONNECT_TIMEOUT = "heartbeatConnectTimeout";
-    public static final String LOCAL_THRESHOLD = "localThreshold";
-    public static final String MAX_CONNECTION_IDLE_TIME = "maxConnectionIdleTime";
-    public static final String MAX_CONNECTION_LIFE_TIME = "maxConnectionLifeTime";
-    public static final String MAX_WAIT_TIME = "maxWaitTime";
-    public static final String MIN_CONNECTIONS_PER_HOST = "minConnectionsPerHost";
-    public static final String MIN_HEARTBEAT_FREQUENCY = "minHeartbeatFrequency";
-    public static final String SERVER_SELECTION_TIMEOUT = "serverSelectionTimeout";
-    public static final String SOCKET_TIMEOUT = "socketTimeout";
-    public static final String THREADS_ALLOWED_TO_BLOCK = "threadsAllowedToBlockForConnectionMultiplier";
-    public static final String SOCKET_KEEP_ALIVE = "socketKeepAlive";
-    public static final String SSL_ENABLED = "sslEnabled";
-    public static final String CURSOR_FINALIZER_ENABLED = "cursorFinalizerEnabled";
-    public static final String REQUIRED_REPLICA_SET_NAME = "requiredReplicaSetName";
-    public static final String APPLICATION_NAME = "applicationName";
-    public static final String READ_PREFERENCE = "readPreference";
-
-    public static final String DEFAULT_TRUST_STORE_FILE = "${carbon.home}/resources/security/client-truststore.jks";
-    public static final String DEFAULT_TRUST_STORE_PASSWORD = "wso2carbon";
-    public static final String DEFAULT_KEY_STORE_FILE = "${carbon.home}/resources/security/client-truststore.jks";
-    public static final String DEFAULT_KEY_STORE_PASSWORD = "wso2carbon";
     public static final String VARIABLE_CARBON_HOME = "carbon.home";
+
+
+    //Copied from CosmosDB
+    //Placeholder strings needed for processing the query configuration file
+    //public static final String CosmosDB_QUERY_CONFIG_FILE = "cosmosdb-table-config.xml";
+    public static final String PLACEHOLDER_COLUMNS_FOR_CREATE = "{{COLUMNS, PRIMARY_KEYS}}";
+    public static final String PLACEHOLDER_CONDITION = "{{CONDITION}}";
+    public static final String PLACEHOLDER_COLUMNS_VALUES = "{{COLUMNS_AND_VALUES}}";
+    public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
+    public static final String PLACEHOLDER_INDEX = "{{INDEX_COLUMNS}}";
+    public static final String PLACEHOLDER_Q = "{{Q}}";
+    public static final String PLACEHOLDER_COLUMNS = "{{COLUMNS}}";
+    public static final String PLACEHOLDER_VALUES = "{{VALUES}}";
+    public static final String PLACEHOLDER_SELECTORS = "{{SELECTORS}}";
+    public static final String PLACEHOLDER_INNER_QUERY = "{{INNER_QUERY}}";
+    public static final String PLACEHOLDER_LIMIT_WRAPPER = "{{LIMIT_WRAPPER}}";
+    public static final String PLACEHOLDER_OFFSET_WRAPPER = "{{OFFSET_WRAPPER}}";
+    public static final String PLACEHOLDER_INDEX_NUMBER = "{{INDEX_NUM}}";
+
+    //Miscellaneous SQL constants
+    public static final String SQL_MATH_ADD = "+";
+    public static final String SQL_MATH_DIVIDE = "/";
+    public static final String SQL_MATH_MULTIPLY = "*";
+    public static final String SQL_MATH_SUBTRACT = "-";
+    public static final String SQL_MATH_MOD = "%";
+    public static final String SQL_COMPARE_LESS_THAN = "<";
+    public static final String SQL_COMPARE_GREATER_THAN = ">";
+    public static final String SQL_COMPARE_LESS_THAN_EQUAL = "<=";
+    public static final String SQL_COMPARE_GREATER_THAN_EQUAL = ">=";
+    public static final String SQL_COMPARE_EQUAL = "=";
+    public static final String SQL_COMPARE_NOT_EQUAL = "<>"; //Using the ANSI SQL-92 standard over '!=' (non-standard)
+    public static final String SQL_AND = " AND ";
+    public static final String SQL_OR = "OR";
+    public static final String SQL_NOT = "NOT";
+    public static final String SQL_IN = "IN";
+    public static final String SQL_IS_NULL = "IS NULL";
+    public static final String SQL_NOT_NULL = "NOT NULL";
+    public static final String SQL_PRIMARY_KEY_DEF = "PRIMARY KEY";
+    public static final String SQL_WHERE = "WHERE";
+    public static final String SQL_AS = " AS ";
+    public static final String SQL_MAX = "MAX"; // Used for incrementalAggregator:last()
+    public static final String WHITESPACE = " ";
+    public static final String SEPARATOR = ", ";
+    public static final String EQUALS = "=";
+    public static final String QUESTION_MARK = "?";
+    public static final String OPEN_PARENTHESIS = "(";
+    public static final String CLOSE_PARENTHESIS = ")";
+    public static final String SUB_SELECT_QUERY_REF = "t2";
+
+    public static final String CONTAINS_CONDITION_REGEX = "(CONTAINS\\()([a-zA-z.]*)(\\s\\?\\s\\))";
+
+
+    //Check these again
+    public static final String PROPERTY_SEPARATOR = ".";
+    public static final String RECORD_INSERT_QUERY = "INSERT INTO {{TABLE_NAME}} ({{COLUMNS}}) VALUES ({{Q}})";
+    public static final String RECORD_UPDATE_QUERY = "UPDATE {{TABLE_NAME}} SET {{COLUMNS_AND_VALUES}} {{CONDITION}}";
+    public static final String RECORD_SELECT_QUERY = "SELECT * FROM {{TABLE_NAME}} {{CONDITION}}";
+    public static final String RECORD_EXISTS_QUERY = "SELECT TOP 1 FROM {{TABLE_NAME}} {{CONDITION}}";
+    public static final String RECORD_DELETE_QUERY = "DELETE FROM {{TABLE_NAME}} {{CONDITION}}";
+    public static final String SELECT_CLAUSE = "SELECT {{SELECTORS}} FROM {{TABLE_NAME}}";
+    public static final String SELECT_QUERY_WITH_SUB_SELECT_TEMPLATE = "SELECT {{SELECTORS}} FROM {{TABLE_NAME}}, ( {{INNER_QUERY}} ) AS t2";
+    public static final String WHERE_CLAUSE = "WHERE {{CONDITION}}";
+    public static final String ORDER_BY_CLAUSE = "ORDER BY {{COLUMNS}}";
+    public static final String LIMIT_CLAUSE = "LIMIT {{Q}}";
+    public static final String OFFSET_CLAUSE = "OFFSET {{Q}}";
+    public static final boolean IS_LIMIT_BEFORE_OFFSET = false;
+
 
     private CosmosTableConstants() {
     }

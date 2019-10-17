@@ -17,9 +17,10 @@
  */
 package io.siddhi.extension.store.cosmosdb;
 
+import io.siddhi.core.executor.ExpressionExecutor;
+import io.siddhi.core.table.record.UpdateOrInsertReducer;
 import io.siddhi.core.util.collection.operator.CompiledCondition;
 
-import java.util.Map;
 import java.util.SortedMap;
 
 /**
@@ -29,27 +30,72 @@ import java.util.SortedMap;
 public class CosmosCompiledCondition implements CompiledCondition {
 
     private String compiledQuery;
-    private Map<String, Object> placeholders;
+    private boolean useSubSelect;
+    private String subSelectQuerySelectors;
+    private String outerCompiledCondition;
+    private UpdateOrInsertReducer updateOrInsertReducer;
+    private ExpressionExecutor inMemorySetExpressionExecutor;
     private SortedMap<Integer, Object> parameters;
+    private boolean isContainsConditionExist;
+    private int ordinalOfContainPattern;
 
-    public CosmosCompiledCondition(String compiledQuery, Map<String, Object> parameters) {
+    public CosmosCompiledCondition(String compiledQuery, SortedMap<Integer, Object> parameters,
+                                   boolean isContainsConditionExist, int ordinalOfContainPattern,
+                                   boolean useSubSelect, String subSelectQuerySelectors,
+                                   String outerCompiledCondition, UpdateOrInsertReducer updateOrInsertReducer,
+                                   ExpressionExecutor inMemorySetExpressionExecutor) {
         this.compiledQuery = compiledQuery;
-        this.placeholders = parameters;
+        this.parameters = parameters;
+        this.isContainsConditionExist = isContainsConditionExist;
+        this.ordinalOfContainPattern = ordinalOfContainPattern;
+        this.useSubSelect = useSubSelect;
+        this.subSelectQuerySelectors = subSelectQuerySelectors;
+        this.outerCompiledCondition = outerCompiledCondition;
+        this.updateOrInsertReducer = updateOrInsertReducer;
+        this.inMemorySetExpressionExecutor = inMemorySetExpressionExecutor;
+    }
+
+    public void setCompiledQuery(String compiledQuery) {
+        this.compiledQuery = compiledQuery;
     }
 
     public String getCompiledQuery() {
         return compiledQuery;
     }
 
+    public boolean isContainsConditionExist() {
+        return isContainsConditionExist;
+    }
+
+    public boolean isUseSubSelect() {
+        return useSubSelect;
+    }
+
+    public String getSubSelectQuerySelectors() {
+        return subSelectQuerySelectors;
+    }
+
+    public String getOuterCompiledCondition() {
+        return outerCompiledCondition;
+    }
+
     public String toString() {
         return getCompiledQuery();
     }
 
-    public Map<String, Object> getPlaceholders() {
-        return placeholders;
-    }
-
     public SortedMap<Integer, Object> getParameters() {
         return parameters;
+    }
+
+    public int getOrdinalOfContainPattern() {
+        return ordinalOfContainPattern;
+    }
+
+    public UpdateOrInsertReducer getUpdateOrInsertReducer() {
+        return updateOrInsertReducer;
+    }
+
+    public ExpressionExecutor getInMemorySetExpressionExecutor() {
+        return inMemorySetExpressionExecutor;
     }
 }

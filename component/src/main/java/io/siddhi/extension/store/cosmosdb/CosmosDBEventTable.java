@@ -25,6 +25,7 @@ import io.siddhi.annotation.Parameter;
 import io.siddhi.annotation.SystemParameter;
 import io.siddhi.annotation.util.DataType;
 import io.siddhi.core.exception.ConnectionUnavailableException;
+import io.siddhi.core.table.record.AbstractQueryableRecordTable;
 import io.siddhi.core.table.record.AbstractRecordTable;
 import io.siddhi.core.table.record.ExpressionBuilder;
 import io.siddhi.core.table.record.RecordIterator;
@@ -41,11 +42,11 @@ import io.siddhi.query.api.util.AnnotationHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
+import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.*;
 
 
 /**
@@ -76,26 +77,6 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                         description = "Describes enabling the SSL for the cosmosdb connection",
                         optional = true,
                         defaultValue = "false",
-                        type = {DataType.STRING}),
-                @Parameter(name = "trust.store",
-                        description = "File path to the trust store.",
-                        optional = true,
-                        defaultValue = "${carbon.home}/resources/security/client-truststore.jks",
-                        type = {DataType.STRING}),
-                @Parameter(name = "trust.store.password",
-                        description = "Password to access the trust store",
-                        optional = true,
-                        defaultValue = "wso2carbon",
-                        type = {DataType.STRING}),
-                @Parameter(name = "key.store",
-                        description = "File path to the keystore.",
-                        optional = true,
-                        defaultValue = "${carbon.home}/resources/security/client-truststore.jks",
-                        type = {DataType.STRING}),
-                @Parameter(name = "key.store.password",
-                        description = "Password to access the keystore",
-                        optional = true,
-                        defaultValue = "wso2carbon",
                         type = {DataType.STRING})
         },
         systemParameter = {
@@ -109,128 +90,7 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                 @SystemParameter(name = "cursorFinalizerEnabled",
                         description = "Sets whether cursor finalizers are enabled.",
                         defaultValue = "true",
-                        possibleParameters = {"true", "false"}),
-                @SystemParameter(name = "requiredReplicaSetName",
-                        description = "The name of the replica set",
-                        defaultValue = "null",
-                        possibleParameters = "the logical name of the replica set"),
-                @SystemParameter(name = "sslEnabled",
-                        description = "Sets whether to initiate connection with TSL/SSL enabled. true: Initiate " +
-                                "the connection with TLS/SSL. false: Initiate the connection without TLS/SSL.",
-                        defaultValue = "false",
-                        possibleParameters = {"true", "false"}),
-                @SystemParameter(name = "trustStore",
-                        description = "File path to the trust store.",
-                        defaultValue = "${carbon.home}/resources/security/client-truststore.jks",
-                        possibleParameters = "Any valid file path."),
-                @SystemParameter(name = "trustStorePassword",
-                        description = "Password to access the trust store",
-                        defaultValue = "wso2carbon",
-                        possibleParameters = "Any valid password."),
-                @SystemParameter(name = "keyStore",
-                        description = "File path to the keystore.",
-                        defaultValue = "${carbon.home}/resources/security/client-truststore.jks",
-                        possibleParameters = "Any valid file path."),
-                @SystemParameter(name = "keyStorePassword",
-                        description = "Password to access the keystore",
-                        defaultValue = "wso2carbon",
-                        possibleParameters = "Any valid password."),
-                @SystemParameter(name = "connectTimeout",
-                        description = "The time in milliseconds to attempt a connection before timing out.",
-                        defaultValue = "10000",
-                        possibleParameters = "Any positive integer"),
-                @SystemParameter(name = "connectionsPerHost",
-                        description = "The maximum number of connections in the connection pool.",
-                        defaultValue = "100",
-                        possibleParameters = "Any positive integer"),
-                @SystemParameter(name = "minConnectionsPerHost",
-                        description = "The minimum number of connections in the connection pool.",
-                        defaultValue = "0",
-                        possibleParameters = "Any natural number"),
-                @SystemParameter(name = "maxConnectionIdleTime",
-                        description = "The maximum number of milliseconds that a connection can remain idle in " +
-                                "the pool before being removed and closed. A zero value indicates no limit to " +
-                                "the idle time.  A pooled connection that has exceeded its idle time will be " +
-                                "closed and replaced when necessary by a new connection.",
-                        defaultValue = "0",
-                        possibleParameters = "Any positive integer"),
-                @SystemParameter(name = "maxWaitTime",
-                        description = "The maximum wait time in milliseconds that a thread may wait for a connection " +
-                                "to become available. A value of 0 means that it will not wait.  A negative value " +
-                                "means to wait indefinitely",
-                        defaultValue = "120000",
-                        possibleParameters = "Any integer"),
-                @SystemParameter(name = "threadsAllowedToBlockForConnectionMultiplier",
-                        description = "The maximum number of connections allowed per host for this CosmosClient " +
-                                "instance. Those connections will be kept in a pool when idle. Once the pool " +
-                                "is exhausted, any operation requiring a connection will block waiting for an " +
-                                "available connection.",
-                        defaultValue = "100",
-                        possibleParameters = "Any natural number"),
-                @SystemParameter(name = "maxConnectionLifeTime",
-                        description = "The maximum life time of a pooled connection.  A zero value indicates " +
-                                "no limit to the life time.  A pooled connection that has exceeded its life time " +
-                                "will be closed and replaced when necessary by a new connection.",
-                        defaultValue = "0",
-                        possibleParameters = "Any positive integer"),
-                @SystemParameter(name = "socketKeepAlive",
-                        description = "Sets whether to keep a connection alive through firewalls",
-                        defaultValue = "false",
-                        possibleParameters = {"true", "false"}),
-                @SystemParameter(name = "socketTimeout",
-                        description = "The time in milliseconds to attempt a send or receive on a socket " +
-                                "before the attempt times out. Default 0 means never to timeout.",
-                        defaultValue = "0",
-                        possibleParameters = "Any natural integer"),
-                @SystemParameter(name = "writeConcern",
-                        description = "The write concern to use.",
-                        defaultValue = "acknowledged",
-                        possibleParameters = {"acknowledged", "w1", "w2", "w3", "unacknowledged", "fsynced",
-                                "journaled", "replica_acknowledged", "normal", "safe", "majority", "fsync_safe",
-                                "journal_safe", "replicas_safe"}),
-                @SystemParameter(name = "readConcern",
-                        description = "The level of isolation for the reads from replica sets.",
-                        defaultValue = "default",
-                        possibleParameters = {"local", "majority", "linearizable"}),
-                @SystemParameter(name = "readPreference",
-                        description = "Specifies the replica set read preference for the connection.",
-                        defaultValue = "primary",
-                        possibleParameters = {"primary", "secondary", "secondarypreferred", "primarypreferred",
-                                "nearest"}),
-                @SystemParameter(name = "localThreshold",
-                        description = "The size (in milliseconds) of the latency window for selecting among " +
-                                "multiple suitable CosmosDB instances.",
-                        defaultValue = "15",
-                        possibleParameters = "Any natural number"),
-                @SystemParameter(name = "serverSelectionTimeout",
-                        description = "Specifies how long (in milliseconds) to block for server selection " +
-                                "before throwing an exception. A value of 0 means that it will timeout immediately " +
-                                "if no server is available.  A negative value means to wait indefinitely.",
-                        defaultValue = "30000",
-                        possibleParameters = "Any integer"),
-                @SystemParameter(name = "heartbeatSocketTimeout",
-                        description = "The socket timeout for connections used for the cluster heartbeat. A value of " +
-                                "0 means that it will timeout immediately if no cluster member is available.  " +
-                                "A negative value means to wait indefinitely.",
-                        defaultValue = "20000",
-                        possibleParameters = "Any integer"),
-                @SystemParameter(name = "heartbeatConnectTimeout",
-                        description = "The connect timeout for connections used for the cluster heartbeat. A value " +
-                                "of 0 means that it will timeout immediately if no cluster member is available.  " +
-                                "A negative value means to wait indefinitely.",
-                        defaultValue = "20000",
-                        possibleParameters = "Any integer"),
-                @SystemParameter(name = "heartbeatFrequency",
-                        description = "Specify the interval (in milliseconds) between checks, counted from " +
-                                "the end of the previous check until the beginning of the next one.",
-                        defaultValue = "10000",
-                        possibleParameters = "Any positive integer"),
-                @SystemParameter(name = "minHeartbeatFrequency",
-                        description = "Sets the minimum heartbeat frequency.  In the event that the driver " +
-                                "has to frequently re-check a server's availability, it will wait at least this " +
-                                "long since the previous check to avoid wasted effort.",
-                        defaultValue = "500",
-                        possibleParameters = "Any positive integer")
+                        possibleParameters = {"true", "false"})
         },
         examples = {
                 @Example(
@@ -268,7 +128,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private List<String> attributeNames;
     private boolean initialCollectionTest;
     private String databaseId = "ToDoList";
-    private String collectionId = "Test1";
+    private String collectionId = "";
+    private String tableName = collectionId;
 
 
     @Override
@@ -312,8 +173,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     @Override
     protected void add(List<Object[]> records) throws ConnectionUnavailableException {
 
-        for (Object[] record : records) {
-            Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(record, this.attributeNames);
+        for (int i = 0; i < records.size(); i++) {
+            Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(records.get(i), this.attributeNames);
             Document insertDocument = new Document(gson.toJson(insertMap));
 
             try {
@@ -346,10 +207,45 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     }
 
     @Override
-    protected void delete(List<Map<String, Object>> deleteConditionParameterMaps, CompiledCondition compiledCondition) throws ConnectionUnavailableException {
-        //this.batchProcessDelete(deleteConditionParameterMaps, compiledCondition);
-        //for (int i = 0; i < deleteConditionParameterMaps.size(); i++) {
-        for (Map<String, Object> conditionParams : deleteConditionParameterMaps) {
+    protected void delete(List<Map<String, Object>> deleteConditionParameterMaps, CompiledCondition compiledCondition)
+            throws ConnectionUnavailableException {
+        this.batchProcessDelete(deleteConditionParameterMaps, compiledCondition);
+    }
+
+    private void batchProcessDelete(List<Map<String, Object>> deleteConditionParameterMaps,
+                                    CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+        String condition = ((CosmosCompiledCondition) compiledCondition).getCompiledQuery();
+        for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
+            CosmosTableUtils.resolveCondition(stmt, (CosmosCompiledCondition) compiledCondition,
+                    deleteConditionParameterMap, 0);
+            List<Document> documentList = documentClient
+                    .queryDocuments(getcollectionId().getSelfLink(),
+                            "SELECT * FROM root r WHERE '" + condition + "'", null)
+                    .getQueryIterable().toList();
+            if (documentList.size() > 0) {
+                Document toDeleteDocument = documentList.get(0);
+                try {
+                    documentClient.deleteDocument(toDeleteDocument.getSelfLink(), null);
+                } catch (DocumentClientException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("error");
+            }
+        /*PreparedStatement stmt = null;
+        try {
+            int counter = 0;
+            for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
+                CosmosTableUtils.resolveCondition(stmt, (CosmosCompiledCondition) compiledCondition,
+                        deleteConditionParameterMap, 0);
+
+            }*/
+        }
+
+    }
+
+
+        /*for (Map<String, Object> conditionParams : deleteConditionParameterMaps) {
             String name = conditionParams.get(((CosmosCompiledCondition) compiledCondition)
                     .getCompiledQuery()).toString();
 
@@ -370,30 +266,11 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             }
 
 
-        }
-
-
-        //Uncomment later
-        /*try {
-            for (Map<String, Object> deleteConditionParameter : deleteConditionParameterMaps) {
-                String id = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition, deleteConditionParameter);
-                List<Document> toDeleteDocument = documentClient
-                        .queryDocuments(getcollectionId().getSelfLink(),
-                                "SELECT * FROM root r WHERE r.id='" + id + "'", null)
-                        .getQueryIterable().toList();
-
-                if (toDeleteDocument.size() > 0) {
-                    documentClient.deleteDocument(toDeleteDocument.get(0).getSelfLink(), null);
-                }
-                //Document toDeleteDocument = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition, deleteConditionParameter);
-                //Document todeleteDocument = CosmosTableUtils.resolveCondition(todeleteDocument, (CosmosCompiledCondition) compiledCondition,
-                //deleteConditionParameter, 0);
-            }
-        } catch (DocumentClientException e) {
-            throw new CosmosTableException("Error while deleting records from collection : " + collectionId, e);
         }*/
 
-    }
+
+
+
 
     /*private void batchProcessDelete(List<Map<String, Object>> deleteConditionParameterMaps,
                                     CompiledCondition compiledCondition) throws ConnectionUnavailableException {
@@ -447,16 +324,154 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected CompiledCondition compileCondition(ExpressionBuilder expressionBuilder) {
-        CosmosExpressionVisitor visitor = new CosmosExpressionVisitor();
+        CosmosConditionVisitor visitor = new CosmosConditionVisitor(this.tableName, false);
         expressionBuilder.build(visitor);
-        return new CosmosCompiledCondition(visitor.getCompiledCondition(), visitor.getPlaceholders());
+        return new CosmosCompiledCondition(visitor.returnCondition(), visitor.getParameters(),
+                visitor.isContainsConditionExist(), visitor.getOrdinalOfContainPattern(), false, null, null,
+                expressionBuilder.getUpdateOrInsertReducer(), expressionBuilder.getInMemorySetExpressionExecutor());
     }
 
     @Override
     protected CompiledExpression compileSetAttribute(ExpressionBuilder expressionBuilder) {
-        CosmosSetExpressionVisitor visitor = new CosmosSetExpressionVisitor();
-        expressionBuilder.build(visitor);
-        return new CosmosCompiledCondition(visitor.getCompiledCondition(), visitor.getPlaceholders());
+        return compileCondition(expressionBuilder);
+    }
+
+    /*@Override
+    protected CompiledSelection compileSelection(List<AbstractQueryableRecordTable.SelectAttributeBuilder> selectAttributeBuilders,
+                                                 List<ExpressionBuilder> groupByExpressionBuilder,
+                                                 ExpressionBuilder havingExpressionBuilder,
+                                                 List<AbstractQueryableRecordTable.OrderByAttributeBuilder> orderByAttributeBuilders, Long limit,
+                                                 Long offset) {
+        return new CosmosCompiledSelection(
+                compileSelectClause(selectAttributeBuilders),
+                (groupByExpressionBuilder == null) ? null : compileClause(groupByExpressionBuilder, false),
+                (havingExpressionBuilder == null) ? null :
+                        compileClause(Collections.singletonList(havingExpressionBuilder), true),
+                (orderByAttributeBuilders == null) ? null : compileOrderByClause(orderByAttributeBuilders),
+                limit, offset);
+    }*/
+
+    private CosmosCompiledCondition compileSelectClause(List<AbstractQueryableRecordTable.SelectAttributeBuilder> selectAttributeBuilders) {
+        StringBuilder compiledSelectionList = new StringBuilder();
+        StringBuilder compiledSubSelectQuerySelection = new StringBuilder();
+        StringBuilder compiledOuterOnCondition = new StringBuilder();
+
+        SortedMap<Integer, Object> paramMap = new TreeMap<>();
+        int offset = 0;
+
+        boolean containsLastFunction = false;
+        List<CosmosConditionVisitor> conditionVisitorList = new ArrayList<>();
+        for (AbstractQueryableRecordTable.SelectAttributeBuilder attributeBuilder : selectAttributeBuilders) {
+            CosmosConditionVisitor visitor = new CosmosConditionVisitor(this.tableName, false);
+            attributeBuilder.getExpressionBuilder().build(visitor);
+            if (visitor.isLastConditionExist()) {
+                containsLastFunction = true;
+            }
+            conditionVisitorList.add(visitor);
+        }
+
+        boolean isLastFunctionEncountered = false;
+        for (int i = 0; i < conditionVisitorList.size(); i++) {
+            CosmosConditionVisitor visitor = conditionVisitorList.get(i);
+            AbstractQueryableRecordTable.SelectAttributeBuilder selectAttributeBuilder = selectAttributeBuilders.get(i);
+
+            String compiledCondition = visitor.returnCondition();
+
+            if (containsLastFunction) {
+                if (visitor.isLastConditionExist()) {
+                    // Add the select columns with function incrementalAggregator:last()
+                    compiledSelectionList.append(compiledCondition).append(SQL_AS)
+                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
+                    if (!isLastFunctionEncountered) {
+                        //Only add max variable for incrementalAggregator:last() once
+                        compiledSubSelectQuerySelection.append(visitor.returnMaxVariableCondition()).append(SEPARATOR);
+                        compiledOuterOnCondition.append(visitor.getOuterCompiledCondition()).append(SQL_AND);
+                        isLastFunctionEncountered = true;
+                    }
+                } else if (visitor.isContainsAttributeFunction()) {
+                    //Add columns with attributes function such as sum(), max()
+                    //Add max(variable) by default since oracle all columns not in group by must have
+                    // attribute function
+                    compiledSelectionList.append(SQL_MAX).append(OPEN_PARENTHESIS)
+                            .append(SUB_SELECT_QUERY_REF).append(".").append(selectAttributeBuilder.getRename())
+                            .append(CLOSE_PARENTHESIS).append(SQL_AS)
+                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
+                    compiledSubSelectQuerySelection.append(compiledCondition).append(SQL_AS)
+                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
+                } else {
+                    // Add group by column
+                    compiledSelectionList.append(compiledCondition).append(SQL_AS)
+                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
+                    compiledSubSelectQuerySelection.append(compiledCondition).append(SQL_AS)
+                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
+                    compiledOuterOnCondition.append(visitor.getOuterCompiledCondition()).append(SQL_AND);
+                }
+            } else {
+                compiledSelectionList.append(compiledCondition);
+                if (selectAttributeBuilder.getRename() != null && !selectAttributeBuilder.getRename().isEmpty()) {
+                    compiledSelectionList.append(SQL_AS).
+                            append(selectAttributeBuilder.getRename());
+                }
+                compiledSelectionList.append(SEPARATOR);
+            }
+
+            Map<Integer, Object> conditionParamMap = visitor.getParameters();
+            int maxOrdinal = 0;
+            for (Map.Entry<Integer, Object> entry : conditionParamMap.entrySet()) {
+                Integer ordinal = entry.getKey();
+                paramMap.put(ordinal + offset, entry.getValue());
+                if (ordinal > maxOrdinal) {
+                    maxOrdinal = ordinal;
+                }
+            }
+            offset = offset + maxOrdinal;
+        }
+
+        if (compiledSelectionList.length() > 0) {
+            compiledSelectionList.setLength(compiledSelectionList.length() - 2); // Removing the last comma separator.
+        }
+
+        if (compiledSubSelectQuerySelection.length() > 0) {
+            compiledSubSelectQuerySelection.setLength(compiledSubSelectQuerySelection.length() - 2);
+        }
+
+        if (compiledOuterOnCondition.length() > 0) {
+            compiledOuterOnCondition.setLength(compiledOuterOnCondition.length() - 4);
+        }
+
+        return new CosmosCompiledCondition(compiledSelectionList.toString(), paramMap, false, 0, containsLastFunction,
+                compiledSubSelectQuerySelection.toString(), compiledOuterOnCondition.toString(), null, null);
+    }
+
+    private CosmosCompiledCondition compileClause(List<ExpressionBuilder> expressionBuilders, boolean isHavingClause) {
+        StringBuilder compiledSelectionList = new StringBuilder();
+        SortedMap<Integer, Object> paramMap = new TreeMap<>();
+        int offset = 0;
+
+        for (ExpressionBuilder expressionBuilder : expressionBuilders) {
+            CosmosConditionVisitor visitor = new CosmosConditionVisitor(this.tableName, isHavingClause);
+            expressionBuilder.build(visitor);
+
+            String compiledCondition = visitor.returnCondition();
+            compiledSelectionList.append(compiledCondition).append(SEPARATOR);
+
+            Map<Integer, Object> conditionParamMap = visitor.getParameters();
+            int maxOrdinal = 0;
+            for (Map.Entry<Integer, Object> entry : conditionParamMap.entrySet()) {
+                Integer ordinal = entry.getKey();
+                paramMap.put(ordinal + offset, entry.getValue());
+                if (ordinal > maxOrdinal) {
+                    maxOrdinal = ordinal;
+                }
+            }
+            offset = offset + maxOrdinal;
+        }
+
+        if (compiledSelectionList.length() > 0) {
+            compiledSelectionList.setLength(compiledSelectionList.length() - 2); // Removing the last comma separator.
+        }
+        return new CosmosCompiledCondition(compiledSelectionList.toString(), paramMap, false,
+                0, false, null, null, null, null);
     }
 
 
@@ -535,37 +550,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     }
 */
 
-
-    /*
-
-    private void populateStatement(Object[] record, PreparedStatement stmt) throws ConnectionUnavailableException {
-        Attribute attribute = null;
-        try {
-            for (int i = 0; i < this.attributes.size(); i++) {
-                attribute = this.attributes.get(i);
-                Object value = record[i];
-                if (value != null || attribute.getType() == Attribute.Type.STRING) {
-                    CosmosTableUtils.populateStatementWithSingleElement(stmt, i + 1, attribute.getType(), value);
-                } else {
-                    throw new CosmosTableException("Cannot Execute Insert/Update: null value detected for " +
-                            "attribute '" + attribute.getName() + "'");
-                }
-            }
-        } catch (SQLException e) {
-            try {
-                if (!stmt.getConnection().isValid(0)) {
-                    throw new ConnectionUnavailableException("Connection is closed. Could not execute Insert/Update " +
-                            " for store: '" + collectionId + "'", e);
-                } else {
-                    throw new CosmosTableException("Dropping event since value for attribute name " +
-                            attribute.getName() + " cannot be set for store: " + collectionId, e);
-                }
-            } catch (SQLException e1) {
-                throw new CosmosTableException("Could not execute Insert/Update for store: '" + collectionId + "'", e1);
-            }
-        }
-    }
-*/
 
     @Override
     protected void connect() throws ConnectionUnavailableException {
