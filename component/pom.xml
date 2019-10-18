@@ -181,15 +181,8 @@
                             org.apache.http.*,
                             com.google.gson.*,
                             org.apache.commons.*
-                            !com.zaxxer.hikari.*,
-                            com.sun.istack.*,
-                            com.sun.xml.*,
-                            javax.xml.*,
-                            com.sun.activation.*,
-                            javax.activation.*
                         </Private-Package>
                         <Export-Package>
-                            !com.zaxxer.hikari.*,
                             io.siddhi.extension.store.cosmosdb.*
                         </Export-Package>
                         <Import-Package>
@@ -198,7 +191,6 @@
                             io.siddhi.core.*;version="${siddhi.version.range}",
                             io.siddhi.query.api.*;version="${siddhi.version.range}",
                             org.json.*,
-                            *;resolution:=optional
                         </Import-Package>
                         <Include-Resource>
                             META-INF=target/classes/META-INF

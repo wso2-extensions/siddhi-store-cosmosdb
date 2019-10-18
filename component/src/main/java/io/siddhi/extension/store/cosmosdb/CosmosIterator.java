@@ -18,74 +18,135 @@
 package io.siddhi.extension.store.cosmosdb;
 
 
-import com.microsoft.azure.documentdb.Document;
+import io.siddhi.core.table.record.RecordIterator;
+import io.siddhi.extension.store.cosmosdb.exception.CosmosTableException;
+import io.siddhi.extension.store.cosmosdb.util.CosmosTableUtils;
+import io.siddhi.query.api.definition.Attribute;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A class representing a RecordIterator which is responsible for processing CosmosDB Event Table find() operations in a
  * streaming fashion.
  */
-/*public class CosmosIterator implements RecordIterator<Object[]> {
-    private CosmosCursor documents;
-    private List<String> attributeNames;
+public class CosmosIterator implements RecordIterator<Object[]> {
+
+    private Connection conn;
+    private PreparedStatement stmt = null;
+    private ResultSet rs = null;
 
     private boolean preFetched;
-    private Object[] nextDocument;
+    private Object[] nextValue;
+    private List<Attribute> attributes;
+    private String tableName;
 
-    public CosmosIterator(FindIterable documents, List<String> attributeNames) {
-        this.documents = documents.iterator();
-        this.attributeNames = attributeNames;
-    }*/
-/*
+    public CosmosIterator(Connection conn, PreparedStatement stmt, ResultSet rs, List<Attribute> attributes,
+                          String tableName) {
+        this.conn = conn;
+        this.stmt = stmt;
+        this.rs = rs;
+        this.attributes = attributes;
+        this.tableName = tableName;
+    }
+
     @Override
     public boolean hasNext() {
         if (!this.preFetched) {
-            this.nextDocument = this.next();
+            this.nextValue = this.next();
             this.preFetched = true;
         }
-        return this.nextDocument.length != 0;
+        return nextValue != null;
     }
 
-*//*
     @Override
     public Object[] next() {
         if (this.preFetched) {
             this.preFetched = false;
-            Object[] result = this.nextDocument;
-            this.nextDocument = null;
+            Object[] result = this.nextValue;
+            this.nextValue = null;
             return result;
         }
-        if (this.documents.hasNext()) {
-            return this.extractRecord((Document) this.documents.next());
-        } else {
-            return new Object[0];
+        try {
+            if (this.rs.next()) {
+                return this.extractRecord(this.rs);
+            } else {
+                // end of the result set, cleaning up.
+                CosmosTableUtils.cleanupConnection(this.rs, this.stmt, this.conn);
+                this.rs = null;
+                this.stmt = null;
+                this.conn = null;
+                return null;
+            }
+        } catch (Exception e) {
+            CosmosTableUtils.cleanupConnection(this.rs, this.stmt, this.conn);
+            throw new CosmosTableException("Error retrieving records from table '" + this.tableName + "': "
+                    + e.getMessage(), e);
         }
     }
-*//*
 
-    *//**
-     * Method which is used for extracting record values (in the form of an Object array) from a
-     * CosmosDB {@link Document}, according to the table's field type order.
+    /**
+     * Method which is used for extracting record values (in the form of an Object array) from an SQL {@link ResultSet},
+     * according to the table's field type order.
      *
-     * //@param document the {@link Document} from which the values should be retrieved.
+     * @param rs the {@link ResultSet} from which the values should be retrieved.
      * @return an array of extracted values, all cast to {@link Object} type for portability.
-     *//*
- *//*   private Object[] extractRecord(Document document) {
+     * @throws SQLException if there are errors in extracring the values from the {@link ResultSet} instance according
+     *                      to the table definition
+     */
+    private Object[] extractRecord(ResultSet rs) throws SQLException {
         List<Object> result = new ArrayList<>();
-        for (String attributeName : this.attributeNames) {
-            Object attributeValue = document.get(attributeName);
-            if (attributeValue instanceof Document) {
-                HashMap<Object, Object> attributAsAMap = new HashMap<>();
-                ((Document) attributeValue).forEach(attributAsAMap::put);
-                result.add(attributAsAMap);
-            } else {
-                result.add(attributeValue);
+        for (Attribute attribute : this.attributes) {
+            switch (attribute.getType()) {
+                case BOOL:
+                    result.add(rs.getBoolean(attribute.getName()));
+                    break;
+                case DOUBLE:
+                    result.add(rs.getDouble(attribute.getName()));
+                    break;
+                case FLOAT:
+                    result.add(rs.getFloat(attribute.getName()));
+                    break;
+                case INT:
+                    result.add(rs.getInt(attribute.getName()));
+                    break;
+                case LONG:
+                    result.add(rs.getLong(attribute.getName()));
+                    break;
+                case OBJECT:
+                    result.add(rs.getObject(attribute.getName()));
+                    break;
+                case STRING:
+                    result.add(rs.getString(attribute.getName()));
+                    break;
             }
         }
         return result.toArray();
-    }*//*
+    }
+
+    @Override
+    public void remove() {
+        //Do nothing. This is a read-only iterator.
+    }
 
     @Override
     public void close() throws IOException {
-
+        CosmosTableUtils.cleanupConnection(this.rs, this.stmt, this.conn);
+        this.rs = null;
+        this.stmt = null;
+        this.conn = null;
     }
-}*/
+
+    @Override
+    protected void finalize() throws Throwable {
+        //In the unlikely case this iterator does not go to the end, we have to make sure the connection is cleaned up.
+        CosmosTableUtils.cleanupConnection(this.rs, this.stmt, this.conn);
+        super.finalize();
+    }
+
+}

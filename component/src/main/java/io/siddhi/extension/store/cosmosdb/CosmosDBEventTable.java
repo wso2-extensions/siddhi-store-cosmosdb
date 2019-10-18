@@ -130,6 +130,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private String databaseId = "ToDoList";
     private String collectionId = "";
     private String tableName = collectionId;
+    private String deleteQuery;
 
 
     @Override
@@ -215,23 +216,28 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private void batchProcessDelete(List<Map<String, Object>> deleteConditionParameterMaps,
                                     CompiledCondition compiledCondition) throws ConnectionUnavailableException {
         String condition = ((CosmosCompiledCondition) compiledCondition).getCompiledQuery();
-        for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
-            CosmosTableUtils.resolveCondition(stmt, (CosmosCompiledCondition) compiledCondition,
-                    deleteConditionParameterMap, 0);
-            List<Document> documentList = documentClient
-                    .queryDocuments(getcollectionId().getSelfLink(),
-                            "SELECT * FROM root r WHERE '" + condition + "'", null)
-                    .getQueryIterable().toList();
-            if (documentList.size() > 0) {
-                Document toDeleteDocument = documentList.get(0);
-                try {
-                    documentClient.deleteDocument(toDeleteDocument.getSelfLink(), null);
-                } catch (DocumentClientException e) {
-                    e.printStackTrace();
+        String stmt = condition;
+        try {
+            stmt = (CosmosTableUtils.isEmpty(condition) ?
+                    (deleteQuery.replace(PLACEHOLDER_CONDITION, "")) :
+                    (CosmosTableUtils.formatQueryWithCondition(deleteQuery, condition)));
+            for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
+                CosmosTableUtils.resolveCondition(stmt, (CosmosCompiledCondition) compiledCondition,
+                        deleteConditionParameterMap, 0);
+                List<Document> documentList = documentClient
+                        .queryDocuments(getcollectionId().getSelfLink(),
+                                "SELECT * FROM root r '" + stmt + "'", null)
+                        .getQueryIterable().toList();
+
+                for (Document toDeleteDocument : documentList) {
+                    try {
+                        documentClient.deleteDocument(toDeleteDocument.getSelfLink(), null);
+                    } catch (DocumentClientException e) {
+                        e.printStackTrace();
+                    }
                 }
-            } else {
-                System.out.println("error");
             }
+
         /*PreparedStatement stmt = null;
         try {
             int counter = 0;
@@ -240,8 +246,10 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                         deleteConditionParameterMap, 0);
 
             }*/
-        }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

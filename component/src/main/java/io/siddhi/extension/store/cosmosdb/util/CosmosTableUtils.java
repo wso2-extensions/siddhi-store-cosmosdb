@@ -20,7 +20,6 @@ package io.siddhi.extension.store.cosmosdb.util;
 import io.siddhi.core.exception.CannotLoadConfigurationException;
 import io.siddhi.core.util.collection.operator.CompiledExpression;
 import io.siddhi.extension.store.cosmosdb.CosmosCompiledCondition;
-import io.siddhi.extension.store.cosmosdb.CosmosCompiledSelection;
 import io.siddhi.extension.store.cosmosdb.exception.CosmosTableException;
 import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.annotation.Element;
@@ -127,7 +126,7 @@ public class CosmosTableUtils {
      * @throws SQLException in the unlikely case where there are errors when setting values to the statement
      *                      (e.g. type mismatches)
      */
-    public static int resolveCondition(PreparedStatement stmt, CosmosCompiledCondition compiledCondition,
+    public static int resolveCondition(String stmt, CosmosCompiledCondition compiledCondition,
                                        Map<String, Object> conditionParameterMap, int seed) throws SQLException {
         int maxOrdinal = 0;
         SortedMap<Integer, Object> parameters = compiledCondition.getParameters();
@@ -139,84 +138,19 @@ public class CosmosTableUtils {
             }
             if (parameter instanceof Constant) {
                 Constant constant = (Constant) parameter;
-                populateStatementWithSingleElement(stmt, seed + ordinal, constant.getType(),
-                        constant.getValue());
+                maxOrdinal = seed + ordinal;
+                stmt.replace("?", (CharSequence) constant.getValue());
             } else {
                 Attribute variable = (Attribute) parameter;
-                populateStatementWithSingleElement(stmt, seed + ordinal, variable.getType(),
-                        conditionParameterMap.get(variable.getName()));
+                maxOrdinal = seed + ordinal;
+                stmt.replace("?", (CharSequence) conditionParameterMap.get(variable.getName()));
             }
         }
         return maxOrdinal;
     }
 
-    public static void resolveQuery(PreparedStatement stmt, CosmosCompiledSelection cosmosCompiledSelection,
-                                    CosmosCompiledCondition cosmosCompiledCondition,
-                                    Map<String, Object> conditionParameterMap, int seed,
-                                    boolean isContainsConditionExist) throws SQLException {
-        seed = seed + resolveCondition(stmt, cosmosCompiledSelection.getCompiledSelectClause(),
-                conditionParameterMap, seed);
 
-        if (cosmosCompiledCondition != null) {
-            if (isContainsConditionExist) {
-                seed = seed + resolveConditionForContainsCheck(stmt, cosmosCompiledCondition, conditionParameterMap,
-                        seed);
-            } else {
-                seed = seed + resolveCondition(stmt, cosmosCompiledCondition, conditionParameterMap, seed);
-            }
-        }
 
-        CosmosCompiledCondition groupByClause = cosmosCompiledSelection.getCompiledGroupByClause();
-        if (groupByClause != null) {
-            seed = seed + resolveCondition(stmt, groupByClause, conditionParameterMap, seed);
-        }
-
-        CosmosCompiledCondition havingClause = cosmosCompiledSelection.getCompiledHavingClause();
-        if (havingClause != null) {
-            seed = seed + resolveCondition(stmt, havingClause, conditionParameterMap, seed);
-        }
-
-        CosmosCompiledCondition orderByClause = cosmosCompiledSelection.getCompiledOrderByClause();
-        if (orderByClause != null) {
-            resolveCondition(stmt, orderByClause, conditionParameterMap, seed);
-        }
-    }
-
-    public static int resolveConditionForContainsCheck(PreparedStatement stmt,
-                                                       CosmosCompiledCondition compiledCondition,
-                                                       Map<String, Object> conditionParameterMap, int seed)
-            throws SQLException {
-        int maxOrdinal = 0;
-        SortedMap<Integer, Object> parameters = compiledCondition.getParameters();
-        for (Map.Entry<Integer, Object> entry : parameters.entrySet()) {
-            Object parameter = entry.getValue();
-            int ordinal = entry.getKey();
-            if (ordinal > maxOrdinal) {
-                maxOrdinal = ordinal;
-            }
-            if (parameter instanceof Constant) {
-                Constant constant = (Constant) parameter;
-                if (entry.getKey().equals(compiledCondition.getOrdinalOfContainPattern())) {
-                    populateStatementWithSingleElement(stmt, seed + entry.getKey(), constant.getType(),
-                            "%" + constant.getValue() + "%");
-                } else {
-                    populateStatementWithSingleElement(stmt, seed + entry.getKey(), constant.getType(),
-                            constant.getValue());
-                }
-            } else {
-                Attribute variable = (Attribute) parameter;
-                if (entry.getKey().equals(compiledCondition.getOrdinalOfContainPattern())) {
-                    populateStatementWithSingleElement(stmt, seed + entry.getKey(), variable.getType(),
-                            "%" + conditionParameterMap.get(variable.getName()) + "%");
-                } else {
-                    populateStatementWithSingleElement(stmt, seed + entry.getKey(), variable.getType(),
-                            conditionParameterMap.get(variable.getName()));
-                }
-
-            }
-        }
-        return maxOrdinal;
-    }
 
     public static int enumerateUpdateSetEntries(Map<String, CompiledExpression> updateSetExpressions,
                                                 PreparedStatement stmt, Map<String, Object> updateSetMap)
@@ -229,12 +163,8 @@ public class CosmosTableUtils {
                 parameter = parameterEntry.getValue();
                 if (parameter instanceof Constant) {
                     Constant constant = (Constant) parameter;
-                    CosmosTableUtils.populateStatementWithSingleElement(stmt, ordinal, constant.getType(),
-                            constant.getValue());
                 } else {
                     Attribute variable = (Attribute) parameter;
-                    CosmosTableUtils.populateStatementWithSingleElement(stmt, ordinal, variable.getType(),
-                            updateSetMap.get(variable.getName()));
                 }
                 ordinal++;
             }
@@ -248,36 +178,26 @@ public class CosmosTableUtils {
      * @param stmt    the statement to which the element should be set.
      * @param ordinal the ordinal of the element in the statement (its place in a potential list of places).
      * @param type    the type of the element to be set, adheres to
-     *                {@link io.siddhi.query.api.definition.Attribute.Type}.
+     *                {@link Attribute.Type}.
      * @param value   the value of the element.
      * @throws SQLException if there are issues when the element is being set.
+     * @return
      */
-    public static void populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, Attribute.Type type,
-                                                          Object value) throws SQLException {
-        switch (type) {
-            case BOOL:
-                stmt.setBoolean(ordinal, (Boolean) value);
-                break;
-            case DOUBLE:
-                stmt.setDouble(ordinal, (Double) value);
-                break;
-            case FLOAT:
-                stmt.setFloat(ordinal, (Float) value);
-                break;
-            case INT:
-                stmt.setInt(ordinal, (Integer) value);
-                break;
-            case LONG:
-                stmt.setLong(ordinal, (Long) value);
-                break;
-            case OBJECT:
-                stmt.setObject(ordinal, value);
-                break;
-            case STRING:
-                stmt.setString(ordinal, (String) value);
-                break;
+    /*public static String populateStatementWithSingleElement(String stmt, int ordinal, Attribute.Type type,
+                                                            Object value) throws SQLException {
+        //stmt.replace(ordinal, (String) value);
+        if(stmt==null){
+            return stmt;
+        }else if(ordinal<0 || ordinal>=stmt.length()){
+            return stmt;
         }
-    }
+        char[] chars = stmt.toCharArray();
+        chars[ordinal] = (char) value;
+        return String.valueOf(chars);
+
+    }*/
+
+
 
     /**
      * Util method which validates the elements from an annotation to verify that they comply to the accepted standards.
