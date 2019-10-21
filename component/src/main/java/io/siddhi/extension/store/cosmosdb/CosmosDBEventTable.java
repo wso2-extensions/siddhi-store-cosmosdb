@@ -128,9 +128,9 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private List<String> attributeNames;
     private boolean initialCollectionTest;
     private String databaseId = "ToDoList";
-    private String collectionId = "";
-    private String tableName = collectionId;
-    private String deleteQuery;
+    private String collectionId = "Items";
+    private String tableName = this.collectionId;
+
 
 
     @Override
@@ -215,19 +215,17 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     private void batchProcessDelete(List<Map<String, Object>> deleteConditionParameterMaps,
                                     CompiledCondition compiledCondition) throws ConnectionUnavailableException {
-        String condition = ((CosmosCompiledCondition) compiledCondition).getCompiledQuery();
-        String stmt = condition;
         try {
-            stmt = (CosmosTableUtils.isEmpty(condition) ?
-                    (deleteQuery.replace(PLACEHOLDER_CONDITION, "")) :
-                    (CosmosTableUtils.formatQueryWithCondition(deleteQuery, condition)));
             for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
-                CosmosTableUtils.resolveCondition(stmt, (CosmosCompiledCondition) compiledCondition,
+                String stmt = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
                         deleteConditionParameterMap, 0);
+                String query = "SELECT * FROM " + collectionId + " WHERE " + stmt;
+                System.out.println(query);
                 List<Document> documentList = documentClient
                         .queryDocuments(getcollectionId().getSelfLink(),
-                                "SELECT * FROM root r '" + stmt + "'", null)
+                                query, null)
                         .getQueryIterable().toList();
+
 
                 for (Document toDeleteDocument : documentList) {
                     try {
@@ -237,15 +235,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     }
                 }
             }
-
-        /*PreparedStatement stmt = null;
-        try {
-            int counter = 0;
-            for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
-                CosmosTableUtils.resolveCondition(stmt, (CosmosCompiledCondition) compiledCondition,
-                        deleteConditionParameterMap, 0);
-
-            }*/
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -332,7 +321,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected CompiledCondition compileCondition(ExpressionBuilder expressionBuilder) {
-        CosmosConditionVisitor visitor = new CosmosConditionVisitor(this.tableName, false);
+        CosmosConditionVisitor visitor = new CosmosConditionVisitor(this.collectionId, false);
         expressionBuilder.build(visitor);
         return new CosmosCompiledCondition(visitor.returnCondition(), visitor.getParameters(),
                 visitor.isContainsConditionExist(), visitor.getOrdinalOfContainPattern(), false, null, null,

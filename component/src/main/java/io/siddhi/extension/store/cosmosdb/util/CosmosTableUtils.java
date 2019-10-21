@@ -28,7 +28,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.*;
@@ -126,27 +129,52 @@ public class CosmosTableUtils {
      * @throws SQLException in the unlikely case where there are errors when setting values to the statement
      *                      (e.g. type mismatches)
      */
-    public static int resolveCondition(String stmt, CosmosCompiledCondition compiledCondition,
-                                       Map<String, Object> conditionParameterMap, int seed) throws SQLException {
-        int maxOrdinal = 0;
+    public static String resolveCondition(CosmosCompiledCondition compiledCondition,
+                                          Map<String, Object> conditionParameterMap, int seed) throws SQLException {
+        //int maxOrdinal = 0;
+        /*String stmt = compiledCondition.getCompiledQuery();
         SortedMap<Integer, Object> parameters = compiledCondition.getParameters();
         for (Map.Entry<Integer, Object> entry : parameters.entrySet()) {
             Object parameter = entry.getValue();
-            int ordinal = entry.getKey();
-            if (ordinal > maxOrdinal) {
+            //int ordinal = entry.getKey();
+            *//*if (ordinal > maxOrdinal) {
                 maxOrdinal = ordinal;
-            }
+            }*//*
             if (parameter instanceof Constant) {
                 Constant constant = (Constant) parameter;
-                maxOrdinal = seed + ordinal;
+                //maxOrdinal = seed + ordinal;
                 stmt.replace("?", (CharSequence) constant.getValue());
             } else {
                 Attribute variable = (Attribute) parameter;
-                maxOrdinal = seed + ordinal;
-                stmt.replace("?", (CharSequence) conditionParameterMap.get(variable.getName()));
+                //maxOrdinal = seed + ordinal;
+                stmt.replace("?", (String) conditionParameterMap.get(variable.getName()));
             }
         }
-        return maxOrdinal;
+        return stmt;*/
+
+        // from elasticsearch
+        String condition = compiledCondition.getCompiledQuery();
+        if (log.isDebugEnabled()) {
+            log.debug("compiled condition for collection : " + condition);
+        }
+        for (Map.Entry<String, Object> entry : conditionParameterMap.entrySet()) {
+            String name = entry.getKey();
+            Object value = entry.getValue();
+            if (value.getClass().getName() == "java.lang.String") {
+                condition = condition.replace("?", "'" + value.toString() + "'");
+            } else {
+                condition = condition.replace("?", value.toString());
+            }
+
+        }
+        //set solr "select all" query if condition is not provided
+        if (condition == null || condition.isEmpty()) {
+            condition = "*:*";
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Resolved condition for collection : " + condition);
+        }
+        return condition;
     }
 
 
