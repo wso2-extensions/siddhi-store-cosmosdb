@@ -25,7 +25,6 @@ import io.siddhi.annotation.Parameter;
 import io.siddhi.annotation.SystemParameter;
 import io.siddhi.annotation.util.DataType;
 import io.siddhi.core.exception.ConnectionUnavailableException;
-import io.siddhi.core.table.record.AbstractQueryableRecordTable;
 import io.siddhi.core.table.record.AbstractRecordTable;
 import io.siddhi.core.table.record.ExpressionBuilder;
 import io.siddhi.core.table.record.RecordIterator;
@@ -42,11 +41,11 @@ import io.siddhi.query.api.util.AnnotationHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
-import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.*;
 
 
 /**
@@ -129,7 +128,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private boolean initialCollectionTest;
     private String databaseId = "ToDoList";
     private String collectionId = "Items";
-    private String tableName = this.collectionId;
+    //private String tableName = this.collectionId;
 
 
 
@@ -217,13 +216,18 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                                     CompiledCondition compiledCondition) throws ConnectionUnavailableException {
         try {
             for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
-                String stmt = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
-                        deleteConditionParameterMap, 0);
-                String query = "SELECT * FROM " + collectionId + " WHERE " + stmt;
+                String condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
+                        deleteConditionParameterMap);
+                //String query = "SELECT * FROM " + collectionId + " WHERE " + condition;
+                SqlQuerySpec query = new SqlQuerySpec();
+                query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
+                FeedOptions options = new FeedOptions();
+                options.setEnableScanInQuery(true);
+
                 System.out.println(query);
                 List<Document> documentList = documentClient
                         .queryDocuments(getcollectionId().getSelfLink(),
-                                query, null)
+                                query, options)
                         .getQueryIterable().toList();
 
 
@@ -348,7 +352,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 limit, offset);
     }*/
 
-    private CosmosCompiledCondition compileSelectClause(List<AbstractQueryableRecordTable.SelectAttributeBuilder> selectAttributeBuilders) {
+    /*private CosmosCompiledCondition compileSelectClause(List<AbstractQueryableRecordTable.SelectAttributeBuilder> selectAttributeBuilders) {
         StringBuilder compiledSelectionList = new StringBuilder();
         StringBuilder compiledSubSelectQuerySelection = new StringBuilder();
         StringBuilder compiledOuterOnCondition = new StringBuilder();
@@ -470,7 +474,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         return new CosmosCompiledCondition(compiledSelectionList.toString(), paramMap, false,
                 0, false, null, null, null, null);
     }
-
+*/
 
     private Database getdatabaseId() {
         if (databaseCache == null) {
