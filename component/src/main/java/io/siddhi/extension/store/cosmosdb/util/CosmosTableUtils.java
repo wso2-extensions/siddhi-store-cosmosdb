@@ -18,6 +18,7 @@
 package io.siddhi.extension.store.cosmosdb.util;
 
 import io.siddhi.extension.store.cosmosdb.CosmosCompiledCondition;
+import io.siddhi.query.api.definition.Attribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,36 +68,33 @@ public class CosmosTableUtils {
             log.debug("compiled condition for collection : " + condition);
         }
         Object[] entries = compiledCondition.getParameters().values().toArray();
-        Object[] keys = conditionParameterMap.keySet().toArray();
-        int i = entries.length - 1;
-        while (i >= 0) {
-            Object key = keys[i];
+        Object[] attributeKeys = conditionParameterMap.keySet().toArray();
+        Object[] keys = compiledCondition.getParameters().keySet().toArray();
+        int i = 0;
+        while (i < keys.length) {
             if (entries[i] instanceof Constant) {
-                //Object value = entries[i];
-                Object[] values = compiledCondition.getParameters().entrySet().toArray();
-                System.out.println(values);
-                Object value = values[i];
-                if (value.getClass().getName() == "java.lang.String") {
-                    condition = condition.replaceFirst("\\?", "'" + value.toString() + "'");
+                Constant value = (Constant) entries[i];
+                //value.getValue();
+                if (value.getType() == Attribute.Type.STRING) {
+                    condition = condition.replaceFirst("\\?", "'" + value.getValue().toString() + "'");
                 } else {
-                    condition = condition.replaceFirst("\\?", value.toString());
+                    condition = condition.replaceFirst("\\?", value.getValue().toString());
                 }
 
             } else {
+                int j = attributeKeys.length - 1;
+                Object key = attributeKeys[j];
                 Object value = conditionParameterMap.get(key);
                 if (value.getClass().getName() == "java.lang.String") {
                     condition = condition.replaceFirst("\\?", "'" + value.toString() + "'");
                 } else {
                     condition = condition.replaceFirst("\\?", value.toString());
                 }
+                j--;
             }
-            i--;
+            i++;
         }
 
-        //set "select all" query if condition is not provided
-        if (condition == null || condition.isEmpty()) {
-            condition = "*:*";
-        }
         if (log.isDebugEnabled()) {
             log.debug("Resolved condition for collection : " + condition);
         }

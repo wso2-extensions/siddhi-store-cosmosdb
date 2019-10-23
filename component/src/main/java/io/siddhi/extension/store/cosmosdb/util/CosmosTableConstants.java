@@ -37,24 +37,6 @@ public class CosmosTableConstants {
 
     public static final String VARIABLE_CARBON_HOME = "carbon.home";
 
-
-    //Copied from CosmosDB
-    //Placeholder strings needed for processing the query configuration file
-    //public static final String CosmosDB_QUERY_CONFIG_FILE = "cosmosdb-table-config.xml";
-    public static final String PLACEHOLDER_COLUMNS_FOR_CREATE = "{{COLUMNS, PRIMARY_KEYS}}";
-    public static final String PLACEHOLDER_CONDITION = "{{CONDITION}}";
-    public static final String PLACEHOLDER_COLUMNS_VALUES = "{{COLUMNS_AND_VALUES}}";
-    public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
-    public static final String PLACEHOLDER_INDEX = "{{INDEX_COLUMNS}}";
-    public static final String PLACEHOLDER_Q = "{{Q}}";
-    public static final String PLACEHOLDER_COLUMNS = "{{COLUMNS}}";
-    public static final String PLACEHOLDER_VALUES = "{{VALUES}}";
-    public static final String PLACEHOLDER_SELECTORS = "{{SELECTORS}}";
-    public static final String PLACEHOLDER_INNER_QUERY = "{{INNER_QUERY}}";
-    public static final String PLACEHOLDER_LIMIT_WRAPPER = "{{LIMIT_WRAPPER}}";
-    public static final String PLACEHOLDER_OFFSET_WRAPPER = "{{OFFSET_WRAPPER}}";
-    public static final String PLACEHOLDER_INDEX_NUMBER = "{{INDEX_NUM}}";
-
     //Miscellaneous SQL constants
     public static final String SQL_MATH_ADD = "+";
     public static final String SQL_MATH_DIVIDE = "/";
