@@ -129,7 +129,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private boolean initialCollectionTest;
     private String databaseId = "ToDoList";
     private String collectionId = "Items";
-    private List<Attribute> attributes;
+    private Object[] attributes;
     private String tableName = this.collectionId;
 
 
@@ -214,18 +214,16 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 .queryDocuments(getcollectionId().getSelfLink(),
                         query, options)
                 .getQueryIterable().toList();
-
-
-        /*for (Document toDeleteDocument : documentList) {
+        /*for (Document findDocument : documentList) {
             try {
-                documentClient.deleteDocument(toDeleteDocument.getSelfLink(), null);
+                documentClient.readDocument(findDocument.getSelfLink(), null);
             } catch (DocumentClientException e) {
                 e.printStackTrace();
             }
         }*/
-        List<Document> rs = documentList;
+        attributes = findConditionParameterMap.values().toArray();
 
-        return new CosmosIterator(rs, this.attributes, this.tableName);
+        return new CosmosIterator(documentList, attributes);
     }
 
     @Override
