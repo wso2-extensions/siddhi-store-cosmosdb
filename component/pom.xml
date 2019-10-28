@@ -65,13 +65,13 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.3.4</version>
+            <version>4.5.10</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.3.2</version>
+            <version>4.4.12</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.json.wso2/json -->
@@ -132,6 +132,24 @@
             <artifactId>activation</artifactId>
             <version>${javax.annotation.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <!--        <dependency>-->
+        <!--            <groupId>org.slf4j</groupId>-->
+        <!--            <artifactId>slf4j-api</artifactId>-->
+        <!--            <version>1.7.28</version>-->
+        <!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.uuid/java-uuid-generator -->
+        <dependency>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <version>3.1.0</version>
+        </dependency>
 
 
     </dependencies>
@@ -178,12 +196,25 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
                             com.microsoft.azure.documentdb.*,
+                            <!--org.apache.http.conn.*,
+                            org.apache.http.client.*,
+                            org.apache.http.impl.conn.*,
+                            org.apache.http.pool.*,
+                            org.apache.http.concurrent.*,
+                            org.apache.http.config.*,
+                            org.apache.http.util.*,
+                            org.apache.http.ssl.*,
+                            org.apache.http.protocol.*,
+                            org.apache.http.io.*,
+                            org.apache.http.entity.*,-->
                             org.apache.http.*,
                             com.google.gson.*,
-                            org.apache.commons.*
+                            org.apache.commons.*,
+                            org.joda.time.*,
+                            com.fasterxml.uuid.*
                         </Private-Package>
                         <Export-Package>
-                            io.siddhi.extension.store.cosmosdb.*
+                            io.siddhi.extension.store.cosmosdb.*,
                         </Export-Package>
                         <Import-Package>
                             org.apache.commons.logging.*;version="${commons.logging.version.range}",
@@ -191,6 +222,8 @@
                             io.siddhi.core.*;version="${siddhi.version.range}",
                             io.siddhi.query.api.*;version="${siddhi.version.range}",
                             org.json.*,
+                            org.slf4j.*,
+                            com.fasterxml.jackson.*
                         </Import-Package>
                         <Include-Resource>
                             META-INF=target/classes/META-INF

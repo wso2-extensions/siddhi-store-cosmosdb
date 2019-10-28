@@ -307,7 +307,21 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected void updateOrAdd(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String, CompiledExpression> map, List<Map<String, Object>> list1, List<Object[]> list2) throws ConnectionUnavailableException {
-
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> conditionParameterMap = list.get(i);
+            int ordinal = list.indexOf(conditionParameterMap);
+            try {
+                Document toUpdateDocument = new Document();
+                for (String key : list1.get(ordinal).keySet()) {
+                    Object value = list1.get(ordinal).get(key);
+                    toUpdateDocument.set(key, value);
+                }
+                documentClient.upsertDocument(getcollectionId().getSelfLink(), toUpdateDocument,
+                        null, false);
+            } catch (DocumentClientException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
