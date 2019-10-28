@@ -18,6 +18,7 @@
 package io.siddhi.extension.store.cosmosdb;
 
 import com.microsoft.azure.documentdb.Document;
+import com.microsoft.azure.documentdb.DocumentClient;
 import io.siddhi.core.table.record.RecordIterator;
 import io.siddhi.extension.store.cosmosdb.exception.CosmosTableException;
 
@@ -37,6 +38,7 @@ public class CosmosIterator implements RecordIterator<Object[]> {
     private Object[] nextValue;
     private Object[] attributes;
     private List<Document> documents;
+    private static DocumentClient documentClient;
 
 
     public CosmosIterator(List<Document> documentList, Object[] attributes) {
@@ -87,10 +89,19 @@ public class CosmosIterator implements RecordIterator<Object[]> {
         //for (Document document : documentList) {
         for (int i = 0; i < documentList.size(); i++) {
             Document document = documentList.get(i);
+
             for (Object attributeName : attributes) {
                 //Object attributeValue = document.getObject("'"+attributeName.toString()+"'");
                 //Object attributeValue = document.propertyBag.get(attributeName.getName());
-                Object attributeValue = attributeName;
+                //Object attributeValue = attributeName;
+                Object attributeValue = document;
+
+                /*try {
+                    attributeValue = documentClient.readDocument(document.getString(String.valueOf(attributeName)), null);
+                } catch (DocumentClientException e) {
+                    e.printStackTrace();
+                }*/
+
                 /*SqlQuerySpec query = new SqlQuerySpec();
                 query.setQueryText("SELECT VALUE FROM " + document + " WHERE " + attributeName.getName());
                 FeedOptions options = new FeedOptions();

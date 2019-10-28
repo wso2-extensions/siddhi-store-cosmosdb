@@ -70,10 +70,10 @@ public class CosmosTableUtils {
         Object[] entries = compiledCondition.getParameters().values().toArray();
         Object[] attributeKeys = conditionParameterMap.keySet().toArray();
         Object[] keys = compiledCondition.getParameters().keySet().toArray();
-        int i = 0;
-        while (i < keys.length) {
-            if (entries[i] instanceof Constant) {
-                Constant value = (Constant) entries[i];
+        int paramCounter = 0;
+        while (paramCounter < keys.length) {
+            if (entries[paramCounter] instanceof Constant) {
+                Constant value = (Constant) entries[paramCounter];
                 //value.getValue();
                 if (value.getType() == Attribute.Type.STRING) {
                     condition = condition.replaceFirst("\\?", "'" + value.getValue().toString() + "'");
@@ -82,17 +82,17 @@ public class CosmosTableUtils {
                 }
 
             } else {
-                int j = attributeKeys.length - 1;
-                Object key = attributeKeys[j];
+                int attributeCounter = attributeKeys.length - 1;
+                Object key = attributeKeys[attributeCounter];
                 Object value = conditionParameterMap.get(key);
                 if (value.getClass().getName() == "java.lang.String") {
                     condition = condition.replaceFirst("\\?", "'" + value.toString() + "'");
                 } else {
                     condition = condition.replaceFirst("\\?", value.toString());
                 }
-                j--;
+                attributeCounter--;
             }
-            i++;
+            paramCounter++;
         }
 
         if (log.isDebugEnabled()) {

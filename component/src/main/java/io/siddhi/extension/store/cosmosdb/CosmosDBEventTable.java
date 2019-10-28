@@ -222,7 +222,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             }
         }*/
         attributes = findConditionParameterMap.values().toArray();
-
+        //attributes = ((CosmosCompiledCondition) compiledCondition).getParameters().entrySet().toArray();
         return new CosmosIterator(documentList, attributes);
     }
 
@@ -248,12 +248,10 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 FeedOptions options = new FeedOptions();
                 options.setEnableScanInQuery(true);
 
-                //System.out.println(query);
                 List<Document> documentList = documentClient
                         .queryDocuments(getcollectionId().getSelfLink(),
                                 query, options)
                         .getQueryIterable().toList();
-
 
                 for (Document toDeleteDocument : documentList) {
                     try {
@@ -271,11 +269,45 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected void update(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String, CompiledExpression> map, List<Map<String, Object>> list1) throws ConnectionUnavailableException {
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> conditionParameterMap = list.get(i);
+            int ordinal = list.indexOf(conditionParameterMap);
+            String condition = null;
+            try {
+                condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
+                        conditionParameterMap);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            SqlQuerySpec query = new SqlQuerySpec();
+            query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
+            FeedOptions options = new FeedOptions();
+            options.setEnableScanInQuery(true);
 
+            List<Document> documentList = documentClient
+                    .queryDocuments(getcollectionId().getSelfLink(),
+                            query, options)
+                    .getQueryIterable().toList();
+
+            for (Document toUpdateDocument : documentList) {
+                try {
+                    for (String key : list1.get(ordinal).keySet()) {
+                        Object value = list1.get(ordinal).get(key);
+                        toUpdateDocument.set(key, value);
+                    }
+                    documentClient.replaceDocument(toUpdateDocument,
+                            null);
+
+                } catch (DocumentClientException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
     protected void updateOrAdd(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String, CompiledExpression> map, List<Map<String, Object>> list1, List<Object[]> list2) throws ConnectionUnavailableException {
+
 
     }
 
