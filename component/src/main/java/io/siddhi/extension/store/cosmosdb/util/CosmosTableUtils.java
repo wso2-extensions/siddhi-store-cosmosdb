@@ -71,6 +71,7 @@ public class CosmosTableUtils {
         Object[] attributeKeys = conditionParameterMap.keySet().toArray();
         Object[] keys = compiledCondition.getParameters().keySet().toArray();
         int paramCounter = 0;
+        int attributeCounter = attributeKeys.length - 1;
         while (paramCounter < keys.length) {
             if (entries[paramCounter] instanceof Constant) {
                 Constant value = (Constant) entries[paramCounter];
@@ -82,7 +83,7 @@ public class CosmosTableUtils {
                 }
 
             } else {
-                int attributeCounter = attributeKeys.length - 1;
+
                 Object key = attributeKeys[attributeCounter];
                 Object value = conditionParameterMap.get(key);
                 if (value.getClass().getName() == "java.lang.String") {

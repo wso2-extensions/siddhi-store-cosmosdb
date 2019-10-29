@@ -270,7 +270,10 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     @Override
     protected void update(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String, CompiledExpression> map, List<Map<String, Object>> list1) throws ConnectionUnavailableException {
         for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> conditionParameterMap = list.get(i);
+            Map<String, Object> conditionParameterMap = null;
+            for (int j = 0; j < list.size(); j++) {
+                conditionParameterMap = list.get(j);
+            }
             int ordinal = list.indexOf(conditionParameterMap);
             String condition = null;
             try {
@@ -307,7 +310,47 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected void updateOrAdd(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String, CompiledExpression> map, List<Map<String, Object>> list1, List<Object[]> list2) throws ConnectionUnavailableException {
-        for (int i = 0; i < list.size(); i++) {
+        Map<String, Object> conditionParameterMap = null;
+        for (int j = 0; j < list.size(); j++) {
+            conditionParameterMap = list.get(j);
+        }
+        int ordinal = list.indexOf(conditionParameterMap);
+        String condition = null;
+        try {
+            condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
+                    conditionParameterMap);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        SqlQuerySpec query = new SqlQuerySpec();
+        query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
+        FeedOptions options = new FeedOptions();
+        options.setEnableScanInQuery(true);
+
+        List<Document> documentList = documentClient
+                .queryDocuments(getcollectionId().getSelfLink(),
+                        query, options)
+                .getQueryIterable().toList();
+        //update
+        if (documentList.size() > 0) {
+            for (Document toUpdateDocument : documentList) {
+                try {
+                    for (String key : list1.get(ordinal).keySet()) {
+                        Object value = list1.get(ordinal).get(key);
+                        toUpdateDocument.set(key, value);
+                    }
+                    documentClient.replaceDocument(toUpdateDocument,
+                            null);
+
+                } catch (DocumentClientException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            add(list2);
+        }
+
+        /*for (int i = 0; i < list.size(); i++) {
             Map<String, Object> conditionParameterMap = list.get(i);
             int ordinal = list.indexOf(conditionParameterMap);
             try {
@@ -321,7 +364,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             } catch (DocumentClientException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
     }
 

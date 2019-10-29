@@ -94,7 +94,7 @@ public class CosmosIterator implements RecordIterator<Object[]> {
                 //Object attributeValue = document.getObject("'"+attributeName.toString()+"'");
                 //Object attributeValue = document.propertyBag.get(attributeName.getName());
                 //Object attributeValue = attributeName;
-                Object attributeValue = document;
+                Object attributeValue = document.getObject(attributeName.toString());
 
                 /*try {
                     attributeValue = documentClient.readDocument(document.getString(String.valueOf(attributeName)), null);
