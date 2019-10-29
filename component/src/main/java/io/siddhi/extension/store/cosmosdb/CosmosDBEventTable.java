@@ -129,7 +129,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private boolean initialCollectionTest;
     private String databaseId = "ToDoList";
     private String collectionId = "Items";
-    private Object[] attributes;
+    private List<String> attributes;
     private String tableName = this.collectionId;
 
 
@@ -214,21 +214,28 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 .queryDocuments(getcollectionId().getSelfLink(),
                         query, options)
                 .getQueryIterable().toList();
-        /*for (Document findDocument : documentList) {
-            try {
-                documentClient.readDocument(findDocument.getSelfLink(), null);
-            } catch (DocumentClientException e) {
-                e.printStackTrace();
-            }
-        }*/
-        attributes = findConditionParameterMap.values().toArray();
-        //attributes = ((CosmosCompiledCondition) compiledCondition).getParameters().entrySet().toArray();
-        return new CosmosIterator(documentList, attributes);
+        return new CosmosIterator(documentList, this.attributeNames);
     }
 
     @Override
     protected boolean contains(Map<String, Object> map, CompiledCondition compiledCondition) throws ConnectionUnavailableException {
-        return false;
+        String condition = null;
+        try {
+            condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
+                    map);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        SqlQuerySpec query = new SqlQuerySpec();
+        query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
+        FeedOptions options = new FeedOptions();
+        options.setEnableScanInQuery(true);
+
+        List<Document> documentList = documentClient
+                .queryDocuments(getcollectionId().getSelfLink(),
+                        query, options)
+                .getQueryIterable().toList();
+        return documentList.size() > 0;
     }
 
     @Override
