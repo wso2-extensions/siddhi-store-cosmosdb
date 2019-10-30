@@ -76,6 +76,10 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                 @Parameter(name = "cosmosdb.key",
                         description = "The CosmosDB Master key for the CosmosDB data store.",
                         type = {DataType.STRING}),
+                @Parameter(name = "container.name",
+                        description = "The name of the CosmosDB container containing this event table",
+                        defaultValue = "Name of the CosmosDB container",
+                        type = {DataType.STRING}),
                 @Parameter(name = "collection.name",
                         description = "The name of the collection in the store this Event Table should" +
                                 " be persisted as.",
@@ -135,11 +139,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private static Database databaseCache;
     private static DocumentCollection collectionCache;
     private List<String> attributeNames;
-    private boolean initialCollectionTest;
-    private String databaseId = "ToDoList";
-    private String collectionId = "Items";
-    private List<String> attributes;
-    private String tableName = this.collectionId;
+    private String databaseId;
+    private String collectionId;
 
 
     @Override
@@ -152,11 +153,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
         this.initializeConnectionParameters(storeAnnotation, configReader);
 
+        this.databaseId = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_CONTAINER_NAME);
+
         String customCollectionName =
                 storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
         this.collectionId = CosmosTableUtils.isEmpty(customCollectionName) ? tableDefinition.getId() :
                 customCollectionName;
-        this.initialCollectionTest = false;
     }
 
     /**
@@ -351,14 +353,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 try {
                     Database databaseDefinition = new Database();
                     databaseDefinition.setId(databaseId);
-
                     databaseCache = documentClient.createDatabase(databaseDefinition, null).getResource();
                 } catch (DocumentClientException e) {
                     log.error("Failed to create the database", e);
                 }
             }
         }
-
         return databaseCache;
     }
 
@@ -377,7 +377,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 try {
                     DocumentCollection collectionDefinition = new DocumentCollection();
                     collectionDefinition.setId(collectionId);
-
                     collectionCache = documentClient.createCollection(getDatabaseId().getSelfLink(),
                             collectionDefinition, null).getResource();
                 } catch (DocumentClientException e) {
@@ -385,7 +384,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 }
             }
         }
-
         return collectionCache;
     }
 
