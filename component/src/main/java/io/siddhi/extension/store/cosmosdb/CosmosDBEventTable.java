@@ -1,24 +1,34 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *
  */
+
 package io.siddhi.extension.store.cosmosdb;
 
 import com.google.gson.Gson;
-import com.microsoft.azure.documentdb.*;
+import com.microsoft.azure.documentdb.ConnectionPolicy;
+import com.microsoft.azure.documentdb.ConsistencyLevel;
+import com.microsoft.azure.documentdb.Database;
+import com.microsoft.azure.documentdb.Document;
+import com.microsoft.azure.documentdb.DocumentClient;
+import com.microsoft.azure.documentdb.DocumentClientException;
+import com.microsoft.azure.documentdb.DocumentCollection;
+import com.microsoft.azure.documentdb.FeedOptions;
+import com.microsoft.azure.documentdb.SqlQuerySpec;
 import io.siddhi.annotation.Example;
 import io.siddhi.annotation.Extension;
 import io.siddhi.annotation.Parameter;
@@ -31,7 +41,6 @@ import io.siddhi.core.table.record.RecordIterator;
 import io.siddhi.core.util.collection.operator.CompiledCondition;
 import io.siddhi.core.util.collection.operator.CompiledExpression;
 import io.siddhi.core.util.config.ConfigReader;
-import io.siddhi.extension.store.cosmosdb.exception.CosmosTableException;
 import io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants;
 import io.siddhi.extension.store.cosmosdb.util.CosmosTableUtils;
 import io.siddhi.query.api.annotation.Annotation;
@@ -60,9 +69,9 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
         parameters = {
                 @Parameter(name = "cosmosdb.uri",
                         description = "The CosmosDB URI for the CosmosDB data store. The uri must be of the format \n" +
-                                "cosmosdb://[username:password@]host1[:port1][,hostN[:portN]][/[database][?options]]\n" +
-                                "The options specified in the uri will override any connection options specified in " +
-                                "the deployment yaml file.",
+                                "cosmosdb://[username:password@]host1[:port1][,hostN[:portN]][/[database][?options]]\n"
+                                + "The options specified in the uri will override any connection options specified in "
+                                + "the deployment yaml file.",
                         type = {DataType.STRING}),
                 @Parameter(name = "cosmosdb.key",
                         description = "The CosmosDB Master key for the CosmosDB data store.",
@@ -133,22 +142,20 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private String tableName = this.collectionId;
 
 
-
     @Override
     protected void init(TableDefinition tableDefinition, ConfigReader configReader) {
         this.attributeNames =
                 tableDefinition.getAttributeList().stream().map(Attribute::getName).collect(Collectors.toList());
 
-        Annotation storeAnnotation = AnnotationHelper
-                .getAnnotation(ANNOTATION_STORE, tableDefinition.getAnnotations());
+        Annotation storeAnnotation = AnnotationHelper.getAnnotation(ANNOTATION_STORE, tableDefinition.getAnnotations());
 
 
         this.initializeConnectionParameters(storeAnnotation, configReader);
 
-        String customCollectionName = storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
-        this.collectionId = CosmosTableUtils.isEmpty(customCollectionName) ?
-                tableDefinition.getId() : customCollectionName;
+        String customCollectionName =
+                storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
+        this.collectionId = CosmosTableUtils.isEmpty(customCollectionName) ? tableDefinition.getId() :
+                customCollectionName;
         this.initialCollectionTest = false;
     }
 
@@ -157,16 +164,14 @@ public class CosmosDBEventTable extends AbstractRecordTable {
      *
      * @param storeAnnotation the source annotation which contains the needed parameters.
      * @param configReader    {@link ConfigReader} ConfigurationReader.
-     * @throws CosmosTableException when store annotation does not contain cosmosdb.uri or contains an illegal
-     *                              argument for cosmosdb.uri
      */
     private void initializeConnectionParameters(Annotation storeAnnotation, ConfigReader configReader) {
-        final String HOST = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_URI);
-        final String MASTER_KEY = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_MASTERKEY);
+        String host = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_URI);
+        String masterKey = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_MASTER_KEY);
 
         if (documentClient == null) {
-            documentClient = new DocumentClient(HOST, MASTER_KEY,
-                    ConnectionPolicy.GetDefault(), ConsistencyLevel.Session);
+            documentClient = new DocumentClient(host, masterKey, ConnectionPolicy.GetDefault(),
+                    ConsistencyLevel.Session);
         }
 
 
@@ -175,72 +180,56 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     @Override
     protected void add(List<Object[]> records) throws ConnectionUnavailableException {
 
-        for (int i = 0; i < records.size(); i++) {
-            Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(records.get(i), this.attributeNames);
+        for (Object[] record : records) {
+            Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(record, this.attributeNames);
             Document insertDocument = new Document(gson.toJson(insertMap));
 
             try {
                 // Persist the document using the DocumentClient.
-                documentClient.createDocument(
-                        getcollectionId().getSelfLink(), insertDocument, null,
-                        false).getResource();
+                documentClient.createDocument(getCollectionId().getSelfLink(), insertDocument, null, false);
             } catch (DocumentClientException e) {
-                log.error("Failed to add record", e);
+                log.error("Failed to add document", e);
             }
         }
     }
 
 
     @Override
-    protected RecordIterator<Object[]> find(Map<String, Object> findConditionParameterMap, CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+    protected RecordIterator<Object[]> find(Map<String, Object> findConditionParameterMap,
+                                            CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+        List<Document> documentList = null;
         try {
-            return findRecords(findConditionParameterMap, compiledCondition);
-        } catch (CosmosTableException | SQLException e) {
-            throw new ConnectionUnavailableException("Error while performing the find operation " + e.getMessage(),
-                    e);
-        }
-    }
-
-    private CosmosIterator findRecords(Map<String, Object> findConditionParameterMap, CompiledCondition
-            compiledCondition) throws SQLException {
-        String condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
-                findConditionParameterMap);
-        SqlQuerySpec query = new SqlQuerySpec();
-        query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
-        FeedOptions options = new FeedOptions();
-        options.setEnableScanInQuery(true);
-
-        List<Document> documentList = documentClient
-                .queryDocuments(getcollectionId().getSelfLink(),
-                        query, options)
-                .getQueryIterable().toList();
-        return new CosmosIterator(documentList, this.attributeNames);
-    }
-
-    @Override
-    protected boolean contains(Map<String, Object> map, CompiledCondition compiledCondition) throws ConnectionUnavailableException {
-        String condition = null;
-        try {
-            condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
-                    map);
+            documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, findConditionParameterMap);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Failed to find document", e);
         }
-        SqlQuerySpec query = new SqlQuerySpec();
-        query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
-        FeedOptions options = new FeedOptions();
-        options.setEnableScanInQuery(true);
+        if (documentList != null) {
+            return new CosmosIterator(documentList, this.attributeNames);
+        } else {
+            return null;
+        }
+    }
 
-        List<Document> documentList = documentClient
-                .queryDocuments(getcollectionId().getSelfLink(),
-                        query, options)
-                .getQueryIterable().toList();
-        return documentList.size() > 0;
+
+    @Override
+    protected boolean contains(Map<String, Object> containsConditionParameterMap,
+                               CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+        List<Document> documentList = null;
+        try {
+            documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, containsConditionParameterMap);
+        } catch (SQLException e) {
+            log.error("Failed to find document", e);
+        }
+        if (documentList != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
-    protected void delete(List<Map<String, Object>> deleteConditionParameterMaps, CompiledCondition compiledCondition)
-            throws ConnectionUnavailableException {
+    protected void delete(List<Map<String, Object>> deleteConditionParameterMaps,
+                          CompiledCondition compiledCondition) throws ConnectionUnavailableException {
         this.batchProcessDelete(deleteConditionParameterMaps, compiledCondition);
     }
 
@@ -248,131 +237,87 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                                     CompiledCondition compiledCondition) throws ConnectionUnavailableException {
         try {
             for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
-                String condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
+                List<Document> documentList = queryDocuments((CosmosCompiledCondition) compiledCondition,
                         deleteConditionParameterMap);
-                SqlQuerySpec query = new SqlQuerySpec();
-                query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
-                FeedOptions options = new FeedOptions();
-                options.setEnableScanInQuery(true);
-
-                List<Document> documentList = documentClient
-                        .queryDocuments(getcollectionId().getSelfLink(),
-                                query, options)
-                        .getQueryIterable().toList();
-
                 for (Document toDeleteDocument : documentList) {
                     try {
                         documentClient.deleteDocument(toDeleteDocument.getSelfLink(), null);
                     } catch (DocumentClientException e) {
-                        e.printStackTrace();
+                        log.error("Failed to delete document", e);
                     }
                 }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Failed to find document", e);
         }
     }
 
     @Override
-    protected void update(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String, CompiledExpression> map, List<Map<String, Object>> list1) throws ConnectionUnavailableException {
+    protected void update(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String,
+            CompiledExpression> map, List<Map<String, Object>> list1) throws ConnectionUnavailableException {
         for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> conditionParameterMap = null;
-            for (int j = 0; j < list.size(); j++) {
-                conditionParameterMap = list.get(j);
+            Map<String, Object> updateConditionParameterMap = null;
+            for (Map<String, Object> stringObjectMap : list) {
+                updateConditionParameterMap = stringObjectMap;
             }
-            int ordinal = list.indexOf(conditionParameterMap);
-            String condition = null;
+            int ordinal = list.indexOf(updateConditionParameterMap);
+            List<Document> documentList = null;
             try {
-                condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
-                        conditionParameterMap);
+                documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, updateConditionParameterMap);
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("Failed to find document", e);
             }
-            SqlQuerySpec query = new SqlQuerySpec();
-            query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
-            FeedOptions options = new FeedOptions();
-            options.setEnableScanInQuery(true);
 
-            List<Document> documentList = documentClient
-                    .queryDocuments(getcollectionId().getSelfLink(),
-                            query, options)
-                    .getQueryIterable().toList();
+            if (documentList != null) {
+                for (Document toUpdateDocument : documentList) {
+                    try {
+                        for (String key : list1.get(ordinal).keySet()) {
+                            Object value = list1.get(ordinal).get(key);
+                            toUpdateDocument.set(key, value);
+                        }
+                        documentClient.replaceDocument(toUpdateDocument, null);
 
-            for (Document toUpdateDocument : documentList) {
-                try {
-                    for (String key : list1.get(ordinal).keySet()) {
-                        Object value = list1.get(ordinal).get(key);
-                        toUpdateDocument.set(key, value);
+                    } catch (DocumentClientException e) {
+                        log.error("Failed to update document", e);
                     }
-                    documentClient.replaceDocument(toUpdateDocument,
-                            null);
-
-                } catch (DocumentClientException e) {
-                    e.printStackTrace();
                 }
             }
         }
     }
 
     @Override
-    protected void updateOrAdd(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String, CompiledExpression> map, List<Map<String, Object>> list1, List<Object[]> list2) throws ConnectionUnavailableException {
-        Map<String, Object> conditionParameterMap = null;
-        for (int j = 0; j < list.size(); j++) {
-            conditionParameterMap = list.get(j);
+    protected void updateOrAdd(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String,
+            CompiledExpression> map, List<Map<String, Object>> list1, List<Object[]> list2)
+            throws ConnectionUnavailableException {
+        Map<String, Object> updateOrAddConditionParameterMap = null;
+        for (Map<String, Object> stringObjectMap : list) {
+            updateOrAddConditionParameterMap = stringObjectMap;
         }
-        int ordinal = list.indexOf(conditionParameterMap);
-        String condition = null;
+        int ordinal = list.indexOf(updateOrAddConditionParameterMap);
+        List<Document> documentList = null;
         try {
-            condition = CosmosTableUtils.resolveCondition((CosmosCompiledCondition) compiledCondition,
-                    conditionParameterMap);
+            documentList = queryDocuments((CosmosCompiledCondition) compiledCondition,
+                    updateOrAddConditionParameterMap);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Failed to find document", e);
         }
-        SqlQuerySpec query = new SqlQuerySpec();
-        query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
-        FeedOptions options = new FeedOptions();
-        options.setEnableScanInQuery(true);
-
-        List<Document> documentList = documentClient
-                .queryDocuments(getcollectionId().getSelfLink(),
-                        query, options)
-                .getQueryIterable().toList();
         //update
-        if (documentList.size() > 0) {
+        if (documentList != null) {
             for (Document toUpdateDocument : documentList) {
                 try {
                     for (String key : list1.get(ordinal).keySet()) {
                         Object value = list1.get(ordinal).get(key);
                         toUpdateDocument.set(key, value);
                     }
-                    documentClient.replaceDocument(toUpdateDocument,
-                            null);
-
+                    documentClient.replaceDocument(toUpdateDocument, null);
                 } catch (DocumentClientException e) {
-                    e.printStackTrace();
+                    log.error("Failed to update document", e);
                 }
             }
         } else {
             add(list2);
         }
-
-        /*for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> conditionParameterMap = list.get(i);
-            int ordinal = list.indexOf(conditionParameterMap);
-            try {
-                Document toUpdateDocument = new Document();
-                for (String key : list1.get(ordinal).keySet()) {
-                    Object value = list1.get(ordinal).get(key);
-                    toUpdateDocument.set(key, value);
-                }
-                documentClient.upsertDocument(getcollectionId().getSelfLink(), toUpdateDocument,
-                        null, false);
-            } catch (DocumentClientException e) {
-                e.printStackTrace();
-            }
-        }*/
-
     }
 
     @Override
@@ -389,152 +334,13 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         return compileCondition(expressionBuilder);
     }
 
-    /*@Override
-    protected CompiledSelection compileSelection(List<AbstractQueryableRecordTable.SelectAttributeBuilder> selectAttributeBuilders,
-                                                 List<ExpressionBuilder> groupByExpressionBuilder,
-                                                 ExpressionBuilder havingExpressionBuilder,
-                                                 List<AbstractQueryableRecordTable.OrderByAttributeBuilder> orderByAttributeBuilders, Long limit,
-                                                 Long offset) {
-        return new CosmosCompiledSelection(
-                compileSelectClause(selectAttributeBuilders),
-                (groupByExpressionBuilder == null) ? null : compileClause(groupByExpressionBuilder, false),
-                (havingExpressionBuilder == null) ? null :
-                        compileClause(Collections.singletonList(havingExpressionBuilder), true),
-                (orderByAttributeBuilders == null) ? null : compileOrderByClause(orderByAttributeBuilders),
-                limit, offset);
-    }*/
 
-    /*private CosmosCompiledCondition compileSelectClause(List<AbstractQueryableRecordTable.SelectAttributeBuilder> selectAttributeBuilders) {
-        StringBuilder compiledSelectionList = new StringBuilder();
-        StringBuilder compiledSubSelectQuerySelection = new StringBuilder();
-        StringBuilder compiledOuterOnCondition = new StringBuilder();
-
-        SortedMap<Integer, Object> paramMap = new TreeMap<>();
-        int offset = 0;
-
-        boolean containsLastFunction = false;
-        List<CosmosConditionVisitor> conditionVisitorList = new ArrayList<>();
-        for (AbstractQueryableRecordTable.SelectAttributeBuilder attributeBuilder : selectAttributeBuilders) {
-            CosmosConditionVisitor visitor = new CosmosConditionVisitor(this.tableName, false);
-            attributeBuilder.getExpressionBuilder().build(visitor);
-            if (visitor.isLastConditionExist()) {
-                containsLastFunction = true;
-            }
-            conditionVisitorList.add(visitor);
-        }
-
-        boolean isLastFunctionEncountered = false;
-        for (int i = 0; i < conditionVisitorList.size(); i++) {
-            CosmosConditionVisitor visitor = conditionVisitorList.get(i);
-            AbstractQueryableRecordTable.SelectAttributeBuilder selectAttributeBuilder = selectAttributeBuilders.get(i);
-
-            String compiledCondition = visitor.returnCondition();
-
-            if (containsLastFunction) {
-                if (visitor.isLastConditionExist()) {
-                    // Add the select columns with function incrementalAggregator:last()
-                    compiledSelectionList.append(compiledCondition).append(SQL_AS)
-                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
-                    if (!isLastFunctionEncountered) {
-                        //Only add max variable for incrementalAggregator:last() once
-                        compiledSubSelectQuerySelection.append(visitor.returnMaxVariableCondition()).append(SEPARATOR);
-                        compiledOuterOnCondition.append(visitor.getOuterCompiledCondition()).append(SQL_AND);
-                        isLastFunctionEncountered = true;
-                    }
-                } else if (visitor.isContainsAttributeFunction()) {
-                    //Add columns with attributes function such as sum(), max()
-                    //Add max(variable) by default since oracle all columns not in group by must have
-                    // attribute function
-                    compiledSelectionList.append(SQL_MAX).append(OPEN_PARENTHESIS)
-                            .append(SUB_SELECT_QUERY_REF).append(".").append(selectAttributeBuilder.getRename())
-                            .append(CLOSE_PARENTHESIS).append(SQL_AS)
-                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
-                    compiledSubSelectQuerySelection.append(compiledCondition).append(SQL_AS)
-                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
-                } else {
-                    // Add group by column
-                    compiledSelectionList.append(compiledCondition).append(SQL_AS)
-                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
-                    compiledSubSelectQuerySelection.append(compiledCondition).append(SQL_AS)
-                            .append(selectAttributeBuilder.getRename()).append(SEPARATOR);
-                    compiledOuterOnCondition.append(visitor.getOuterCompiledCondition()).append(SQL_AND);
-                }
-            } else {
-                compiledSelectionList.append(compiledCondition);
-                if (selectAttributeBuilder.getRename() != null && !selectAttributeBuilder.getRename().isEmpty()) {
-                    compiledSelectionList.append(SQL_AS).
-                            append(selectAttributeBuilder.getRename());
-                }
-                compiledSelectionList.append(SEPARATOR);
-            }
-
-            Map<Integer, Object> conditionParamMap = visitor.getParameters();
-            int maxOrdinal = 0;
-            for (Map.Entry<Integer, Object> entry : conditionParamMap.entrySet()) {
-                Integer ordinal = entry.getKey();
-                paramMap.put(ordinal + offset, entry.getValue());
-                if (ordinal > maxOrdinal) {
-                    maxOrdinal = ordinal;
-                }
-            }
-            offset = offset + maxOrdinal;
-        }
-
-        if (compiledSelectionList.length() > 0) {
-            compiledSelectionList.setLength(compiledSelectionList.length() - 2); // Removing the last comma separator.
-        }
-
-        if (compiledSubSelectQuerySelection.length() > 0) {
-            compiledSubSelectQuerySelection.setLength(compiledSubSelectQuerySelection.length() - 2);
-        }
-
-        if (compiledOuterOnCondition.length() > 0) {
-            compiledOuterOnCondition.setLength(compiledOuterOnCondition.length() - 4);
-        }
-
-        return new CosmosCompiledCondition(compiledSelectionList.toString(), paramMap, false, 0, containsLastFunction,
-                compiledSubSelectQuerySelection.toString(), compiledOuterOnCondition.toString(), null, null);
-    }
-
-    private CosmosCompiledCondition compileClause(List<ExpressionBuilder> expressionBuilders, boolean isHavingClause) {
-        StringBuilder compiledSelectionList = new StringBuilder();
-        SortedMap<Integer, Object> paramMap = new TreeMap<>();
-        int offset = 0;
-
-        for (ExpressionBuilder expressionBuilder : expressionBuilders) {
-            CosmosConditionVisitor visitor = new CosmosConditionVisitor(this.tableName, isHavingClause);
-            expressionBuilder.build(visitor);
-
-            String compiledCondition = visitor.returnCondition();
-            compiledSelectionList.append(compiledCondition).append(SEPARATOR);
-
-            Map<Integer, Object> conditionParamMap = visitor.getParameters();
-            int maxOrdinal = 0;
-            for (Map.Entry<Integer, Object> entry : conditionParamMap.entrySet()) {
-                Integer ordinal = entry.getKey();
-                paramMap.put(ordinal + offset, entry.getValue());
-                if (ordinal > maxOrdinal) {
-                    maxOrdinal = ordinal;
-                }
-            }
-            offset = offset + maxOrdinal;
-        }
-
-        if (compiledSelectionList.length() > 0) {
-            compiledSelectionList.setLength(compiledSelectionList.length() - 2); // Removing the last comma separator.
-        }
-        return new CosmosCompiledCondition(compiledSelectionList.toString(), paramMap, false,
-                0, false, null, null, null, null);
-    }
-*/
-
-    private Database getdatabaseId() {
+    private Database getDatabaseId() {
         if (databaseCache == null) {
             // Get the database if it exists
-            List<Database> databaseList = documentClient
-                    .queryDatabases(
-                            "SELECT * FROM root r WHERE r.id='" + databaseId
-                                    + "'", null).getQueryIterable().toList();
+            List<Database> databaseList =
+                    documentClient.queryDatabases("SELECT * FROM root r WHERE r.id='" + databaseId + "'",
+                            null).getQueryIterable().toList();
 
             if (databaseList.size() > 0) {
                 // Cache the database object so we won't have to query for it
@@ -546,8 +352,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     Database databaseDefinition = new Database();
                     databaseDefinition.setId(databaseId);
 
-                    databaseCache = documentClient.createDatabase(
-                            databaseDefinition, null).getResource();
+                    databaseCache = documentClient.createDatabase(databaseDefinition, null).getResource();
                 } catch (DocumentClientException e) {
                     log.error("Failed to create the database", e);
                 }
@@ -557,14 +362,11 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         return databaseCache;
     }
 
-    private DocumentCollection getcollectionId() {
+    private DocumentCollection getCollectionId() {
         if (collectionCache == null) {
             // Get the collection if it exists.
-            List<DocumentCollection> collectionList = documentClient
-                    .queryCollections(
-                            getdatabaseId().getSelfLink(),
-                            "SELECT * FROM root r WHERE r.id='" + collectionId
-                                    + "'", null).getQueryIterable().toList();
+            List<DocumentCollection> collectionList = documentClient.queryCollections(getDatabaseId().getSelfLink(),
+                    "SELECT * FROM root r WHERE r.id='" + collectionId + "'", null).getQueryIterable().toList();
 
             if (collectionList.size() > 0) {
                 // Cache the collection object so we won't have to query for it
@@ -576,8 +378,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     DocumentCollection collectionDefinition = new DocumentCollection();
                     collectionDefinition.setId(collectionId);
 
-                    collectionCache = documentClient.createCollection(
-                            getdatabaseId().getSelfLink(),
+                    collectionCache = documentClient.createCollection(getDatabaseId().getSelfLink(),
                             collectionDefinition, null).getResource();
                 } catch (DocumentClientException e) {
                     log.error("Failed to create the collection", e);
@@ -588,20 +389,17 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         return collectionCache;
     }
 
-    /*private Document getDocumentById(String id) {
-        // Retrieve the document using the DocumentClient.
-        List<Document> documentList = documentClient
-                .queryDocuments(getcollectionId().getSelfLink(),
-                        "SELECT * FROM root r WHERE r.id='" + id + "'", null)
-                .getQueryIterable().toList();
+    private List<Document> queryDocuments(CosmosCompiledCondition compiledCondition,
+                                          Map<String, Object> conditionParameterMap) throws SQLException {
+        String condition = CosmosTableUtils.resolveCondition(compiledCondition, conditionParameterMap);
+        SqlQuerySpec query = new SqlQuerySpec();
+        query.setQueryText("SELECT * FROM " + collectionId + " WHERE " + condition);
+        FeedOptions options = new FeedOptions();
+        options.setEnableScanInQuery(true);
 
-        if (documentList.size() > 0) {
-            return documentList.get(0);
-        } else {
-            return null;
-        }
+        return documentClient.queryDocuments(getCollectionId().getSelfLink(),
+                query, options).getQueryIterable().toList();
     }
-*/
 
 
     @Override
@@ -620,3 +418,4 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     }
 
 }
+

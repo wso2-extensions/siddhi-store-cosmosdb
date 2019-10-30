@@ -1,20 +1,22 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *  WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License.
- *  You may obtain a copy of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *
  */
+
 package io.siddhi.extension.store.cosmosdb;
 
 import io.siddhi.core.exception.OperationNotSupportedException;
@@ -25,9 +27,20 @@ import io.siddhi.extension.store.cosmosdb.util.CosmosTableUtils;
 import io.siddhi.query.api.definition.Attribute;
 import io.siddhi.query.api.expression.condition.Compare;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.Stack;
+import java.util.TreeMap;
 
-import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.*;
+import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.CLOSE_PARENTHESIS;
+import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.EQUALS;
+import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.OPEN_PARENTHESIS;
+import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.SQL_AS;
+import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.SQL_MAX;
+import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.SUB_SELECT_QUERY_REF;
+import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.WHITESPACE;
 
 
 /**
@@ -79,22 +92,6 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
     public String returnCondition() {
         this.parametrizeCondition();
         return this.finalCompiledCondition.trim();
-    }
-
-    public String returnMaxVariableCondition() {
-        return this.subSelect.toString();
-    }
-
-    public boolean isContainsAttributeFunction() {
-        return containsAttributeFunction;
-    }
-
-    public String getOuterCompiledCondition() {
-        return outerCompiledCondition.toString();
-    }
-
-    public boolean isLastConditionExist() {
-        return lastConditionExist;
     }
 
     public int getOrdinalOfContainPattern() {
