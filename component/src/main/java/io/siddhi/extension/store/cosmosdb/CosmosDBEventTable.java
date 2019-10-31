@@ -223,7 +223,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             log.error("Failed to find document", e);
         }
         if (documentList != null) {
-            return true;
+            return documentList.size() > 0;
         } else {
             return false;
         }
@@ -256,14 +256,15 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     }
 
     @Override
-    protected void update(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String,
-            CompiledExpression> map, List<Map<String, Object>> list1) throws ConnectionUnavailableException {
-        for (int i = 0; i < list.size(); i++) {
+    protected void update(CompiledCondition compiledCondition, List<Map<String, Object>> updateConditionParameterMaps,
+                          Map<String, CompiledExpression> map, List<Map<String, Object>> updateSetParameterMaps)
+            throws ConnectionUnavailableException {
+        for (int i = 0; i < updateConditionParameterMaps.size(); i++) {
             Map<String, Object> updateConditionParameterMap = null;
-            for (Map<String, Object> stringObjectMap : list) {
+            for (Map<String, Object> stringObjectMap : updateConditionParameterMaps) {
                 updateConditionParameterMap = stringObjectMap;
             }
-            int ordinal = list.indexOf(updateConditionParameterMap);
+            int ordinal = updateConditionParameterMaps.indexOf(updateConditionParameterMap);
             List<Document> documentList = null;
             try {
                 documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, updateConditionParameterMap);
@@ -274,8 +275,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             if (documentList != null) {
                 for (Document toUpdateDocument : documentList) {
                     try {
-                        for (String key : list1.get(ordinal).keySet()) {
-                            Object value = list1.get(ordinal).get(key);
+                        for (String key : updateSetParameterMaps.get(ordinal).keySet()) {
+                            Object value = updateSetParameterMaps.get(ordinal).get(key);
                             toUpdateDocument.set(key, value);
                         }
                         documentClient.replaceDocument(toUpdateDocument, null);
@@ -289,36 +290,41 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     }
 
     @Override
-    protected void updateOrAdd(CompiledCondition compiledCondition, List<Map<String, Object>> list, Map<String,
-            CompiledExpression> map, List<Map<String, Object>> list1, List<Object[]> list2)
-            throws ConnectionUnavailableException {
-        Map<String, Object> updateOrAddConditionParameterMap = null;
-        for (Map<String, Object> stringObjectMap : list) {
-            updateOrAddConditionParameterMap = stringObjectMap;
-        }
-        int ordinal = list.indexOf(updateOrAddConditionParameterMap);
-        List<Document> documentList = null;
-        try {
-            documentList = queryDocuments((CosmosCompiledCondition) compiledCondition,
-                    updateOrAddConditionParameterMap);
-        } catch (SQLException e) {
-            log.error("Failed to find document", e);
-        }
-        //update
-        if (documentList != null) {
-            for (Document toUpdateDocument : documentList) {
-                try {
-                    for (String key : list1.get(ordinal).keySet()) {
-                        Object value = list1.get(ordinal).get(key);
-                        toUpdateDocument.set(key, value);
+    protected void updateOrAdd(CompiledCondition compiledCondition,
+                               List<Map<String, Object>> updateConditionParameterMaps,
+                               Map<String, CompiledExpression> map, List<Map<String, Object>> updateSetParameterMaps,
+                               List<Object[]> addingDocuments) throws ConnectionUnavailableException {
+        for (int i = 0; i < updateConditionParameterMaps.size(); i++) {
+            Map<String, Object> updateOrAddConditionParameterMap = null;
+            for (Map<String, Object> stringObjectMap : updateConditionParameterMaps) {
+                updateOrAddConditionParameterMap = stringObjectMap;
+            }
+            int ordinal = updateConditionParameterMaps.indexOf(updateOrAddConditionParameterMap);
+            List<Document> documentList = null;
+            try {
+                documentList = queryDocuments((CosmosCompiledCondition) compiledCondition,
+                        updateOrAddConditionParameterMap);
+            } catch (SQLException e) {
+                log.error("Failed to find document", e);
+            }
+            //update
+            if (documentList != null) {
+                if (documentList.size() > 0) {
+                    for (Document toUpdateDocument : documentList) {
+                        try {
+                            for (String key : updateSetParameterMaps.get(ordinal).keySet()) {
+                                Object value = updateSetParameterMaps.get(ordinal).get(key);
+                                toUpdateDocument.set(key, value);
+                            }
+                            documentClient.replaceDocument(toUpdateDocument, null);
+                        } catch (DocumentClientException e) {
+                            log.error("Failed to update document", e);
+                        }
                     }
-                    documentClient.replaceDocument(toUpdateDocument, null);
-                } catch (DocumentClientException e) {
-                    log.error("Failed to update document", e);
+                } else {
+                    add(addingDocuments);
                 }
             }
-        } else {
-            add(list2);
         }
     }
 
@@ -327,7 +333,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         CosmosConditionVisitor visitor = new CosmosConditionVisitor(this.collectionId, false);
         expressionBuilder.build(visitor);
         return new CosmosCompiledCondition(visitor.returnCondition(), visitor.getParameters(),
-                visitor.isContainsConditionExist(), visitor.getOrdinalOfContainPattern(), false, null, null,
                 expressionBuilder.getUpdateOrInsertReducer(), expressionBuilder.getInMemorySetExpressionExecutor());
     }
 

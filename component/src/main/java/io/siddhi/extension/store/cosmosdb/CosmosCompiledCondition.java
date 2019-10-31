@@ -32,53 +32,17 @@ import java.util.SortedMap;
 public class CosmosCompiledCondition implements CompiledCondition {
 
     private String compiledQuery;
-    private boolean useSubSelect;
-    private String subSelectQuerySelectors;
-    private String outerCompiledCondition;
-    private UpdateOrInsertReducer updateOrInsertReducer;
-    private ExpressionExecutor inMemorySetExpressionExecutor;
     private SortedMap<Integer, Object> parameters;
-    private boolean isContainsConditionExist;
-    private int ordinalOfContainPattern;
 
     public CosmosCompiledCondition(String compiledQuery, SortedMap<Integer, Object> parameters,
-                                   boolean isContainsConditionExist, int ordinalOfContainPattern,
-                                   boolean useSubSelect, String subSelectQuerySelectors,
-                                   String outerCompiledCondition, UpdateOrInsertReducer updateOrInsertReducer,
+                                   UpdateOrInsertReducer updateOrInsertReducer,
                                    ExpressionExecutor inMemorySetExpressionExecutor) {
         this.compiledQuery = compiledQuery;
         this.parameters = parameters;
-        this.isContainsConditionExist = isContainsConditionExist;
-        this.ordinalOfContainPattern = ordinalOfContainPattern;
-        this.useSubSelect = useSubSelect;
-        this.subSelectQuerySelectors = subSelectQuerySelectors;
-        this.outerCompiledCondition = outerCompiledCondition;
-        this.updateOrInsertReducer = updateOrInsertReducer;
-        this.inMemorySetExpressionExecutor = inMemorySetExpressionExecutor;
-    }
-
-    public void setCompiledQuery(String compiledQuery) {
-        this.compiledQuery = compiledQuery;
     }
 
     public String getCompiledQuery() {
         return compiledQuery;
-    }
-
-    public boolean isContainsConditionExist() {
-        return isContainsConditionExist;
-    }
-
-    public boolean isUseSubSelect() {
-        return useSubSelect;
-    }
-
-    public String getSubSelectQuerySelectors() {
-        return subSelectQuerySelectors;
-    }
-
-    public String getOuterCompiledCondition() {
-        return outerCompiledCondition;
     }
 
     public String toString() {
@@ -89,15 +53,4 @@ public class CosmosCompiledCondition implements CompiledCondition {
         return parameters;
     }
 
-    public int getOrdinalOfContainPattern() {
-        return ordinalOfContainPattern;
-    }
-
-    public UpdateOrInsertReducer getUpdateOrInsertReducer() {
-        return updateOrInsertReducer;
-    }
-
-    public ExpressionExecutor getInMemorySetExpressionExecutor() {
-        return inMemorySetExpressionExecutor;
-    }
 }
