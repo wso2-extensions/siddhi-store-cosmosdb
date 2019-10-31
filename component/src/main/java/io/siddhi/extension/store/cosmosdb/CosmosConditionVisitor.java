@@ -64,7 +64,6 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
     private boolean nextProcessContainsPattern;
     private int ordinalOfContainPattern = 1;
 
-    private boolean containsAttributeFunction = false;
     private boolean lastConditionExist = false;
     private Stack<String> lastConditionParams;
     private StringBuilder subSelect;
@@ -315,7 +314,6 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
         if (CosmosTableUtils.isEmpty(namespace) &&
                 (Arrays.stream(supportedFunctions).anyMatch(functionName::equals))) {
             condition.append(functionName).append(CosmosTableConstants.OPEN_PARENTHESIS);
-            containsAttributeFunction = true;
         } else if (namespace.trim().equals("str") && functionName.equals("contains")) {
             condition.append("CONTAINS").append(OPEN_PARENTHESIS);
             isContainsConditionExist = true;

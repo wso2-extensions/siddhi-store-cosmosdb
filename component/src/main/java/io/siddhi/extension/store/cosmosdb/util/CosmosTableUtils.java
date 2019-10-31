@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.siddhi.extension.store.cosmosdb.util.CosmosTableConstants.VARIABLE_CARBON_HOME;
-
 /**
  * Class which holds the utility methods which are used by various units in the CosmosDB Event Table implementation.
  */
@@ -119,15 +117,4 @@ public class CosmosTableUtils {
         return attributesValuesMap;
     }
 
-
-    private static String resolveCarbonHome(String filePath) {
-        String carbonHome = "";
-        if (System.getProperty(VARIABLE_CARBON_HOME) != null) {
-            carbonHome = System.getProperty(VARIABLE_CARBON_HOME);
-        } else if (System.getenv(VARIABLE_CARBON_HOME) != null) {
-            carbonHome = System.getenv(VARIABLE_CARBON_HOME);
-        }
-        return filePath.replaceAll("\\$\\{carbon.home}", carbonHome);
-    }
 }
-

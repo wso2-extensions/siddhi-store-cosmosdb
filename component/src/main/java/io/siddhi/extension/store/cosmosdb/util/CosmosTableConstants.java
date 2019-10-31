@@ -30,8 +30,6 @@ public class CosmosTableConstants {
     public static final String ANNOTATION_ELEMENT_CONTAINER_NAME = "container.name";
     public static final String ANNOTATION_ELEMENT_COLLECTION_NAME = "collection.name";
 
-    public static final String VARIABLE_CARBON_HOME = "carbon.home";
-
     //Miscellaneous SQL constants
     public static final String SQL_MATH_ADD = "+";
     public static final String SQL_MATH_DIVIDE = "/";

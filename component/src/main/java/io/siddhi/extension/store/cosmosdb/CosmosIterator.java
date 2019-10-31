@@ -100,12 +100,5 @@ public class CosmosIterator implements RecordIterator<Object[]> {
     public void close() throws IOException {
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        //In the unlikely case this iterator does not go to the end, we have to make sure the connection is cleaned up.
-        super.finalize();
-    }
-
 }
-
 
