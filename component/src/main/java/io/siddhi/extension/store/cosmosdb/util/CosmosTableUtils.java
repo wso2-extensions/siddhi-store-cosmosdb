@@ -86,7 +86,7 @@ public class CosmosTableUtils {
 
                 Object key = attributeKeys[attributeCounter];
                 Object value = conditionParameterMap.get(key);
-                if (value.getClass().getName() == "java.lang.String") {
+                if (value.getClass().getName().equals("java.lang.String")) {
                     condition = condition.replaceFirst("\\?", "'" + value.toString() + "'");
                 } else {
                     condition = condition.replaceFirst("\\?", value.toString());

@@ -69,12 +69,10 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
         parameters = {
                 @Parameter(name = "cosmosdb.uri",
                         description = "The CosmosDB URI for the CosmosDB data store. The uri must be of the format \n" +
-                                "cosmosdb://[username:password@]host1[:port1][,hostN[:portN]][/[database][?options]]\n"
-                                + "The options specified in the uri will override any connection options specified in "
-                                + "the deployment yaml file.",
+                                "https://{databaseaccount}.documents.azure.com/dbs/{db}",
                         type = {DataType.STRING}),
                 @Parameter(name = "cosmosdb.key",
-                        description = "The CosmosDB Master key for the CosmosDB data store.",
+                        description = "The CosmosDB Account key for the CosmosDB data store.",
                         type = {DataType.STRING}),
                 @Parameter(name = "container.name",
                         description = "The name of the CosmosDB container containing this event table",
@@ -99,45 +97,24 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                                 "the server, for use in server logs, slow query logs, and profile collection.",
                         defaultValue = "null",
                         possibleParameters = "the logical name of the application using this CosmosClient. The " +
-                                "UTF-8 encoding may not exceed 128 bytes."),
-                @SystemParameter(name = "cursorFinalizerEnabled",
-                        description = "Sets whether cursor finalizers are enabled.",
-                        defaultValue = "true",
-                        possibleParameters = {"true", "false"})
+                                "UTF-8 encoding may not exceed 128 bytes.")
         },
         examples = {
                 @Example(
                         syntax = "@Store(type=\"cosmosdb\"," +
-                                "cosmosdb.uri=\"cosmosdb://admin:admin@localhost/Foo\")\n" +
+                                "cosmosdb.uri=\"https://myCosmosDBName.documents.azure.com:443\")\n" +
                                 "@PrimaryKey(\"symbol\")\n" +
-                                "@IndexBy(\"volume 1 {background:true,unique:true}\")\n" +
                                 "define table FooTable (symbol string, price float, volume long);",
-                        description = "This will create a collection called FooTable for the events to be saved " +
-                                "with symbol as Primary Key(unique index at cosmosd level) and index for the field " +
-                                "volume will be created in ascending order with the index option to create the index " +
-                                "in the background.\n\n" +
-                                "Note: \n" +
-                                "@PrimaryKey: This specifies a list of comma-separated values to be treated as " +
-                                "unique fields in the table. Each record in the table must have a unique combination " +
-                                "of values for the fields specified here.\n\n" +
-                                "@IndexBy: This specifies the fields that must be indexed at the database level. " +
-                                "You can specify multiple values as a come-separated list. A single value to be in " +
-                                "the format,\n“<FieldName> <SortOrder> <IndexOptions>”\n" +
-                                "<SortOrder> - ( 1) for Ascending and (-1) for Descending\n" +
-                                "<IndexOptions> - Index Options must be defined inside curly brackets. {} to be " +
-                                "used for default options. Options must follow the standard cosmosdb index options " +
-                                "format. Reference : " +
-                                "https://docs.cosmosdb.com/manual/reference/method/db.collection.createIndex/\n" +
-                                "Example : “symbol 1 {“unique”:true}”\n"
+                        description = "This will create a collection called FooTable for the events to be saved."
                 )
         }
 )
 public class CosmosDBEventTable extends AbstractRecordTable {
     private static final Log log = LogFactory.getLog(CosmosDBEventTable.class);
-    private static Gson gson = new Gson();
-    private static DocumentClient documentClient;
-    private static Database databaseCache;
-    private static DocumentCollection collectionCache;
+    private Gson gson = new Gson();
+    private DocumentClient documentClient;
+    private Database databaseCache;
+    private DocumentCollection collectionCache;
     private List<String> attributeNames;
     private String databaseId;
     private String collectionId;
@@ -149,7 +126,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 tableDefinition.getAttributeList().stream().map(Attribute::getName).collect(Collectors.toList());
 
         Annotation storeAnnotation = AnnotationHelper.getAnnotation(ANNOTATION_STORE, tableDefinition.getAnnotations());
-
 
         this.initializeConnectionParameters(storeAnnotation, configReader);
 
@@ -341,7 +317,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         return compileCondition(expressionBuilder);
     }
 
-
+    @SuppressWarnings("unchecked")
     private Database getDatabaseId() {
         if (databaseCache == null) {
             // Get the database if it exists
@@ -359,6 +335,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     Database databaseDefinition = new Database();
                     databaseDefinition.setId(databaseId);
                     databaseCache = documentClient.createDatabase(databaseDefinition, null).getResource();
+
                 } catch (DocumentClientException e) {
                     log.error("Failed to create the database", e);
                 }
@@ -390,6 +367,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             }
         }
         return collectionCache;
+
     }
 
     private List<Document> queryDocuments(CosmosCompiledCondition compiledCondition,
