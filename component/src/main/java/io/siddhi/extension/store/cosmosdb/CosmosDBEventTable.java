@@ -317,7 +317,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         return compileCondition(expressionBuilder);
     }
 
-    @SuppressWarnings("unchecked")
     private Database getDatabaseId() {
         if (databaseCache == null) {
             // Get the database if it exists
@@ -334,8 +333,11 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 try {
                     Database databaseDefinition = new Database();
                     databaseDefinition.setId(databaseId);
-                    databaseCache = documentClient.createDatabase(databaseDefinition, null).getResource();
-
+                    try {
+                        databaseCache = documentClient.createDatabase(databaseDefinition, null).getResource();
+                    } catch (ClassCastException e) {
+                        log.error("Failed to cast from Request Response to Database", e);
+                    }
                 } catch (DocumentClientException e) {
                     log.error("Failed to create the database", e);
                 }
@@ -359,8 +361,13 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 try {
                     DocumentCollection collectionDefinition = new DocumentCollection();
                     collectionDefinition.setId(collectionId);
-                    collectionCache = documentClient.createCollection(getDatabaseId().getSelfLink(),
-                            collectionDefinition, null).getResource();
+                    try {
+                        collectionCache = documentClient.createCollection(getDatabaseId().getSelfLink(),
+                                collectionDefinition, null).getResource();
+                    } catch (ClassCastException e) {
+                        log.error("Failed to cast from Request Response to Document Collection", e);
+                    }
+
                 } catch (DocumentClientException e) {
                     log.error("Failed to create the collection", e);
                 }
