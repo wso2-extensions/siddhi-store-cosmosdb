@@ -29,7 +29,7 @@
 
     <groupId>io.siddhi.extension.store.cosmosdb</groupId>
     <artifactId>siddhi-store-cosmosdb-parent</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Siddhi Store Cosmosdb Extension Parent</name>
     <url>https://github.com/Tikiri16/siddhi-store-cosmosdb</url>
