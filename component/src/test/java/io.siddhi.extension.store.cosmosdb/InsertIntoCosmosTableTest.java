@@ -57,7 +57,7 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest1() throws InterruptedException {
         log.info("insertIntoCosmosTableTest1 - DASC5-877:Insert events to a CosmosDB table successfully");
 
-        CosmosTableTestUtils.dropCollection(uri, "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -79,7 +79,7 @@ public class InsertIntoCosmosTableTest {
 
         siddhiAppRuntime.shutdown();
 
-        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, "FooTable");
+        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key,"FooTable");
         Assert.assertEquals(totalDocumentsInCollection, 1, "Insertion failed");
 
     }
@@ -134,7 +134,7 @@ public class InsertIntoCosmosTableTest {
         log.info("insertIntoCosmosTableTest4 - " +
                 "DASC5-880:[N] Insert events to a non existing CosmosDB table");
 
-        CosmosTableTestUtils.dropCollection(uri, "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -156,7 +156,7 @@ public class InsertIntoCosmosTableTest {
 
         siddhiAppRuntime.shutdown();
 
-        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, "FooTable");
+        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key,"FooTable");
         Assert.assertEquals(totalDocumentsInCollection, 0, "Insertion failed");
     }
 
@@ -208,7 +208,7 @@ public class InsertIntoCosmosTableTest {
         log.info("insertIntoCosmosTableTest7 - " +
                 "DASC5-889:[N] Insert events data to CosmosDB table when the table has not defined");
 
-        CosmosTableTestUtils.dropCollection(uri, "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -234,7 +234,7 @@ public class InsertIntoCosmosTableTest {
         log.info("insertIntoCosmosTableTest8");
         //Object inserts
 
-        CosmosTableTestUtils.dropCollection(uri, "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -258,7 +258,7 @@ public class InsertIntoCosmosTableTest {
 
         siddhiAppRuntime.shutdown();
 
-        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, "FooTable");
+        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key,"FooTable");
         Assert.assertEquals(totalDocumentsInCollection, 1, "Insertion failed");
 
     }
