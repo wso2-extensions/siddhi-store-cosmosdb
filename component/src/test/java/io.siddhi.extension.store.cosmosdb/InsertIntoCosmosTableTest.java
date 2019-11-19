@@ -225,7 +225,8 @@ public class InsertIntoCosmosTableTest {
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
 
-        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, "FooTable");
+        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, "admin",
+                "FooTable");
         Assert.assertEquals(doesCollectionExists, false, "Definition was created");
     }
 
