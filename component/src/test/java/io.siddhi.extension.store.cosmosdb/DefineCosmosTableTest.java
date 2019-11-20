@@ -34,7 +34,7 @@ public class DefineCosmosTableTest {
 
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static final String key = CosmosTableTestUtils.resolveMasterKey();
-    private static final String container = CosmosTableTestUtils.resolveContainer();
+    private static final String database = CosmosTableTestUtils.resolveDatabase();
 
     @BeforeClass
     public void init() {
@@ -56,7 +56,7 @@ public class DefineCosmosTableTest {
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long); ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
@@ -77,7 +77,7 @@ public class DefineCosmosTableTest {
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long); ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
@@ -97,7 +97,7 @@ public class DefineCosmosTableTest {
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long); ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
@@ -112,7 +112,7 @@ public class DefineCosmosTableTest {
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb', cosmosdb.uri='', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long); ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
@@ -127,7 +127,7 @@ public class DefineCosmosTableTest {
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb', cosmosdb.uri='123456', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long); ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
@@ -144,7 +144,7 @@ public class DefineCosmosTableTest {
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb', cosmosdb.uri='\" + uri + \"', cosmosdb.key='\"+ key +\"', \" +\n" +
-                "                \"container.name='\"+ container +\"', collection.name=\"newCollection\") " +
+                "                \"database.name='\"+ database +\"', collection.name=\"newCollection\") " +
                 "define table FooTable (symbol string, price float, volume long); ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();

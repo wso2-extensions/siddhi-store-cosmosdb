@@ -31,9 +31,9 @@ public class CosmosTableTestUtils {
     private static final String uri = "https://a6cec7ca-0ee0-4-231-b9ee.documents.azure.com:443/";
     private static final String key =
             "pNXzmZ7T6Fxw7di1aeOML9USfUEGMwyWjUVwZw8mYemeu3ro7UkkqxOsrjpZk8g7j5PS2YejpRYf8ONWwgr2GA==";
-    private static final String containerName = "admin";
-    private static final String collectionName = "fooTable";
-    //private static String databaseName = "admin";
+    private static final String databaseName = "admin";
+    private static final String collectionName = "FooTable";
+    private final String collectionLink = String.format("/dbs/%s/colls/%s", databaseName, collectionName);
 
     private CosmosTableTestUtils() {
     }
@@ -46,8 +46,8 @@ public class CosmosTableTestUtils {
         return key;
     }
 
-    public static String resolveContainer() {
-        return containerName;
+    public static String resolveDatabase() {
+        return databaseName;
     }
 
 
@@ -64,7 +64,7 @@ public class CosmosTableTestUtils {
         }
     }
 
-    public static long getDocumentsCount(String uri, String key, String collectionName) {
+    public static long getDocumentsCount(String uri, String key, String collectionName, String collectionLink) {
         try (DocumentClient documentClient = new DocumentClient(uri, key, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
             SqlQuerySpec query = new SqlQuerySpec();
@@ -72,17 +72,20 @@ public class CosmosTableTestUtils {
             query.setQueryText("SELECT * FROM " + collectionName);
             FeedOptions options = new FeedOptions();
             options.setEnableScanInQuery(true);
-            List<Document> documentList = documentClient.queryDocuments(collectionName,
+            List<Document> documentList = documentClient.queryDocuments(collectionLink,
                     query, options).getQueryIterable().toList();
             return documentList.size();
+        } catch (Exception e){
+            log.debug("Getting document count failed due to" + e.getMessage(), e);
+            throw e;
         }
     }
 
-    public static boolean doesCollectionExists(String uri, String key, String containerName,
+    public static boolean doesCollectionExists(String uri, String key, String databaseName,
                                                String customCollectionName) {
         try (DocumentClient documentClient = new DocumentClient(uri, key, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
-            List<DocumentCollection> collectionList = documentClient.queryCollections(containerName,
+            List<DocumentCollection> collectionList = documentClient.queryCollections(databaseName,
                     "SELECT * FROM root r WHERE r.id='" + customCollectionName + "'",
                     null).getQueryIterable().toList();
 
@@ -93,14 +96,14 @@ public class CosmosTableTestUtils {
         }
     }
 
-    public static void createCollection(String uri, String key, String containerName, String collectionName) {
+    public static void createCollection(String uri, String key, String databaseName, String collectionName) {
         dropCollection(uri, key, "FooTable");
         try (DocumentClient documentClient = new DocumentClient(uri, key, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
             try {
                 DocumentCollection collectionDefinition = new DocumentCollection();
                 collectionDefinition.setId(collectionName);
-                documentClient.createCollection(containerName, collectionDefinition, null);
+                documentClient.createCollection(databaseName, collectionDefinition, null);
             } catch (DocumentClientException e) {
                 log.error("Failed to create the collection", e);
             }

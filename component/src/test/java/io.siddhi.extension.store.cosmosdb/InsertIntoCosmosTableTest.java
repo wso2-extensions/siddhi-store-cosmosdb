@@ -20,7 +20,6 @@
 package io.siddhi.extension.store.cosmosdb;
 
 import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiAppRuntimeImpl;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.exception.SiddhiAppCreationException;
 import io.siddhi.core.stream.input.InputHandler;
@@ -28,7 +27,6 @@ import io.siddhi.query.api.exception.DuplicateDefinitionException;
 import io.siddhi.query.api.exception.SiddhiAppValidationException;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
-import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -41,7 +39,7 @@ public class InsertIntoCosmosTableTest {
 
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static final String key = CosmosTableTestUtils.resolveMasterKey();
-    private static final String container = CosmosTableTestUtils.resolveContainer();
+    private static final String database = CosmosTableTestUtils.resolveDatabase();
 
     @BeforeClass
     public void init() {
@@ -57,14 +55,16 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest1() throws InterruptedException {
         log.info("insertIntoCosmosTableTest1 - DASC5-877:Insert events to a CosmosDB table successfully");
 
-        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+
+        CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -79,9 +79,9 @@ public class InsertIntoCosmosTableTest {
 
         siddhiAppRuntime.shutdown();
 
-        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key,"FooTable");
+        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
+                collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Insertion failed");
-
     }
 
     @Test(expectedExceptions = DuplicateDefinitionException.class)
@@ -94,7 +94,7 @@ public class InsertIntoCosmosTableTest {
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -116,7 +116,7 @@ public class InsertIntoCosmosTableTest {
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -128,41 +128,9 @@ public class InsertIntoCosmosTableTest {
         siddhiAppRuntime.shutdown();
     }
 
-
-    @Test
-    public void insertIntoCosmosTableTest4() throws InterruptedException {
-        log.info("insertIntoCosmosTableTest4 - " +
-                "DASC5-880:[N] Insert events to a non existing CosmosDB table");
-
-        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
-
-        SiddhiManager siddhiManager = new SiddhiManager();
-        String streams = "" +
-                "@source(type='inMemory', topic='stock') " +
-                "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
-                "define table FooTable (symbol string, price float, volume long);";
-        String query = "" +
-                "@info(name = 'query1') " +
-                "from FooStream " +
-                "select symbol, price, volume " +
-                "insert into FooTable144;";
-        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
-        InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
-        siddhiAppRuntime.start();
-
-        fooStream.send(new Object[]{"WSO2", 55.6f, 100L});
-
-        siddhiAppRuntime.shutdown();
-
-        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key,"FooTable");
-        Assert.assertEquals(totalDocumentsInCollection, 0, "Insertion failed");
-    }
-
     @Test(expectedExceptions = SiddhiAppCreationException.class)
-    public void insertIntoCosmosTableTest5() {
-        log.info("insertIntoCosmosTableTest5 - " +
+    public void insertIntoCosmosTableTest4() {
+        log.info("insertIntoCosmosTableTest4 - " +
                 "DASC5-883:[N] Insert events to a CosmosDB table by selecting from non existing stream");
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -170,7 +138,7 @@ public class InsertIntoCosmosTableTest {
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -183,15 +151,15 @@ public class InsertIntoCosmosTableTest {
     }
 
     @Test(expectedExceptions = SiddhiAppCreationException.class)
-    public void insertIntoCosmosTableTest6() {
-        log.info("insertIntoCosmosTableTest6 - " +
+    public void insertIntoCosmosTableTest5() {
+        log.info("insertIntoCosmosTableTest5 - " +
                 "DASC5-888:[N] Insert events to a CosmosDB table when the stream has not defined");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -204,18 +172,18 @@ public class InsertIntoCosmosTableTest {
     }
 
     @Test
-    public void insertIntoCosmosTableTest7() {
-        log.info("insertIntoCosmosTableTest7 - " +
+    public void insertIntoCosmosTableTest6() {
+        log.info("insertIntoCosmosTableTest6 - " +
                 "DASC5-889:[N] Insert events data to CosmosDB table when the table has not defined");
-
-        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')";
+                "database.name='"+ database +"')";
         String query = "" +
                 "@info(name = 'query1') " +
                 "from FooStream " +
@@ -225,24 +193,25 @@ public class InsertIntoCosmosTableTest {
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
 
-        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, "admin",
+        String databaseLink = String.format("/dbs/%s", "admin");
+        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
         Assert.assertEquals(doesCollectionExists, false, "Definition was created");
     }
 
     @Test
-    public void insertIntoCosmosTableTest8() throws InterruptedException {
-        log.info("insertIntoCosmosTableTest8");
+    public void insertIntoCosmosTableTest7() throws InterruptedException {
+        log.info("insertIntoCosmosTableTest7");
         //Object inserts
-
-        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, input Object); " +
                 "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "container.name='"+ container +"')" +
+                "database.name='"+ database +"')" +
                 "define table FooTable (symbol string, price float, input Object);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -259,7 +228,8 @@ public class InsertIntoCosmosTableTest {
 
         siddhiAppRuntime.shutdown();
 
-        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key,"FooTable");
+        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key,"FooTable",
+                collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Insertion failed");
 
     }

@@ -74,9 +74,9 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                 @Parameter(name = "cosmosdb.key",
                         description = "The CosmosDB Account key for the CosmosDB data store.",
                         type = {DataType.STRING}),
-                @Parameter(name = "container.name",
-                        description = "The name of the CosmosDB container containing this event table",
-                        defaultValue = "Name of the CosmosDB container",
+                @Parameter(name = "database.name",
+                        description = "The name of the CosmosDB database containing this event table",
+                        defaultValue = "Name of the CosmosDB database",
                         type = {DataType.STRING}),
                 @Parameter(name = "collection.name",
                         description = "The name of the collection in the store this Event Table should" +
@@ -129,7 +129,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
         this.initializeConnectionParameters(storeAnnotation, configReader);
 
-        this.databaseId = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_CONTAINER_NAME);
+        this.databaseId = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_DATABASE_NAME);
 
         String customCollectionName =
                 storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
