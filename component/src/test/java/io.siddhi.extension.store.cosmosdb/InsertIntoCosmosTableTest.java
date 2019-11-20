@@ -56,7 +56,6 @@ public class InsertIntoCosmosTableTest {
         log.info("insertIntoCosmosTableTest1 - DASC5-877:Insert events to a CosmosDB table successfully");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
-
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();

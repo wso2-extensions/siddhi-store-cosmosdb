@@ -33,7 +33,7 @@ public class CosmosTableTestUtils {
             "pNXzmZ7T6Fxw7di1aeOML9USfUEGMwyWjUVwZw8mYemeu3ro7UkkqxOsrjpZk8g7j5PS2YejpRYf8ONWwgr2GA==";
     private static final String databaseName = "admin";
     private static final String collectionName = "FooTable";
-    private final String collectionLink = String.format("/dbs/%s/colls/%s", databaseName, collectionName);
+    //private final String collectionLink = String.format("/dbs/%s/colls/%s", databaseName, collectionName);
 
     private CosmosTableTestUtils() {
     }
@@ -97,13 +97,15 @@ public class CosmosTableTestUtils {
     }
 
     public static void createCollection(String uri, String key, String databaseName, String collectionName) {
-        dropCollection(uri, key, "FooTable");
         try (DocumentClient documentClient = new DocumentClient(uri, key, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
+            String collectionLink = String.format("/dbs/%s/colls/%s", databaseName, collectionName);
+            dropCollection(uri, key, collectionLink);
             try {
                 DocumentCollection collectionDefinition = new DocumentCollection();
                 collectionDefinition.setId(collectionName);
-                documentClient.createCollection(databaseName, collectionDefinition, null);
+                String databaseLink = String.format("/dbs/%s", databaseName);
+                documentClient.createCollection(databaseLink, collectionDefinition, null);
             } catch (DocumentClientException e) {
                 log.error("Failed to create the collection", e);
             }

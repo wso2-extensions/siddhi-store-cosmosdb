@@ -51,7 +51,8 @@ public class DefineCosmosTableTest {
         log.info("cosmosTableDefinitionTest1 - " +
                 "DASC5-958:Defining a CosmosDB event table with a non existing collection.");
 
-        CosmosTableTestUtils.dropCollection(uri, key, "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -62,9 +63,10 @@ public class DefineCosmosTableTest {
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
 
-        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, "admin",
+        String databaseLink = String.format("/dbs/%s", "admin");
+        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
-        Assert.assertEquals(doesCollectionExists, true, "Definition failed");
+        Assert.assertEquals(doesCollectionExists, false, "Definition failed");
     }
 
     @Test
@@ -83,7 +85,8 @@ public class DefineCosmosTableTest {
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
 
-        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, "admin",
+        String databaseLink = String.format("/dbs/%s", "admin");
+        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
         Assert.assertEquals(doesCollectionExists, true, "Definition failed");
 
@@ -139,20 +142,21 @@ public class DefineCosmosTableTest {
         log.info("cosmosTableDefinitionTest6 - " +
                 "DASC5-948:Defining a CosmosDB event table with a new collection name");
 
-        CosmosTableTestUtils.dropCollection(uri, key,"FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
-                "@store(type = 'cosmosdb', cosmosdb.uri='\" + uri + \"', cosmosdb.key='\"+ key +\"', \" +\n" +
-                "                \"database.name='\"+ database +\"', collection.name=\"newCollection\") " +
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
+                "database.name='"+ database +"', collection.name='newCollection') " +
                 "define table FooTable (symbol string, price float, volume long); ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
 
-        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, "admin",
+        String databaseLink = String.format("/dbs/%s", "admin");
+        boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "newCollection");
-        Assert.assertEquals(doesCollectionExists, true, "Definition failed");
+        Assert.assertEquals(doesCollectionExists, false, "Definition failed");
     }
-
 }
