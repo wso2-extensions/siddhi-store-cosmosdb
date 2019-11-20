@@ -117,12 +117,12 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
 
     @Override
     public void beginVisitAndLeftOperand() {
-        //Not applicable
+        condition.append(OPEN_PARENTHESIS);
     }
 
     @Override
     public void endVisitAndLeftOperand() {
-        //Not applicable
+        condition.append(CLOSE_PARENTHESIS);
     }
 
     @Override
@@ -167,12 +167,12 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
 
     @Override
     public void beginVisitNot() {
-        condition.append(CosmosTableConstants.SQL_NOT).append(WHITESPACE);
+        condition.append(CosmosTableConstants.SQL_NOT).append(WHITESPACE).append(OPEN_PARENTHESIS);
     }
 
     @Override
     public void endVisitNot() {
-        //Not applicable
+        condition.append(CLOSE_PARENTHESIS);
     }
 
     @Override

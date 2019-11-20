@@ -23,7 +23,6 @@ import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.exception.SiddhiAppCreationException;
 import io.siddhi.core.stream.input.InputHandler;
-import io.siddhi.extension.store.cosmosdb.exception.CosmosTableException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -68,7 +67,7 @@ public class ConditionVisitorTest {
                 "@info(name = 'query2') " +
                 "from DeleteStockStream " +
                 "delete FooTable " +
-                "   on 'IBM' == symbol  ;";
+                "   on 'IBM' == amount  ;";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
@@ -93,7 +92,7 @@ public class ConditionVisitorTest {
                 "@info(name = 'query2') " +
                 "from DeleteStockStream " +
                 "delete FooTable " +
-                "   on symbol == 'IBM'  ;";
+                "   on amount == 'IBM'  ;";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
@@ -659,35 +658,9 @@ public class ConditionVisitorTest {
         Assert.assertEquals(totalDocumentsInCollection, 0, "Deletion failed");
     }
 
-    @Test(expectedExceptions = CosmosTableException.class)
+    @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void conditionBuilderTest17() {
         log.info("conditionBuilderTest17");
-
-        SiddhiManager siddhiManager = new SiddhiManager();
-        String streams = "" +
-                "define stream StockStream (symbol string, price float, volume long); " +
-                "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
-                "database.name='" + database + "')" +
-                "define table FooTable (symbol string, price float, volume long);";
-        String query = "" +
-                "@info(name = 'query1') " +
-                "from StockStream " +
-                "insert into FooTable ;" +
-                "" +
-                "@info(name = 'query2') " +
-                "from DeleteStockStream " +
-                "delete FooTable " +
-                "   on FooTable.price + price < 67;";
-        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
-        siddhiAppRuntime.start();
-        siddhiAppRuntime.shutdown();
-    }
-
-
-    @Test(expectedExceptions = SiddhiAppCreationException.class)
-    public void conditionBuilderTest18() {
-        log.info("conditionBuilderTest18");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +

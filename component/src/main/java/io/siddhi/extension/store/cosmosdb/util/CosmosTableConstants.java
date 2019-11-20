@@ -44,9 +44,9 @@ public class CosmosTableConstants {
     public static final String SQL_COMPARE_NOT_EQUAL = "<>"; //Using the ANSI SQL-92 standard over '!=' (non-standard)
     public static final String SQL_AND = " AND ";
     public static final String SQL_OR = "OR";
-    public static final String SQL_NOT = "NOT";
+    public static final String SQL_NOT = " NOT";
     public static final String SQL_IN = "IN";
-    public static final String SQL_IS_NULL = "IS NULL";
+    public static final String SQL_IS_NULL = "= null";
     public static final String SQL_AS = " AS ";
     public static final String SQL_MAX = "MAX"; // Used for incrementalAggregator:last()
     public static final String WHITESPACE = " ";
