@@ -19,7 +19,14 @@
 
 package io.siddhi.extension.store.cosmosdb;
 
-import com.microsoft.azure.documentdb.*;
+import com.microsoft.azure.documentdb.ConnectionPolicy;
+import com.microsoft.azure.documentdb.ConsistencyLevel;
+import com.microsoft.azure.documentdb.Document;
+import com.microsoft.azure.documentdb.DocumentClient;
+import com.microsoft.azure.documentdb.DocumentClientException;
+import com.microsoft.azure.documentdb.DocumentCollection;
+import com.microsoft.azure.documentdb.FeedOptions;
+import com.microsoft.azure.documentdb.SqlQuerySpec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -75,7 +82,7 @@ public class CosmosTableTestUtils {
             List<Document> documentList = documentClient.queryDocuments(collectionLink,
                     query, options).getQueryIterable().toList();
             return documentList.size();
-        } catch (Exception e){
+        } catch (Exception e) {
             log.debug("Getting document count failed due to" + e.getMessage(), e);
             throw e;
         }

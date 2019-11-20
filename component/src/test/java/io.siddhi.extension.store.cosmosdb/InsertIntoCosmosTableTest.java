@@ -62,8 +62,8 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "database.name='"+ database +"')" +
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -92,8 +92,8 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "database.name='"+ database +"')" +
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -114,8 +114,8 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "database.name='"+ database +"')" +
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -136,8 +136,8 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "database.name='"+ database +"')" +
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -157,8 +157,8 @@ public class InsertIntoCosmosTableTest {
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "database.name='"+ database +"')" +
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -181,8 +181,8 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "database.name='"+ database +"')";
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "database.name='" + database + "')";
         String query = "" +
                 "@info(name = 'query1') " +
                 "from FooStream " +
@@ -209,8 +209,8 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, input Object); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='"+ key +"', " +
-                "database.name='"+ database +"')" +
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, input Object);";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -227,7 +227,7 @@ public class InsertIntoCosmosTableTest {
 
         siddhiAppRuntime.shutdown();
 
-        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key,"FooTable",
+        long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Insertion failed");
 
