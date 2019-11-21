@@ -52,7 +52,7 @@ public class DeleteFromCosmosTableTest {
     @Test
     public void deleteFromCosmosTableTest1() throws InterruptedException {
         log.info("deleteFromCosmosTableTest1 - " +
-                "DASC5-903:Delete an event of a CosmosDB table successfully");
+                "Delete an event of a CosmosDB table successfully");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -95,7 +95,7 @@ public class DeleteFromCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void deleteFromCosmosTableTest2() {
         log.info("deleteFromCosmosTableTest2 - " +
-                "DASC5-904:Delete an event from a non existing CosmosDB table");
+                "Delete an event from a non existing CosmosDB table");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -122,7 +122,7 @@ public class DeleteFromCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void deleteFromCosmosTableTest3() {
         log.info("deleteFromCosmosTableTest3 - " +
-                "DASC5-905:Delete an event from a CosmosDB table by selecting from non existing stream");
+                "Delete an event from a CosmosDB table by selecting from non existing stream");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -149,7 +149,7 @@ public class DeleteFromCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void deleteFromCosmosTableTest4() {
         log.info("deleteFromCosmosTableTest4 - " +
-                "DASC5-906:Delete an event from a CosmosDB table based on a non-existing attribute");
+                "Delete an event from a CosmosDB table based on a non-existing attribute");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -175,7 +175,7 @@ public class DeleteFromCosmosTableTest {
     @Test
     public void deleteFromCosmosTableTest5() throws InterruptedException {
         log.info("deleteFromCosmosTableTest5 - " +
-                "DASC5-909:Delete an event from a CosmosDB table based on a non-existing attribute value");
+                "Delete an event from a CosmosDB table based on a non-existing attribute value");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);

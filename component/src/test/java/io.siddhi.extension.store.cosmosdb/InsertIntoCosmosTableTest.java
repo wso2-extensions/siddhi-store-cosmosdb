@@ -53,7 +53,7 @@ public class InsertIntoCosmosTableTest {
 
     @Test
     public void insertIntoCosmosTableTest1() throws InterruptedException {
-        log.info("insertIntoCosmosTableTest1 - DASC5-877:Insert events to a CosmosDB table successfully");
+        log.info("insertIntoCosmosTableTest1 - Insert events to a CosmosDB table successfully");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -86,7 +86,7 @@ public class InsertIntoCosmosTableTest {
     @Test(expectedExceptions = DuplicateDefinitionException.class)
     public void insertIntoCosmosTableTest2() {
         log.info("insertIntoCosmosTableTest2 - " +
-                "DASC5-878:Insert events to a CosmosDB table when query has less attributes to select from");
+                "Insert events to a CosmosDB table when query has less attributes to select from");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -108,7 +108,7 @@ public class InsertIntoCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void insertIntoCosmosTableTest3() {
         log.info("insertIntoCosmosTableTest3 - " +
-                "DASC5-879:[N] Insert events to a CosmosDB table when query has more attributes to select from");
+                "Insert events to a CosmosDB table when query has more attributes to select from");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -130,7 +130,7 @@ public class InsertIntoCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void insertIntoCosmosTableTest4() {
         log.info("insertIntoCosmosTableTest4 - " +
-                "DASC5-883:[N] Insert events to a CosmosDB table by selecting from non existing stream");
+                "Insert events to a CosmosDB table by selecting from non existing stream");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -152,7 +152,7 @@ public class InsertIntoCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void insertIntoCosmosTableTest5() {
         log.info("insertIntoCosmosTableTest5 - " +
-                "DASC5-888:[N] Insert events to a CosmosDB table when the stream has not defined");
+                "Insert events to a CosmosDB table when the stream has not defined");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -173,7 +173,7 @@ public class InsertIntoCosmosTableTest {
     @Test
     public void insertIntoCosmosTableTest6() {
         log.info("insertIntoCosmosTableTest6 - " +
-                "DASC5-889:[N] Insert events data to CosmosDB table when the table has not defined");
+                "Insert events data to CosmosDB table when the table has not defined");
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 

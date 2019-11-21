@@ -49,7 +49,7 @@ public class DefineCosmosTableTest {
     @Test
     public void cosmosTableDefinitionTest1() {
         log.info("cosmosTableDefinitionTest1 - " +
-                "DASC5-958:Defining a CosmosDB event table with a non existing collection.");
+                "Defining a CosmosDB event table with a non existing collection.");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -72,7 +72,7 @@ public class DefineCosmosTableTest {
     @Test
     public void cosmosTableDefinitionTest2() {
         log.info("cosmosTableDefinitionTest2 - " +
-                "DASC5-854:Defining a CosmosDB event table with an existing collection");
+                "Defining a CosmosDB event table with an existing collection");
 
         CosmosTableTestUtils.createCollection(uri, key, "admin", "FooTable");
 
@@ -95,7 +95,7 @@ public class DefineCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void cosmosTableDefinitionTest3() {
         log.info("cosmosTableDefinitionTest3 - " +
-                "DASC5-859:Defining a CosmosDB table without having a cosmosdb uri field");
+                "Defining a CosmosDB table without having a cosmosdb uri field");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -110,7 +110,7 @@ public class DefineCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void cosmosTableDefinitionTest4() {
         log.info("cosmosTableDefinitionTest4 - " +
-                "DASC5-860:Defining a CosmosDB table without defining a value for cosmosdb uri field");
+                "Defining a CosmosDB table without defining a value for cosmosdb uri field");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -125,7 +125,7 @@ public class DefineCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void cosmosTableDefinitionTest5() {
         log.info("cosmosTableDefinitionTest5 - " +
-                "DASC5-861:Defining a CosmosDBS table with an invalid value for cosmosdb uri field");
+                "Defining a CosmosDBS table with an invalid value for cosmosdb uri field");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -140,7 +140,7 @@ public class DefineCosmosTableTest {
     @Test
     public void cosmosTableDefinitionTest6() {
         log.info("cosmosTableDefinitionTest6 - " +
-                "DASC5-948:Defining a CosmosDB event table with a new collection name");
+                "Defining a CosmosDB event table with a new collection name");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
