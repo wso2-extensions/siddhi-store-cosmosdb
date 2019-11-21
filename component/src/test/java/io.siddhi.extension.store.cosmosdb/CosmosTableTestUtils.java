@@ -30,15 +30,14 @@ import com.microsoft.azure.documentdb.SqlQuerySpec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class CosmosTableTestUtils {
 
     private static final Log log = LogFactory.getLog(CosmosTableTestUtils.class);
-    private static final String uri = "https://a6cec7ca-0ee0-4-231-b9ee.documents.azure.com:443/";
+    private static final String uri = "https://e2c10094-0ee0-4-231-b9ee.documents.azure.com:443/";
     private static final String key =
-            "pNXzmZ7T6Fxw7di1aeOML9USfUEGMwyWjUVwZw8mYemeu3ro7UkkqxOsrjpZk8g7j5PS2YejpRYf8ONWwgr2GA==";
+            "ddV5CxcHFe1oMBgkkCoTyUXVSN0wpW6LOjW9Vr9axk5pAFCMo1gB5XEAK1J7XjkVpgoLiCtcLw8UoadMUKqHUw==";
     private static final String databaseName = "admin";
     private static final String collectionName = "FooTable";
     //private final String collectionLink = String.format("/dbs/%s/colls/%s", databaseName, collectionName);
@@ -125,7 +124,7 @@ public class CosmosTableTestUtils {
         try (DocumentClient documentClient = new DocumentClient(uri, masterKey, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
             SqlQuerySpec query = new SqlQuerySpec();
-            query.setQueryText("SELECT * FROM " + collectionName + " WHERE " + value );
+            query.setQueryText("SELECT * FROM " + collectionName + " WHERE " + value);
             FeedOptions options = new FeedOptions();
             options.setEnableScanInQuery(true);
             List<Document> documentList = documentClient.queryDocuments(collectionLink,
