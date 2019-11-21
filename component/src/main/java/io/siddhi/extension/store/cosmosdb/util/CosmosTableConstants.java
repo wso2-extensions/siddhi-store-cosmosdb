@@ -41,7 +41,7 @@ public class CosmosTableConstants {
     public static final String SQL_COMPARE_LESS_THAN_EQUAL = "<=";
     public static final String SQL_COMPARE_GREATER_THAN_EQUAL = ">=";
     public static final String SQL_COMPARE_EQUAL = "=";
-    public static final String SQL_COMPARE_NOT_EQUAL = "<>"; //Using the ANSI SQL-92 standard over '!=' (non-standard)
+    public static final String SQL_COMPARE_NOT_EQUAL = "!=";
     public static final String SQL_AND = " AND ";
     public static final String SQL_OR = "OR";
     public static final String SQL_NOT = " NOT";

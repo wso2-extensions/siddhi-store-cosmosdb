@@ -58,10 +58,6 @@ public class CosmosTableTestUtils {
     }
 
 
-    private static boolean isEmpty(String field) {
-        return (field == null || field.trim().length() == 0);
-    }
-
     public static void dropCollection(String uri, String key, String collectionName) {
         try (DocumentClient documentClient = new DocumentClient(uri, key, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
