@@ -39,8 +39,6 @@ public class CosmosTableTestUtils {
     private static final String key =
             "ddV5CxcHFe1oMBgkkCoTyUXVSN0wpW6LOjW9Vr9axk5pAFCMo1gB5XEAK1J7XjkVpgoLiCtcLw8UoadMUKqHUw==";
     private static final String databaseName = "admin";
-    private static final String collectionName = "FooTable";
-    //private final String collectionLink = String.format("/dbs/%s/colls/%s", databaseName, collectionName);
 
     private CosmosTableTestUtils() {
     }
