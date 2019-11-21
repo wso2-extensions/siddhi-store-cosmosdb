@@ -376,10 +376,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
-                    <!--<suiteXmlFiles>
+                    <!--<skip>true</skip>-->
+                    <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testngStandalone.xml</suiteXmlFile>
-                    </suiteXmlFiles>-->
+                    </suiteXmlFiles>
                 </configuration>
             </plugin>
             <plugin>

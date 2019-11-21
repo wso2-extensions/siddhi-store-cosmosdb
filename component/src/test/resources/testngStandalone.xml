@@ -5,15 +5,12 @@
         <classes>
             <class name="io.siddhi.extension.store.cosmosdb.DefineCosmosTableTest"/>
             <class name="io.siddhi.extension.store.cosmosdb.ConditionVisitorTest"/>
-            <!--<class name="io.siddhi.extension.store.cosmosdb.ContainsCosmosTableTest"/>
-            <class name="io.siddhi.extension.store.cosmosdb.DeleteFromCosmosTableTest"/>-->
+            <class name="io.siddhi.extension.store.cosmosdb.ContainsCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.DeleteFromCosmosTableTest"/>
             <class name="io.siddhi.extension.store.cosmosdb.InsertIntoCosmosTableTest"/>
-            <!--<class name="io.siddhi.extension.store.cosmosdb.JoinCosmosTableTest"/>
-            <class name="io.siddhi.extension.store.cosmosdb.UpdateOrInsertCosmosTableTest"/>-->
-            <!-- Skipping update test till set is implemented-->
-            <!--
-                        <class name="io.siddhi.extension.store.cosmosdb.UpdateCosmosTableTest" />
-            -->
+            <class name="io.siddhi.extension.store.cosmosdb.JoinCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.UpdateCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.UpdateOrInsertCosmosTableTest"/>
         </classes>
     </test>
 </suite>
