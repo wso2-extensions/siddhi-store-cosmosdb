@@ -30,6 +30,7 @@ import com.microsoft.azure.documentdb.SqlQuerySpec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class CosmosTableTestUtils {
@@ -116,6 +117,24 @@ public class CosmosTableTestUtils {
             } catch (DocumentClientException e) {
                 log.error("Failed to create the collection", e);
             }
+        }
+    }
+
+    public static Document getDocument(String uri, String masterKey, String collectionLink, String collectionName,
+                                       String value) {
+        try (DocumentClient documentClient = new DocumentClient(uri, masterKey, ConnectionPolicy.GetDefault(),
+                ConsistencyLevel.Session)) {
+            SqlQuerySpec query = new SqlQuerySpec();
+            query.setQueryText("SELECT * FROM " + collectionName + " WHERE " + value );
+            FeedOptions options = new FeedOptions();
+            options.setEnableScanInQuery(true);
+            List<Document> documentList = documentClient.queryDocuments(collectionLink,
+                    query, options).getQueryIterable().toList();
+            Document document = documentList.get(0);
+            return document;
+        } catch (Exception e) {
+            log.error("Failed to get the document", e);
+            throw e;
         }
     }
 }
