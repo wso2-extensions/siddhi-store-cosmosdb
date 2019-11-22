@@ -266,4 +266,60 @@ public class JoinCosmosTableTest {
         siddhiAppRuntime.shutdown();
     }
 
+    @Test
+    public void testCosmosTableJoinQuery6() throws InterruptedException {
+        log.info("testCosmosTableJoinQuery6");
+        //Object reads
+
+        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
+
+        SiddhiManager siddhiManager = new SiddhiManager();
+        String streams = "" +
+                "define stream StockStream (symbol string, price float, input Object); " +
+                "define stream FooStream (symbol string); " +
+                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "database.name='" + database + "')" +
+                "define table FooTable (symbol string, price float, input Object);";
+        String query = "" +
+                "@info(name = 'query1') " +
+                "from StockStream " +
+                "insert into FooTable ;" +
+                "" +
+                "@info(name = 'query2') " +
+                "from FooStream#window.length(1) join FooTable " +
+                "select FooStream.symbol as checkSymbol, FooTable.symbol as symbol, " +
+                "FooTable.input as input  " +
+                "insert into OutputStream ;";
+
+        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
+        siddhiAppRuntime.addCallback("query2", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                if (inEvents != null) {
+                    for (Event event : inEvents) {
+                        eventCount.incrementAndGet();
+                        if (eventCount.intValue() == 1) {
+                            String input = "{symbol=IBM}";
+                            Assert.assertEquals(new Object[]{"WSO2_check", "WSO2", input}, event.getData());
+                        }
+                    }
+                }
+            }
+
+        });
+
+        InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
+        InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
+        siddhiAppRuntime.start();
+
+        String input = "{symbol=IBM}";
+        stockStream.send(new Object[]{"WSO2", 5.6f, input});
+        fooStream.send(new Object[]{"WSO2_check"});
+        SiddhiTestHelper.waitForEvents(waitTime, 1, eventCount, timeout);
+
+        siddhiAppRuntime.shutdown();
+
+        Assert.assertEquals(eventCount.intValue(), 1, "Read events failed");
+    }
 }
