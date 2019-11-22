@@ -34,11 +34,12 @@ public class Constant {
         this.type = type;
     }
 
-    public Object getValue() {
+    Object getValue() {
         return value;
     }
 
     public Attribute.Type getType() {
         return type;
     }
+
 }

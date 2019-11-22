@@ -24,7 +24,6 @@ import io.siddhi.query.api.definition.Attribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,11 +56,9 @@ public class CosmosTableUtils {
      * @param compiledCondition     the compiled condition which was built during compile time and now is being provided
      *                              by the Siddhi runtime.
      * @param conditionParameterMap the map which contains the runtime value(s) for the condition.
-     * @throws SQLException in the unlikely case where there are errors when setting values to the statement
-     *                      (e.g. type mismatches)
      */
     public static String resolveCondition(CosmosCompiledCondition compiledCondition,
-                                          Map<String, Object> conditionParameterMap) throws SQLException {
+                                          Map<String, Object> conditionParameterMap) {
 
         String condition = compiledCondition.getCompiledQuery();
         if (log.isDebugEnabled()) {
@@ -102,7 +99,7 @@ public class CosmosTableUtils {
     }
 
     /**
-     * Utility method tp map the values to the respective attributes before database writes.
+     * Utility method to map the values to the respective attributes before database writes.
      *
      * @param record         Object array of the runtime values.
      * @param attributeNames List containing names of the attributes.

@@ -21,10 +21,7 @@ package io.siddhi.extension.store.cosmosdb;
 
 import com.microsoft.azure.documentdb.Document;
 import io.siddhi.core.table.record.RecordIterator;
-import io.siddhi.extension.store.cosmosdb.exception.CosmosTableException;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -41,7 +38,7 @@ public class CosmosIterator implements RecordIterator<Object[]> {
     private ListIterator<Document> document;
 
 
-    public CosmosIterator(List<Document> documents, List<String> attributes) {
+    CosmosIterator(List<Document> documents, List<String> attributes) {
         this.attributes = attributes;
         this.document = documents.listIterator();
     }
@@ -64,11 +61,7 @@ public class CosmosIterator implements RecordIterator<Object[]> {
             return result;
         }
         if (this.document.hasNext()) {
-            try {
-                return this.extractRecord(this.document.next());
-            } catch (SQLException e) {
-                throw new CosmosTableException("Failed to iterate document list", e);
-            }
+            return this.extractRecord(this.document.next());
         }
         return new Object[0];
     }
@@ -79,10 +72,8 @@ public class CosmosIterator implements RecordIterator<Object[]> {
      *
      * @param document the {@link List} from which the values should be retrieved.
      * @return an array of extracted values, all cast to {@link Object} type for portability.
-     * @throws SQLException if there are errors in extracting the values from the {@link List} instance according
-     *                      to the table definition
      */
-    private Object[] extractRecord(Document document) throws SQLException {
+    private Object[] extractRecord(Document document) {
         List<Object> result = new ArrayList<>();
             for (Object attributeName : attributes) {
                 Object attributeValue = document.get(attributeName.toString());
@@ -97,7 +88,7 @@ public class CosmosIterator implements RecordIterator<Object[]> {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
     }
 
 }

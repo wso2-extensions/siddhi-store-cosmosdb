@@ -57,4 +57,5 @@ public class CosmosTableConstants {
 
     private CosmosTableConstants() {
     }
+
 }

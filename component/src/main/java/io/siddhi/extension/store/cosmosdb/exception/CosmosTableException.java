@@ -27,10 +27,6 @@ import io.siddhi.core.exception.SiddhiAppCreationException;
  */
 public class CosmosTableException extends SiddhiAppCreationException {
 
-    public CosmosTableException(String message) {
-        super(message);
-    }
-
     public CosmosTableException(String message, Throwable throwable) {
         super(message, throwable);
     }

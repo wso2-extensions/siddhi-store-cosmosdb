@@ -60,9 +60,7 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
     private int streamVarCount;
     private int constantCount;
 
-    private boolean isContainsConditionExist;
     private boolean nextProcessContainsPattern;
-    private int ordinalOfContainPattern = 1;
 
     private boolean lastConditionExist = false;
     private Stack<String> lastConditionParams;
@@ -71,7 +69,7 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
 
     private String[] supportedFunctions = {"sum", "avg", "min", "max"};
 
-    public CosmosConditionVisitor(String tableName, boolean isAfterSelectClause) {
+    CosmosConditionVisitor(String tableName, boolean isAfterSelectClause) {
         this.tableName = tableName;
         this.condition = new StringBuilder();
         this.streamVarCount = 0;
@@ -88,21 +86,13 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
         //preventing initialization
     }
 
-    public String returnCondition() {
+    String returnCondition() {
         this.parametrizeCondition();
         return this.finalCompiledCondition.trim();
     }
 
-    public int getOrdinalOfContainPattern() {
-        return ordinalOfContainPattern;
-    }
-
-    public SortedMap<Integer, Object> getParameters() {
+    SortedMap<Integer, Object> getParameters() {
         return this.parameters;
-    }
-
-    public boolean isContainsConditionExist() {
-        return isContainsConditionExist;
     }
 
     @Override
@@ -316,7 +306,6 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
             condition.append(functionName).append(CosmosTableConstants.OPEN_PARENTHESIS);
         } else if (namespace.trim().equals("str") && functionName.equals("contains")) {
             condition.append("CONTAINS").append(OPEN_PARENTHESIS);
-            isContainsConditionExist = true;
             nextProcessContainsPattern = true;
         } else if (namespace.trim().equals("incrementalAggregator") && functionName.equals("last")) {
             lastConditionExist = true;
@@ -418,9 +407,6 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
                 String candidate = token.substring(0, token.indexOf("]"));
                 if (this.placeholders.containsKey(candidate)) {
                     this.parameters.put(ordinal, this.placeholders.get(candidate));
-                    if (candidate.contains("pattern-value")) {
-                        ordinalOfContainPattern = ordinal;
-                    }
                     ordinal++;
                 }
             }

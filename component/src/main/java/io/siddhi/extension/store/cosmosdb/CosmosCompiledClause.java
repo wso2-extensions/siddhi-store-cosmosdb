@@ -20,7 +20,6 @@
 package io.siddhi.extension.store.cosmosdb;
 
 import io.siddhi.core.util.collection.operator.CompiledCondition;
-import java.util.SortedMap;
 
 /**
  * Implementation class of {@link CompiledCondition} corresponding to the CosmosDB Event Table.
@@ -34,18 +33,12 @@ public class CosmosCompiledClause implements CompiledCondition {
      */
     private String compiledQuery;
 
-    /**
-     * Parameters that will be used to fill in the placeholders in the compiledQuery.
-     * The key of the map is the index of the parameter in the compiledQuery. Index starts with 1.
-     */
-    private SortedMap<Integer, Object> parameters;
-
-    public CosmosCompiledClause(String compiledQuery, SortedMap<Integer, Object> parameters) {
+    public CosmosCompiledClause(String compiledQuery) {
         this.compiledQuery = compiledQuery;
-        this.parameters = parameters;
+
     }
 
-    public String getCompiledQuery() {
+    private String getCompiledQuery() {
         return compiledQuery;
     }
 
@@ -53,7 +46,4 @@ public class CosmosCompiledClause implements CompiledCondition {
         return getCompiledQuery();
     }
 
-    public SortedMap<Integer, Object> getParameters() {
-        return parameters;
-    }
 }

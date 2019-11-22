@@ -34,7 +34,6 @@ import io.siddhi.annotation.Extension;
 import io.siddhi.annotation.Parameter;
 import io.siddhi.annotation.SystemParameter;
 import io.siddhi.annotation.util.DataType;
-import io.siddhi.core.exception.ConnectionUnavailableException;
 import io.siddhi.core.table.record.AbstractRecordTable;
 import io.siddhi.core.table.record.ExpressionBuilder;
 import io.siddhi.core.table.record.RecordIterator;
@@ -123,7 +122,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
         Annotation storeAnnotation = AnnotationHelper.getAnnotation(ANNOTATION_STORE, tableDefinition.getAnnotations());
 
-        this.initializeConnectionParameters(storeAnnotation, configReader);
+        this.initializeConnectionParameters(storeAnnotation);
 
         this.databaseId = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_DATABASE_NAME);
 
@@ -137,9 +136,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
      * Method for initializing HOST and database name.
      *
      * @param storeAnnotation the source annotation which contains the needed parameters.
-     * @param configReader    {@link ConfigReader} ConfigurationReader.
      */
-    private void initializeConnectionParameters(Annotation storeAnnotation, ConfigReader configReader) {
+    private void initializeConnectionParameters(Annotation storeAnnotation) {
         String host = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_URI);
         String masterKey = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_MASTER_KEY);
 
@@ -152,14 +150,13 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     }
 
     @Override
-    protected void add(List<Object[]> records) throws ConnectionUnavailableException {
+    protected void add(List<Object[]> records) {
 
         for (Object[] record : records) {
             Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(record, this.attributeNames);
             Document insertDocument = new Document(gson.toJson(insertMap));
 
             try {
-                // Persist the document using the DocumentClient.
                 documentClient.createDocument(getCollectionId().getSelfLink(), insertDocument, null, false);
             } catch (DocumentClientException e) {
                 log.error("Failed to add document", e);
@@ -170,7 +167,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected RecordIterator<Object[]> find(Map<String, Object> findConditionParameterMap,
-                                            CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+                                            CompiledCondition compiledCondition) {
         List<Document> documentList = null;
         try {
             documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, findConditionParameterMap);
@@ -187,7 +184,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected boolean contains(Map<String, Object> containsConditionParameterMap,
-                               CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+                               CompiledCondition compiledCondition) {
         List<Document> documentList = null;
         try {
             documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, containsConditionParameterMap);
@@ -203,12 +200,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected void delete(List<Map<String, Object>> deleteConditionParameterMaps,
-                          CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+                          CompiledCondition compiledCondition) {
         this.batchProcessDelete(deleteConditionParameterMaps, compiledCondition);
     }
 
     private void batchProcessDelete(List<Map<String, Object>> deleteConditionParameterMaps,
-                                    CompiledCondition compiledCondition) throws ConnectionUnavailableException {
+                                    CompiledCondition compiledCondition) {
         try {
             for (Map<String, Object> deleteConditionParameterMap : deleteConditionParameterMaps) {
                 List<Document> documentList = queryDocuments((CosmosCompiledCondition) compiledCondition,
@@ -229,8 +226,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected void update(CompiledCondition compiledCondition, List<Map<String, Object>> updateConditionParameterMaps,
-                          Map<String, CompiledExpression> map, List<Map<String, Object>> updateSetParameterMaps)
-            throws ConnectionUnavailableException {
+                          Map<String, CompiledExpression> map, List<Map<String, Object>> updateSetParameterMaps) {
         for (int i = 0; i < updateConditionParameterMaps.size(); i++) {
             Map<String, Object> updateConditionParameterMap = null;
             for (Map<String, Object> stringObjectMap : updateConditionParameterMaps) {
@@ -265,7 +261,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     protected void updateOrAdd(CompiledCondition compiledCondition,
                                List<Map<String, Object>> updateConditionParameterMaps,
                                Map<String, CompiledExpression> map, List<Map<String, Object>> updateSetParameterMaps,
-                               List<Object[]> addingDocuments) throws ConnectionUnavailableException {
+                               List<Object[]> addingDocuments) {
         for (int i = 0; i < updateConditionParameterMaps.size(); i++) {
             Map<String, Object> updateOrAddConditionParameterMap = null;
             for (Map<String, Object> stringObjectMap : updateConditionParameterMaps) {
@@ -387,7 +383,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
 
     @Override
-    protected void connect() throws ConnectionUnavailableException {
+    protected void connect() {
 
     }
 
