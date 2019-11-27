@@ -25,8 +25,8 @@ package io.siddhi.extension.store.cosmosdb.util;
 public class CosmosTableConstants {
 
     //Annotation field names
-    public static final String ANNOTATION_ELEMENT_URI = "cosmosdb.uri";
-    public static final String ANNOTATION_ELEMENT_MASTER_KEY = "cosmosdb.key";
+    public static final String ANNOTATION_ELEMENT_URI = "uri";
+    public static final String ANNOTATION_ELEMENT_ACCESS_KEY = "access.key";
     public static final String ANNOTATION_ELEMENT_DATABASE_NAME = "database.name";
     public static final String ANNOTATION_ELEMENT_COLLECTION_NAME = "collection.name";
 
@@ -54,6 +54,24 @@ public class CosmosTableConstants {
     public static final String OPEN_PARENTHESIS = "(";
     public static final String CLOSE_PARENTHESIS = ")";
     public static final String SUB_SELECT_QUERY_REF = "t2";
+
+    //Configurable System Parameters associated with Connection Policy
+    public static final String CONNECTION_MODE = "connectionMode";
+    public static final String DIRECT_REQUEST_TIMEOUT = "directRequestTimeout";
+    public static final String ENABLE_ENDPOINT_DISCOVERY = "enableEndpointDiscovery";
+    public static final String HANDLE_SERVICE_UNAVAILABLE_FROM_PROXY = "handleServiceUnavailableFromProxy";
+    public static final String IDLE_CONNECTION_TIMEOUT = "idleConnectionTimeout";
+    public static final String MAX_POOL_SIZE = "maxPoolSize";
+    public static final String MAX_RETRY_ATTEMPTS_ON_THROTTLED_REQUESTS = "MaxRetryAttemptsOnThrottledRequests";
+    public static final String MAX_RETRY_WAIT_TIME = "MaxRetryWaitTimeInSeconds";
+    public static final String MEDIA_READ_MODE = "mediaReadMode";
+    public static final String MEDIA_REQUEST_TIMEOUT = "mediaRequestTimeout";
+    public static final String PREFERRED_LOCATIONS = "preferredLocations";
+    public static final String USER_AGENT_SUFFIX = "userAgentSuffix";
+    public static final String USING_MULTIPLE_WRITE_LOCATIONS = "usingMultipleWriteLocations";
+    public static final String REQUEST_TIMEOUT = "requestTimeout";
+
+    public static final String CONSISTENCY_LEVEL = "consistencyLevel";
 
     private CosmosTableConstants() {
     }

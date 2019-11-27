@@ -395,7 +395,7 @@ public class CosmosConditionVisitor extends BaseExpressionVisitor {
      * Util method for walking through the generated condition string and isolating the parameters which will be filled
      * in later as part of building the SQL statement. This method will:
      * (a) eliminate all temporary placeholders and put "?" in their places.
-     * (b) build and maintain a sorted map of ordinals and the coresponding parameters which will fit into the above
+     * (b) build and maintain a sorted map of ordinals and the corresponding parameters which will fit into the above
      * places in the PreparedStatement.
      */
     private void parametrizeCondition() {

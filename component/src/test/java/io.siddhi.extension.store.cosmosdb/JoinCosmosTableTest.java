@@ -73,7 +73,7 @@ public class JoinCosmosTableTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream FooStream (symbol string); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -132,7 +132,7 @@ public class JoinCosmosTableTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream FooStream (symbol string); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -159,7 +159,7 @@ public class JoinCosmosTableTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream FooStream (symbol string); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -190,7 +190,7 @@ public class JoinCosmosTableTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream FooStream (symbol string); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -248,7 +248,7 @@ public class JoinCosmosTableTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream FooStream (symbol string); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -278,7 +278,7 @@ public class JoinCosmosTableTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, input Object); " +
                 "define stream FooStream (symbol string); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, input Object);";
         String query = "" +

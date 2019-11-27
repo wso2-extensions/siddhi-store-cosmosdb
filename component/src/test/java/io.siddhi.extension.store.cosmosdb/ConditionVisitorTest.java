@@ -56,7 +56,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -81,7 +81,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -100,7 +100,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest3() throws InterruptedException {
-        log.info("conditionBuilderTest3");
+        log.info("conditionBuilderTest3"); //TODO add meaningful name
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -109,7 +109,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -149,7 +149,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -189,7 +189,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -229,7 +229,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -269,7 +269,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -309,7 +309,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -349,7 +349,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -389,7 +389,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -429,7 +429,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -469,7 +469,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -509,7 +509,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -549,7 +549,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -589,7 +589,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -629,7 +629,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -666,7 +666,7 @@ public class ConditionVisitorTest {
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
                 "define stream DeleteStockStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +

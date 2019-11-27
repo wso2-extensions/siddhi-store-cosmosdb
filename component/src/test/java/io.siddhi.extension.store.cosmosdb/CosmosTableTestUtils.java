@@ -113,9 +113,9 @@ public class CosmosTableTestUtils {
         }
     }
 
-    public static Document getDocument(String uri, String masterKey, String collectionLink, String collectionName,
+    public static Document getDocument(String uri, String accessKey, String collectionLink, String collectionName,
                                        String value) {
-        try (DocumentClient documentClient = new DocumentClient(uri, masterKey, ConnectionPolicy.GetDefault(),
+        try (DocumentClient documentClient = new DocumentClient(uri, accessKey, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
             SqlQuerySpec query = new SqlQuerySpec();
             query.setQueryText("SELECT * FROM " + collectionName + " WHERE " + value);

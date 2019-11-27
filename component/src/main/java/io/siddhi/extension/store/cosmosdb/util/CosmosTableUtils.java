@@ -19,11 +19,16 @@
 
 package io.siddhi.extension.store.cosmosdb.util;
 
+import com.microsoft.azure.documentdb.ConnectionMode;
+import com.microsoft.azure.documentdb.ConnectionPolicy;
+import com.microsoft.azure.documentdb.MediaReadMode;
+import io.siddhi.core.util.config.ConfigReader;
 import io.siddhi.extension.store.cosmosdb.CosmosCompiledCondition;
 import io.siddhi.query.api.definition.Attribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,4 +118,50 @@ public class CosmosTableUtils {
         return attributesValuesMap;
     }
 
+    public static ConnectionPolicy getConnectionPolicy(ConfigReader configReader) {
+        ConnectionPolicy connectionPolicy = new ConnectionPolicy();
+
+        connectionPolicy.setRequestTimeout(Integer.parseInt(configReader.readConfig(
+                CosmosTableConstants.REQUEST_TIMEOUT, String.valueOf(
+                        ConnectionPolicy.GetDefault().getRequestTimeout()))));
+        connectionPolicy.setDirectRequestTimeout(Integer.parseInt(configReader.readConfig(
+                CosmosTableConstants.DIRECT_REQUEST_TIMEOUT, String.valueOf(
+                        ConnectionPolicy.GetDefault().getDirectRequestTimeout()))));
+        connectionPolicy.setMediaRequestTimeout(Integer.parseInt(configReader.readConfig(
+                CosmosTableConstants.MEDIA_REQUEST_TIMEOUT, String.valueOf(
+                        ConnectionPolicy.GetDefault().getMediaRequestTimeout()))));
+        connectionPolicy.setConnectionMode(ConnectionMode.valueOf(configReader.readConfig(
+                CosmosTableConstants.CONNECTION_MODE, String.valueOf(
+                        ConnectionPolicy.GetDefault().getConnectionMode()))));
+        connectionPolicy.setMediaReadMode(MediaReadMode.valueOf(configReader.readConfig(
+                CosmosTableConstants.MEDIA_READ_MODE, String.valueOf(
+                        ConnectionPolicy.GetDefault().getMediaReadMode()))));
+        connectionPolicy.setMaxPoolSize(Integer.parseInt(configReader.readConfig(
+                CosmosTableConstants.MAX_POOL_SIZE, String.valueOf(ConnectionPolicy.GetDefault().getMaxPoolSize()))));
+        connectionPolicy.setIdleConnectionTimeout(Integer.parseInt(configReader.readConfig(
+                CosmosTableConstants.IDLE_CONNECTION_TIMEOUT, String.valueOf(
+                        ConnectionPolicy.GetDefault().getIdleConnectionTimeout()))));
+        connectionPolicy.setUserAgentSuffix(configReader.readConfig(
+                CosmosTableConstants.USER_AGENT_SUFFIX, ConnectionPolicy.GetDefault().getUserAgentSuffix()));
+        connectionPolicy.setEnableEndpointDiscovery(Boolean.parseBoolean(configReader.readConfig(
+                CosmosTableConstants.ENABLE_ENDPOINT_DISCOVERY, String.valueOf(
+                        ConnectionPolicy.GetDefault().getEnableEndpointDiscovery()))));
+        connectionPolicy.setPreferredLocations(Collections.singleton((String.valueOf(configReader.readConfig(
+                CosmosTableConstants.PREFERRED_LOCATIONS, String.valueOf(
+                        ConnectionPolicy.GetDefault().getPreferredLocations()))))));
+        connectionPolicy.setUsingMultipleWriteLocations(Boolean.parseBoolean(configReader.readConfig(
+                CosmosTableConstants.USING_MULTIPLE_WRITE_LOCATIONS, String.valueOf(
+                        ConnectionPolicy.GetDefault().isUsingMultipleWriteLocations()))));
+        connectionPolicy.setHandleServiceUnavailableFromProxy(Boolean.parseBoolean(configReader.readConfig(
+                CosmosTableConstants.HANDLE_SERVICE_UNAVAILABLE_FROM_PROXY, String.valueOf(
+                        ConnectionPolicy.GetDefault().getHandleServiceUnavailableFromProxy()))));
+        connectionPolicy.getRetryOptions().setMaxRetryWaitTimeInSeconds(Integer.parseInt(configReader.readConfig(
+                CosmosTableConstants.MAX_RETRY_WAIT_TIME, String.valueOf(
+                        ConnectionPolicy.GetDefault().getRetryOptions().getMaxRetryWaitTimeInSeconds()))));
+        connectionPolicy.getRetryOptions().setMaxRetryAttemptsOnThrottledRequests(Integer.parseInt(
+                configReader.readConfig(CosmosTableConstants.MAX_RETRY_ATTEMPTS_ON_THROTTLED_REQUESTS, String.valueOf(
+                        ConnectionPolicy.GetDefault().getRetryOptions().getMaxRetryAttemptsOnThrottledRequests()))));
+
+        return connectionPolicy;
+    }
 }

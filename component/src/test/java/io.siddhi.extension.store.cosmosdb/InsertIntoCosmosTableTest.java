@@ -62,7 +62,7 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -92,7 +92,7 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -114,7 +114,7 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -136,7 +136,7 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -157,7 +157,7 @@ public class InsertIntoCosmosTableTest {
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, volume long);";
         String query = "" +
@@ -181,7 +181,7 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, volume long); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')";
         String query = "" +
                 "@info(name = 'query1') " +
@@ -209,7 +209,7 @@ public class InsertIntoCosmosTableTest {
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
                 "define stream FooStream (symbol string, price float, input Object); " +
-                "@store(type = 'cosmosdb' , cosmosdb.uri='" + uri + "', cosmosdb.key='" + key + "', " +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
                 "define table FooTable (symbol string, price float, input Object);";
         String query = "" +
