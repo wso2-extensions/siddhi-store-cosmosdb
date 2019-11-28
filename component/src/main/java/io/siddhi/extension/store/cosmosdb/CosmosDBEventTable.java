@@ -85,20 +85,96 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                         type = {DataType.STRING})
         },
         systemParameter = {
-                @SystemParameter(name = "applicationName",
-                        description = "Sets the logical name of the application using this CosmosClient. The " +
-                                "application name may be used by the client to identify the application to " +
-                                "the server, for use in server logs, slow query logs, and profile collection.",
-                        defaultValue = "null",
-                        possibleParameters = "the logical name of the application using this CosmosClient. The " +
-                                "UTF-8 encoding may not exceed 128 bytes."), //TODO check application in cosmosdb
                 @SystemParameter(name = "requestTimeout",
                         description = "Sets the request timeout (time to wait for response from network peer) in " +
                                 "seconds.",
                         defaultValue = "60",
-                        possibleParameters = "the logical name of the application using this CosmosClient. The " +
-                                "UTF-8 encoding may not exceed 128 bytes.")
-        }, //TODO add custom properties
+                        possibleParameters = "any positive integer"),
+                @SystemParameter(name = "directRequestTimeout",
+                        description = "Sets the direct mode request timeout (time to wait for response from network " +
+                                "peer) in seconds. This only applies to requests that talk directly to the backend. ",
+                        defaultValue = "5",
+                        possibleParameters = "any positive integer"),
+                @SystemParameter(name = "mediaRequestTimeout",
+                        description = "Sets time to wait for response from network peer for attachment content " +
+                                "(aka media) operations in seconds.",
+                        defaultValue = "300",
+                        possibleParameters = "any positive integer"),
+                @SystemParameter(name = "connectionMode",
+                        description = "Sets the connection mode used in the client. Direct and Gateway connectivity " +
+                                "modes are supported",
+                        defaultValue = "Gateway",
+                        possibleParameters = {"Gateway", "DirectHttps"}),
+                @SystemParameter(name = "mediaReadMode",
+                        description = "Sets the attachment content (aka media) download mode.",
+                        defaultValue = "Buffered",
+                        possibleParameters = {"Buffered", "Streamed"}),
+                @SystemParameter(name = "maxPoolSize",
+                        description = "Sets the value of the connection pool size of the httpclient.",
+                        defaultValue = "100",
+                        possibleParameters = "any positive integer"),
+                @SystemParameter(name = "idleConnectionTimeout",
+                        description = "Sets the value of the timeout for an idle connection in seconds. After that " +
+                                "time, the connection will be automatically closed.",
+                        defaultValue = "60",
+                        possibleParameters = "any positive integer"),
+                @SystemParameter(name = "userAgentSuffix",
+                        description = "Sets the value to be appended to the user-agent header, this is used for " +
+                                "monitoring purposes",
+                        defaultValue = "\"\"",
+                        possibleParameters = "any String value"),
+                @SystemParameter(name = "MaxRetryAttemptsOnThrottledRequests",
+                        description = "Sets the maximum number of retries in the case where the request fails " +
+                                "because the service has applied rate limiting on the client. The default value is " +
+                                "9. This means in the case where the request is throttled, the same request will be " +
+                                "issued for a maximum of 10 times to the server before an error is returned to " +
+                                "the application.",
+                        defaultValue = "9",
+                        possibleParameters = "any positive integer"),
+                @SystemParameter(name = "MaxRetryWaitTimeInSeconds",
+                        description = "Sets the maximum retry time in seconds. When a request fails due to a " +
+                                "throttle error, the service sends back a response that contains a value indicating " +
+                                "the client should not retry before the time period has elapsed (Retry-After). " +
+                                "The MaxRetryWaitTime flag allows the application to set a maximum wait time for " +
+                                "all retry attempts.",
+                        defaultValue = "30",
+                        possibleParameters = "any positive integer"),
+                @SystemParameter(name = "enableEndpointDiscovery",
+                        description = "Sets the flag to enable endpoint discovery for geo-replicated database " +
+                                "accounts. When EnableEndpointDiscovery is true, the extension will automatically " +
+                                "discover the current write and read regions to ensure requests are sent to the " +
+                                "correct region based on the capability of the region and the user's preference.",
+                        defaultValue = "true",
+                        possibleParameters = {"true", "false"}),
+                @SystemParameter(name = "preferredLocations",
+                        description = "Sets the preferred locations for geo-replicated database accounts. For " +
+                                "example, \"East US\" as the preferred location. If EnableEndpointDiscovery is set " +
+                                "to false, this property is ignored.",
+                        defaultValue = "null",
+                        possibleParameters = "list of valid locations"),
+                @SystemParameter(name = "usingMultipleWriteLocations",
+                        description = "Sets the value to enable writes on any locations (regions) for geo-replicated " +
+                                "database accounts. When the value of this property is true, the SDK will direct " +
+                                "write operations to available writable locations of geo-replicated database " +
+                                "account. Writable locations are ordered by PreferredLocations property. Setting the " +
+                                "property value to true has no effect until EnableMultipleWriteLocations in " +
+                                "DatabaseAccount is also set to true.",
+                        defaultValue = "false",
+                        possibleParameters = {"true", "false"}),
+                @SystemParameter(name = "handleServiceUnavailableFromProxy",
+                        description = "Sets the value to handle service unavailable errors returned without a " +
+                                "service version header, by a proxy. When the value of this property is true, the " +
+                                "extension will handle it as a known error and perform retries.",
+                        defaultValue = "false",
+                        possibleParameters = {"true", "false"}),
+                @SystemParameter(name = "consistencyLevel",
+                        description = "Represents the consistency levels supported for Azure Cosmos DB client " +
+                                "operations in the Azure Cosmos DB database service. The requested ConsistencyLevel " +
+                                "must match or be weaker than that provisioned for the database account. Consistency " +
+                                "levels by order of strength are Strong, BoundedStaleness, Session and Eventual.",
+                        defaultValue = "Session",
+                        possibleParameters = {"Strong", "BoundedStaleness", "Session", "Eventual", "ConsistentPrefix"})
+        },
         examples = {
                 @Example(
                         syntax = "@Store(type=\"cosmosdb\"," +
@@ -156,7 +232,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
         if (documentClient == null) {
             documentClient = new DocumentClient(uri, accessKey, connectionPolicy,
-                    consistencyLevel); //TODO add system parameters for connectionpolicy and consistencylevel
+                    consistencyLevel);
         }
     }
 
