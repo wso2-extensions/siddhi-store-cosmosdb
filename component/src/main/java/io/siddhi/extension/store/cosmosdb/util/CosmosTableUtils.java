@@ -29,8 +29,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,6 +36,7 @@ import java.util.Map;
  */
 public class CosmosTableUtils {
     private static final Log log = LogFactory.getLog(CosmosTableUtils.class);
+
 
     private CosmosTableUtils() {
         //Prevent Initialization.
@@ -103,20 +102,14 @@ public class CosmosTableUtils {
         return condition;
     }
 
-    /**
-     * Utility method to map the values to the respective attributes before database writes.
-     *
-     * @param record         Object array of the runtime values.
-     * @param attributeNames List containing names of the attributes.
-     * @return Document
-     */
+/*    /*
     public static Map<String, Object> mapValuesToAttributes(Object[] record, List<String> attributeNames) {
         Map<String, Object> attributesValuesMap = new HashMap<>();
         for (int i = 0; i < record.length; i++) {
             attributesValuesMap.put(attributeNames.get(i), record[i]);
         }
         return attributesValuesMap;
-    }
+    }*/
 
     public static ConnectionPolicy getConnectionPolicy(ConfigReader configReader) {
         ConnectionPolicy connectionPolicy = new ConnectionPolicy();
