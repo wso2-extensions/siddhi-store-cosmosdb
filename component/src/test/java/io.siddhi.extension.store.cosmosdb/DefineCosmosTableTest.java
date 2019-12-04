@@ -89,7 +89,6 @@ public class DefineCosmosTableTest {
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
         Assert.assertEquals(doesCollectionExists, true, "Definition failed");
-
     }
 
     @Test(expectedExceptions = SiddhiAppCreationException.class)

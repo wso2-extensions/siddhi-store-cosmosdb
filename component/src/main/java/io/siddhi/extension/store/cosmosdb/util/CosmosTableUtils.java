@@ -30,6 +30,10 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.SortedMap;
+
+import static io.siddhi.query.api.definition.Attribute.Type;
+import static io.siddhi.query.api.definition.Attribute.Type.STRING;
 
 /**
  * Class which holds the utility methods which are used by various units in the CosmosDB Event Table implementation.
@@ -68,34 +72,28 @@ public class CosmosTableUtils {
         if (log.isDebugEnabled()) {
             log.debug("compiled condition for collection : " + condition);
         }
-        Object[] entries = compiledCondition.getParameters().values().toArray();
-        Object[] attributeKeys = conditionParameterMap.keySet().toArray();
-        Object[] keys = compiledCondition.getParameters().keySet().toArray();
-        int paramCounter = 0;
-        int attributeCounter = 0;
-        while (paramCounter < keys.length) {
-            if (entries[paramCounter] instanceof Constant) {
-                Constant value = (Constant) entries[paramCounter];
-                if (value.getType() == Attribute.Type.STRING) {
-                    condition = condition.replaceFirst("\\?", "'" + value.getValue().toString() + "'");
+        SortedMap<Integer, Object> parameters = compiledCondition.getParameters();
+        for (Map.Entry<Integer, Object> entry : parameters.entrySet()) {
+            if (entry.getValue() instanceof Constant) {
+                Constant value = (Constant) entry.getValue();
+                if (value.getType() == STRING) {
+                    condition = condition.replaceFirst("\\?",
+                            "'" + value.getValue().toString() + "'");
                 } else {
                     condition = condition.replaceFirst("\\?", value.getValue().toString());
                 }
-
             } else {
-
-                Object key = attributeKeys[attributeCounter];
-                Object value = conditionParameterMap.get(key);
-                if (value.getClass().getName().equals("java.lang.String")) {
-                    condition = condition.replaceFirst("\\?", "'" + value.toString() + "'");
+                Attribute replacingAttribute = (Attribute) entry.getValue();
+                Type type = replacingAttribute.getType();
+                if (type == STRING) {
+                    condition = condition.replaceFirst("\\?",
+                            "'" + conditionParameterMap.get(replacingAttribute.getName()).toString() + "'");
                 } else {
-                    condition = condition.replaceFirst("\\?", value.toString());
+                    condition = condition.replaceFirst("\\?",
+                            String.valueOf(conditionParameterMap.get(replacingAttribute.getName())));
                 }
-                attributeCounter++;
             }
-            paramCounter++;
         }
-
         if (log.isDebugEnabled()) {
             log.debug("Resolved condition for collection : " + condition);
         }

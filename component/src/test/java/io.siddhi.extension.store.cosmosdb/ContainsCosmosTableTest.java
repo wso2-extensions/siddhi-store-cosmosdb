@@ -190,4 +190,71 @@ public class ContainsCosmosTableTest {
 
         Assert.assertEquals(eventCount.intValue(), 2, "Number of success events");
     }
+
+    @Test
+    public void containsCosmosTableTest3() throws InterruptedException {
+        log.info("containsCosmosTableTest3 - " +
+                "Configure siddhi to check whether record exist when OutputStream already exists");
+
+        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
+
+        SiddhiManager siddhiManager = new SiddhiManager();
+        String streams = "" +
+                "define stream StockStream (symbol string, price float, volume long); " +
+                "@source(type='inMemory') " +
+                "define stream FooStream (symbol string, price float, volume long);" +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
+                "database.name='" + database + "')" +
+                "define table FooTable (symbol string, price float, volume long);" +
+                "@source(type='inMemory')" +
+                "define stream OutputStream (symbol string, price float, volume long);";
+        String query = "" +
+                "@info(name = 'query1') " +
+                "from StockStream   " +
+                "insert into FooTable ;" +
+                "@info(name='query2')" +
+                "from FooStream " +
+                "[(FooTable.symbol == symbol and FooTable.price == price) in FooTable]" +
+                "insert into OutputStream ;";
+
+        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
+
+        InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
+        InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
+        siddhiAppRuntime.addCallback("OutputStream", new StreamCallback() {
+            @Override
+            public void receive(Event[] events) {
+                if (events != null) {
+                    for (Event event : events) {
+                        eventCount.incrementAndGet();
+                        switch (eventCount.intValue()) {
+                            case 1:
+                                Assert.assertEquals(new Object[]{"WSO2", 50.56, 200}, event.getData());
+                                break;
+                            case 2:
+                                Assert.assertEquals(new Object[]{"IBM", 70.56, 200}, event.getData());
+                                break;
+                            default:
+                                Assert.assertEquals(new Object[]{}, event.getData());
+                                break;
+                        }
+                    }
+                }
+            }
+        });
+        siddhiAppRuntime.start();
+
+        stockStream.send(new Object[]{"WSO2", 50.56F, 100L});
+        stockStream.send(new Object[]{"IBM", 70.56F, 100L});
+        stockStream.send(new Object[]{"WSO2_2", 57.6F, 100L});
+        fooStream.send(new Object[]{"WSO2", 50.56, 200});
+        fooStream.send(new Object[]{"IBM", 70.56, 200});
+        fooStream.send(new Object[]{"IBM_2", 70.56, 200});
+        SiddhiTestHelper.waitForEvents(waitTime, 2, eventCount, timeout);
+
+        siddhiAppRuntime.shutdown();
+
+        Assert.assertEquals(eventCount.intValue(), 2, "Number of success events");
+    }
 }
