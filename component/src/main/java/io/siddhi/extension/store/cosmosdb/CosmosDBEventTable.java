@@ -27,13 +27,14 @@ import com.microsoft.azure.documentdb.DocumentClient;
 import com.microsoft.azure.documentdb.DocumentClientException;
 import com.microsoft.azure.documentdb.DocumentCollection;
 import com.microsoft.azure.documentdb.FeedOptions;
+import com.microsoft.azure.documentdb.RequestOptions;
 import com.microsoft.azure.documentdb.SqlQuerySpec;
 import io.siddhi.annotation.Example;
 import io.siddhi.annotation.Extension;
 import io.siddhi.annotation.Parameter;
 import io.siddhi.annotation.SystemParameter;
 import io.siddhi.annotation.util.DataType;
-import io.siddhi.core.exception.SiddhiAppCreationException;
+//import io.siddhi.core.exception.SiddhiAppCreationException;
 import io.siddhi.core.table.record.AbstractRecordTable;
 import io.siddhi.core.table.record.ExpressionBuilder;
 import io.siddhi.core.table.record.RecordIterator;
@@ -82,7 +83,105 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                                 "persisted as. A collection is a named logical container for JSON documents.",
                         optional = true,
                         defaultValue = "Name of the siddhi event table.",
-                        type = {DataType.STRING})
+                        type = {DataType.STRING}),
+                @Parameter(name = "custom.request.options",
+                        description = "This parameter contains all the possible options a create, update or delete " +
+                                "request can have." +
+                                "e.g., 'offerThroughput:500,scriptLoggingEnabled:true'.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "is.script.logging.enabled",
+                        description = "Sets whether Javascript stored procedure logging is enabled for the requests" +
+                                " in the Azure Cosmos DB database service or not. Possible values are 'true' or " +
+                                "'false'.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "false"),
+                @Parameter(name = "is.populate.quota.info",
+                        description = "Sets the PopulateQuotaInfo setting for document collection read requests " +
+                                "in the Azure Cosmos DB database service. PopulateQuotaInfo is used to " +
+                                "enable/disable getting document collection quota related stats for document " +
+                                "collection read requests. Possible values are 'true' or 'false'.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "false"),
+                @Parameter(name = "is.disable.ru.per.minute.usage",
+                        description = "is.disable.ru.per.minute.usage is used to enable/disable Request " +
+                                "Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second " +
+                                "is exhausted. Possible values are 'true' or 'false'.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "false"),
+                @Parameter(name = "offer.enable.ru.per.minute.throughput",
+                        description = "Sets offerEnableRUPerMinuteThroughput for a collection in the Azure Cosmos " +
+                                "DB database service. Possible values are 'true' or 'false'.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "false"),
+                @Parameter(name = "is.populate.partition.key.range.statistics",
+                        description = "Sets populatePartitionKeyRangeStatistics for a collection in the Azure " +
+                                "Cosmos DB database service. Possible values are 'true' or 'false'.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "false"),
+                @Parameter(name = "partition.key",
+                        description = "Sets the partition key used to identify the current request's target partition.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "offer.throughput",
+                        description = "Sets the throughput in the form of Request Units per second when creating " +
+                                "a document collection. Possible values for this parameter are positive integers.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "offer.type",
+                        description = "Sets the offer type when creating a document collection.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "resource.token.expiry.seconds",
+                        description = "Sets the expiry time for resource token. Used when creating, updating, " +
+                                "reading permission. Possible values for this parameter are positive integers.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "session.token",
+                        description = "Sets the token for use with session consistency.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "indexing.directive",
+                        description = "Specifies whether or not the resource is to be indexed in the Azure Cosmos" +
+                                " DB database service. Possible values are 'Default', 'Include' or 'Exclude'.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "access.condition.type",
+                        description = "Specifies the set of access condition types that can be used for operations " +
+                                "in the Azure Cosmos DB database service. Possible values are 'IfMatch' or " +
+                                "'IfNoneMatch'.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "access.condition",
+                        description = "Sets the value of the condition - for AccessConditionType IfMatchs and " +
+                                "IfNotMatch, this is the ETag that has to be compared to.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "pre.trigger.include",
+                        description = "Sets the triggers to be invoked before the operation.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+                @Parameter(name = "post.trigger.include",
+                        description = "Sets the triggers to be invoked after the operation.",
+                        type = {DataType.STRING},
+                        optional = true,
+                        defaultValue = "null"),
+
         },
         systemParameter = {
                 @SystemParameter(name = "requestTimeout",
@@ -306,7 +405,9 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private List<String> attributeNames;
     private String databaseId;
     private String collectionId;
-
+    private String collectionLink;
+    private RequestOptions options;
+    private boolean disableAutomaticIdGeneration;
 
     @Override
     protected void init(TableDefinition tableDefinition, ConfigReader configReader) {
@@ -321,6 +422,10 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
         this.collectionId = CosmosTableUtils.isEmpty(customCollectionName) ? tableDefinition.getId() :
                 customCollectionName;
+
+        collectionLink = getCollectionId().getSelfLink();
+        //this.disableAutomaticIdGeneration =
+        options = CosmosTableUtils.getCustomRequestOptions(storeAnnotation);
     }
 
     /**
@@ -338,13 +443,14 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 CosmosTableConstants.CONSISTENCY_LEVEL, String.valueOf(ConsistencyLevel.Session)));
 
         if (documentClient == null) {
-            try {
+            if (uri == null || uri.isEmpty()) {
+                log.error("URI is not given. ");
+            } else if (accessKey == null || accessKey.isEmpty()) {
+                log.error("Access key is not given. ");
+            } else {
                 documentClient = new DocumentClient(uri, accessKey, connectionPolicy, consistencyLevel);
-            } catch (IllegalStateException e) {
-                log.error("Failed to create documentClient. ", e);
             }
         }
-
     }
 
     @Override
@@ -358,8 +464,9 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 Object value = record[counter];
                 insertDocument.set(key, value);
             }
+
             try {
-                documentClient.createDocument(getCollectionId().getSelfLink(), insertDocument, null, false);
+                documentClient.createDocument(collectionLink, insertDocument, options, false);
             } catch (DocumentClientException e) { //TODO check options and idGeneration
                 log.error("Failed to add document. ", e);
             }
@@ -407,7 +514,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                         deleteConditionParameterMap);
                 for (Document toDeleteDocument : documentList) {
                     try {
-                        documentClient.deleteDocument(toDeleteDocument.getSelfLink(), null);
+                        documentClient.deleteDocument(toDeleteDocument.getSelfLink(), options);
                     } catch (DocumentClientException e) {
                         log.error("Failed to delete document", e);
                     }
@@ -441,7 +548,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                             Object value = updateSetParameterMaps.get(ordinal).get(key);
                             toUpdateDocument.set(key, value);
                         }
-                        documentClient.replaceDocument(toUpdateDocument, null);
+                        documentClient.replaceDocument(toUpdateDocument, options);
                     } catch (DocumentClientException e) {
                         log.error("Failed to update document", e);
                     }
@@ -477,7 +584,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                                 Object value = updateSetParameterMaps.get(ordinal).get(key);
                                 toUpdateDocument.set(key, value);
                             }
-                            documentClient.replaceDocument(toUpdateDocument, null);
+                            documentClient.replaceDocument(toUpdateDocument, options);
                         } catch (DocumentClientException e) {
                             log.error("Failed to update document", e);
                         }
@@ -519,7 +626,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     Database databaseDefinition = new Database();
                     databaseDefinition.setId(databaseId);
                     try {
-                        databaseCache = documentClient.createDatabase(databaseDefinition, null).getResource();
+                        databaseCache = documentClient.createDatabase(databaseDefinition, options).getResource();
                     } catch (ClassCastException e) {
                         log.error("Failed to cast from Request Response to Database", e);
                     }
@@ -548,7 +655,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     collectionDefinition.setId(collectionId);
                     try {
                         collectionCache = documentClient.createCollection(getDatabaseId().getSelfLink(),
-                                collectionDefinition, null).getResource();
+                                collectionDefinition, options).getResource();
                     } catch (ClassCastException e) {
                         log.error("Failed to cast from Request Response to Document Collection", e);
                     }
@@ -570,7 +677,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         FeedOptions options = new FeedOptions();
         options.setEnableScanInQuery(true);
 
-        return documentClient.queryDocuments(getCollectionId().getSelfLink(),
+        return documentClient.queryDocuments(collectionLink,
                 query, options).getQueryIterable().toList();
     }
 

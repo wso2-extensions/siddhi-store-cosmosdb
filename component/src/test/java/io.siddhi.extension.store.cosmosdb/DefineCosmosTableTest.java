@@ -66,7 +66,7 @@ public class DefineCosmosTableTest {
         String databaseLink = String.format("/dbs/%s", "admin");
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
-        Assert.assertEquals(doesCollectionExists, false, "Definition failed");
+        Assert.assertEquals(doesCollectionExists, true, "Definition failed");
     }
 
     @Test
@@ -156,6 +156,6 @@ public class DefineCosmosTableTest {
         String databaseLink = String.format("/dbs/%s", "admin");
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "newCollection");
-        Assert.assertEquals(doesCollectionExists, false, "Definition failed");
+        Assert.assertEquals(doesCollectionExists, true, "Definition failed");
     }
 }

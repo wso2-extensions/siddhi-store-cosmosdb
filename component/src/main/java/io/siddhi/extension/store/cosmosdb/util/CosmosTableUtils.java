@@ -19,11 +19,10 @@
 
 package io.siddhi.extension.store.cosmosdb.util;
 
-import com.microsoft.azure.documentdb.ConnectionMode;
-import com.microsoft.azure.documentdb.ConnectionPolicy;
-import com.microsoft.azure.documentdb.MediaReadMode;
+import com.microsoft.azure.documentdb.*;
 import io.siddhi.core.util.config.ConfigReader;
 import io.siddhi.extension.store.cosmosdb.CosmosCompiledCondition;
+import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.definition.Attribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -154,5 +153,55 @@ public class CosmosTableUtils {
                         ConnectionPolicy.GetDefault().getRetryOptions().getMaxRetryAttemptsOnThrottledRequests()))));
 
         return connectionPolicy;
+    }
+
+
+    public static RequestOptions getCustomRequestOptions(Annotation storeAnnotation) {
+        RequestOptions requestOptions = new RequestOptions();
+        AccessCondition accessCondition = new AccessCondition();
+
+        requestOptions.setScriptLoggingEnabled(Boolean.parseBoolean(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_SCRIPT_LOGGING)));
+        requestOptions.setPopulateQuotaInfo(Boolean.parseBoolean(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_POPULATE_QUOTA)));
+        requestOptions.setDisableRUPerMinuteUsage(Boolean.parseBoolean(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_RU_PER_MINUTE)));
+        requestOptions.setOfferEnableRUPerMinuteThroughput(Boolean.parseBoolean(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_ENABLE_RU_THROUGHPUT)));
+        requestOptions.setPopulatePartitionKeyRangeStatistics(Boolean.parseBoolean(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_POPULATE_PK_STATS)));
+        requestOptions.setPartitionKey(PartitionKey.FromJsonString(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)));
+        requestOptions.setOfferThroughput(Integer.valueOf(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_THROUGHPUT)));
+        requestOptions.setOfferType(storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_TYPE));
+        requestOptions.setResourceTokenExpirySeconds(Integer.valueOf(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_RESOURCE_TOKEN_EXPIRY)));
+        requestOptions.setSessionToken(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_SESSION_TOKEN));
+        requestOptions.setIndexingDirective(IndexingDirective.valueOf(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_INDEXING_DIRECTIVE)));
+        accessCondition.setType(AccessConditionType.valueOf(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_CONDITION_TYPE)));
+        accessCondition.setCondition(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_CONDITION));
+        requestOptions.setAccessCondition(accessCondition);
+        requestOptions.setPreTriggerInclude(Collections.singletonList(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_PRE_TRIGGER_INCLUDE)));
+        requestOptions.setPostTriggerInclude(Collections.singletonList(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE)));
+
+        String customOptions = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_REQUEST_OPTIONS);
+        if (customOptions != null) {
+            String[] customOption = customOptions.split(",");
+            for (int counter = 0; counter < customOption.length; counter++) {
+                String[] option = customOption[counter].split(":");
+                String key = option[0];
+                String value = option[1];
+                requestOptions.setCustomRequestOption(key, value);
+            }
+        }
+
+        return requestOptions;
     }
 }
