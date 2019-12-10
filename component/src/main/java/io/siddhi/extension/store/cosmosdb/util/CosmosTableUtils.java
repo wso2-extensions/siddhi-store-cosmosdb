@@ -19,7 +19,14 @@
 
 package io.siddhi.extension.store.cosmosdb.util;
 
-import com.microsoft.azure.documentdb.*;
+import com.microsoft.azure.documentdb.AccessCondition;
+import com.microsoft.azure.documentdb.AccessConditionType;
+import com.microsoft.azure.documentdb.ConnectionMode;
+import com.microsoft.azure.documentdb.ConnectionPolicy;
+import com.microsoft.azure.documentdb.IndexingDirective;
+import com.microsoft.azure.documentdb.MediaReadMode;
+import com.microsoft.azure.documentdb.PartitionKey;
+import com.microsoft.azure.documentdb.RequestOptions;
 import io.siddhi.core.util.config.ConfigReader;
 import io.siddhi.extension.store.cosmosdb.CosmosCompiledCondition;
 import io.siddhi.query.api.annotation.Annotation;
@@ -170,26 +177,38 @@ public class CosmosTableUtils {
                 CosmosTableConstants.ANNOTATION_ELEMENT_ENABLE_RU_THROUGHPUT)));
         requestOptions.setPopulatePartitionKeyRangeStatistics(Boolean.parseBoolean(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_POPULATE_PK_STATS)));
-        requestOptions.setPartitionKey(PartitionKey.FromJsonString(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)));
-        requestOptions.setOfferThroughput(Integer.valueOf(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_THROUGHPUT)));
-        requestOptions.setOfferType(storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_TYPE));
-        requestOptions.setResourceTokenExpirySeconds(Integer.valueOf(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_RESOURCE_TOKEN_EXPIRY)));
-        requestOptions.setSessionToken(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_SESSION_TOKEN));
-        requestOptions.setIndexingDirective(IndexingDirective.valueOf(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_INDEXING_DIRECTIVE)));
-        accessCondition.setType(AccessConditionType.valueOf(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_CONDITION_TYPE)));
-        accessCondition.setCondition(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_CONDITION));
+        requestOptions.setPartitionKey(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)) ? null : PartitionKey.FromJsonString(
+                        storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)));
+        requestOptions.setOfferThroughput(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_THROUGHPUT)) ? null : Integer.valueOf(
+                        storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_THROUGHPUT)));
+        requestOptions.setOfferType(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_TYPE)) ? null : storeAnnotation.getElement(
+                        CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_TYPE));
+        requestOptions.setResourceTokenExpirySeconds(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_RESOURCE_TOKEN_EXPIRY)) ? null : Integer.valueOf(
+                        storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_RESOURCE_TOKEN_EXPIRY)));
+        requestOptions.setSessionToken(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_SESSION_TOKEN)) ? null : storeAnnotation.getElement(
+                        CosmosTableConstants.ANNOTATION_ELEMENT_SESSION_TOKEN));
+        requestOptions.setIndexingDirective(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_INDEXING_DIRECTIVE)) ? null : IndexingDirective.valueOf(
+                        storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_INDEXING_DIRECTIVE)));
+        accessCondition.setType(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_CONDITION_TYPE)) ? null :
+                AccessConditionType.valueOf(storeAnnotation.getElement(
+                        CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_CONDITION_TYPE)));
+        accessCondition.setCondition(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_CONDITION)) ? null : storeAnnotation.getElement(
+                        CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_CONDITION));
         requestOptions.setAccessCondition(accessCondition);
-        requestOptions.setPreTriggerInclude(Collections.singletonList(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_PRE_TRIGGER_INCLUDE)));
-        requestOptions.setPostTriggerInclude(Collections.singletonList(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE)));
+        requestOptions.setPreTriggerInclude(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_PRE_TRIGGER_INCLUDE)) ? null : Collections.singletonList(
+                        storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_PRE_TRIGGER_INCLUDE)));
+        requestOptions.setPostTriggerInclude(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE)) ? null : Collections.singletonList(
+                        storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE)));
 
         String customOptions = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_REQUEST_OPTIONS);
         if (customOptions != null) {
@@ -201,7 +220,6 @@ public class CosmosTableUtils {
                 requestOptions.setCustomRequestOption(key, value);
             }
         }
-
         return requestOptions;
     }
 }

@@ -47,6 +47,7 @@ public class CosmosTableConstants {
     public static final String ANNOTATION_ELEMENT_ACCESS_CONDITION = "access.condition";
     public static final String ANNOTATION_ELEMENT_PRE_TRIGGER_INCLUDE = "pre.trigger.include";
     public static final String ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE = "post.trigger.include";
+    public static final String ANNOTATION_ELEMENT_ID_GENERATION = "disable.automatic.id.generation";
 
     //Miscellaneous SQL constants
     public static final String SQL_MATH_ADD = "+";
@@ -72,6 +73,10 @@ public class CosmosTableConstants {
     public static final String OPEN_PARENTHESIS = "(";
     public static final String CLOSE_PARENTHESIS = ")";
     public static final String SUB_SELECT_QUERY_REF = "t2";
+
+    //SQL queries
+    public static final String SQL_SELECT_FROM_ROOT = "SELECT * FROM root r WHERE r.id=?";
+    public static final String SQL_SELECT = "SELECT * FROM ? WHERE ?";
 
     //Configurable System Parameters associated with Connection Policy
     public static final String CONNECTION_MODE = "connectionMode";
