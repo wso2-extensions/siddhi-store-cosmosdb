@@ -37,7 +37,7 @@ public class CosmosTableTestUtils {
     private static final Log log = LogFactory.getLog(CosmosTableTestUtils.class);
     private static final String uri = "https://e2c10094-0ee0-4-231-b9ee.documents.azure.com:443/";
     private static final String key =
-            "ddV5CxcHFe1oMBgkkCoTyUXVSN0wpW6LOjW9Vr9axk5pAFCMo1gB5XEAK1J7XjkVpgoLiCtcLw8UoadMUKqHUw==";
+            "BgkkCoTyUXVSN0wpW6LOjW9Vr9axk5pAFCMo1gB5XEAK1J7XjkVpgoLiCtcLw8UoadMUKqHUw==";
     private static final String databaseName = "admin";
 
     private CosmosTableTestUtils() {

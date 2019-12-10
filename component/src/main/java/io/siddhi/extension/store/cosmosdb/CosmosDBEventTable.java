@@ -34,6 +34,7 @@ import io.siddhi.annotation.Extension;
 import io.siddhi.annotation.Parameter;
 import io.siddhi.annotation.SystemParameter;
 import io.siddhi.annotation.util.DataType;
+import io.siddhi.core.exception.SiddhiAppCreationException;
 import io.siddhi.core.table.record.AbstractRecordTable;
 import io.siddhi.core.table.record.ExpressionBuilder;
 import io.siddhi.core.table.record.RecordIterator;
@@ -85,7 +86,7 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                         defaultValue = "Name of the siddhi event table.",
                         type = {DataType.STRING}),
                 @Parameter(name = "custom.request.options",
-                        description = "This parameter contains all the possible options a create, update or delete " +
+                        description = "This parameter contains custom options a create, update or delete " +
                                 "request can have." +
                                 "e.g., 'offerThroughput:500,scriptLoggingEnabled:true'.",
                         type = {DataType.STRING},
@@ -427,7 +428,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
         this.collectionId = CosmosTableUtils.isEmpty(customCollectionName) ? tableDefinition.getId() :
                 customCollectionName;
-        collectionLink = getCollectionId().getSelfLink();
 
         disableAutomaticIdGeneration = Boolean.parseBoolean(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_ID_GENERATION));
@@ -450,20 +450,46 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
         if (documentClient == null) {
             if (uri == null || uri.isEmpty()) {
-                log.error("URI is not given. ");
+                throw new SiddhiAppCreationException("URI is not given or empty. ");
             } else if (accessKey == null || accessKey.isEmpty()) {
-                log.error("Access key is not given. ");
+                throw new SiddhiAppCreationException("Access key is not given or empty. ");
             } else {
                 documentClient = new DocumentClient(uri, accessKey, connectionPolicy, consistencyLevel);
             }
         }
+    }
+    @Override
+    protected void connect() {
+        if (collectionCache == null) {
+            String query = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst("\\?",
+                    "'" + collectionId + "'");
+            List<DocumentCollection> collectionList = documentClient.queryCollections(getDatabaseId().getSelfLink(),
+                    query, null).getQueryIterable().toList();
+
+            if (collectionList.size() > 0) {
+                collectionCache = collectionList.get(0);
+            } else {
+                try {
+                    DocumentCollection collectionDefinition = new DocumentCollection();
+                    collectionDefinition.setId(collectionId);
+                    try {
+                        collectionCache = documentClient.createCollection(getDatabaseId().getSelfLink(),
+                                collectionDefinition, options).getResource();
+                    } catch (ClassCastException e) {
+                        log.error("Failed to cast from Request Response to Document Collection. ", e);
+                    }
+                } catch (DocumentClientException e) {
+                    log.error("Failed to create the collection. ", e);
+                }
+            }
+        }
+        collectionLink = collectionCache.getSelfLink();
     }
 
     @Override
     protected void add(List<Object[]> records) {
 
         for (Object[] record : records) {
-            //Map<String, Object> insertMap = CosmosTableUtils.mapValuesToAttributes(record, this.attributeNames);
             Document insertDocument = new Document();
             for (int counter = 0; counter < record.length; counter++) {
                 String key = this.attributeNames.get(counter);
@@ -485,7 +511,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         try {
             documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, findConditionParameterMap);
         } catch (SQLException e) {
-            log.error("Failed to find document", e);
+            log.error("Failed to find document. ", e);
         }
         if (documentList != null) {
             return new CosmosIterator(documentList, this.attributeNames);
@@ -501,7 +527,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         try {
             documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, containsConditionParameterMap);
         } catch (SQLException e) {
-            log.error("Failed to find document", e);
+            log.error("Failed to find document. ", e);
         }
         if (documentList != null) {
             return documentList.size() > 0;
@@ -521,12 +547,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     try {
                         documentClient.deleteDocument(toDeleteDocument.getSelfLink(), options);
                     } catch (DocumentClientException e) {
-                        log.error("Failed to delete document", e);
+                        log.error("Failed to delete document. ", e);
                     }
                 }
             }
         } catch (SQLException e) {
-            log.error("Failed to find document", e);
+            log.error("Failed to find document. ", e);
         }
     }
 
@@ -543,7 +569,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             try {
                 documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, updateConditionParameterMap);
             } catch (SQLException e) {
-                log.error("Failed to find document", e);
+                log.error("Failed to find document. ", e);
             }
 
             if (documentList != null) {
@@ -555,7 +581,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                         }
                         documentClient.replaceDocument(toUpdateDocument, options);
                     } catch (DocumentClientException e) {
-                        log.error("Failed to update document", e);
+                        log.error("Failed to update document. ", e);
                     }
                 }
             }
@@ -578,7 +604,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 documentList = queryDocuments((CosmosCompiledCondition) compiledCondition,
                         updateOrAddConditionParameterMap);
             } catch (SQLException e) {
-                log.error("Failed to find document", e);
+                log.error("Failed to find document. ", e);
             }
             //update
             if (documentList != null) {
@@ -591,7 +617,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                             }
                             documentClient.replaceDocument(toUpdateDocument, options);
                         } catch (DocumentClientException e) {
-                            log.error("Failed to update document", e);
+                            log.error("Failed to update document. ", e);
                         }
                     }
                 } else {
@@ -630,17 +656,17 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     try {
                         databaseCache = documentClient.createDatabase(databaseDefinition, options).getResource();
                     } catch (ClassCastException e) {
-                        log.error("Failed to cast from Request Response to Database", e);
+                        log.error("Failed to cast from Request Response to Database. ", e);
                     }
                 } catch (DocumentClientException e) {
-                    log.error("Failed to create the database", e);
+                    log.error("Failed to create the database. ", e);
                 }
             }
         }
         return databaseCache;
     }
 
-    private DocumentCollection getCollectionId() {
+/*    private DocumentCollection getCollectionId() {
         if (collectionCache == null) {
             String query = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst("\\?",
                     "'" + collectionId + "'");
@@ -657,17 +683,17 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                         collectionCache = documentClient.createCollection(getDatabaseId().getSelfLink(),
                                 collectionDefinition, options).getResource();
                     } catch (ClassCastException e) {
-                        log.error("Failed to cast from Request Response to Document Collection", e);
+                        log.error("Failed to cast from Request Response to Document Collection. ", e);
                     }
 
                 } catch (DocumentClientException e) {
-                    log.error("Failed to create the collection", e);
+                    log.error("Failed to create the collection. ", e);
                 }
             }
         }
         return collectionCache;
 
-    }
+    }*/
 
     private List<Document> queryDocuments(CosmosCompiledCondition compiledCondition,
                                           Map<String, Object> conditionParameterMap) throws SQLException {
@@ -680,11 +706,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         options.setEnableScanInQuery(true);
 
         return documentClient.queryDocuments(collectionLink, query, options).getQueryIterable().toList();
-    }
-
-
-    @Override
-    protected void connect() {
     }
 
     @Override

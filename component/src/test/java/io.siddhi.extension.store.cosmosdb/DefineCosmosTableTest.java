@@ -158,4 +158,34 @@ public class DefineCosmosTableTest {
                 "newCollection");
         Assert.assertEquals(doesCollectionExists, true, "Definition failed");
     }
+
+    @Test(expectedExceptions = SiddhiAppCreationException.class)
+    public void cosmosTableDefinitionTest7() {
+        log.info("cosmosTableDefinitionTest7 - " +
+                "Defining a CosmosDB table without having a cosmosdb access.key field");
+
+        SiddhiManager siddhiManager = new SiddhiManager();
+        String streams = "" +
+                "@store(type = 'cosmosdb' , uri='" + uri + "', " +
+                "database.name='" + database + "')" +
+                "define table FooTable (symbol string, price float, volume long); ";
+        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
+        siddhiAppRuntime.start();
+        siddhiAppRuntime.shutdown();
+    }
+
+    @Test(expectedExceptions = SiddhiAppCreationException.class)
+    public void cosmosTableDefinitionTest8() {
+        log.info("cosmosTableDefinitionTest8 - " +
+                "Defining a CosmosDB table without defining a value for cosmosdb access.key field");
+
+        SiddhiManager siddhiManager = new SiddhiManager();
+        String streams = "" +
+                "@store(type = 'cosmosdb', uri='" + uri + "', access.key='', " +
+                "database.name='" + database + "')" +
+                "define table FooTable (symbol string, price float, volume long); ";
+        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
+        siddhiAppRuntime.start();
+        siddhiAppRuntime.shutdown();
+    }
 }

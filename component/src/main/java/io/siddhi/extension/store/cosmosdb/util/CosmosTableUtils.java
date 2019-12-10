@@ -47,7 +47,6 @@ import static io.siddhi.query.api.definition.Attribute.Type.STRING;
 public class CosmosTableUtils {
     private static final Log log = LogFactory.getLog(CosmosTableUtils.class);
 
-
     private CosmosTableUtils() {
         //Prevent Initialization.
     }
@@ -61,7 +60,6 @@ public class CosmosTableUtils {
     public static boolean isEmpty(String field) {
         return (field == null || field.trim().length() == 0);
     }
-
 
     /**
      * Util method used throughout the CosmosDB Event Table implementation which accepts a compiled condition (from
@@ -105,15 +103,6 @@ public class CosmosTableUtils {
         }
         return condition;
     }
-
-/*    /*
-    public static Map<String, Object> mapValuesToAttributes(Object[] record, List<String> attributeNames) {
-        Map<String, Object> attributesValuesMap = new HashMap<>();
-        for (int i = 0; i < record.length; i++) {
-            attributesValuesMap.put(attributeNames.get(i), record[i]);
-        }
-        return attributesValuesMap;
-    }*/
 
     public static ConnectionPolicy getConnectionPolicy(ConfigReader configReader) {
         ConnectionPolicy connectionPolicy = new ConnectionPolicy();
@@ -161,7 +150,6 @@ public class CosmosTableUtils {
 
         return connectionPolicy;
     }
-
 
     public static RequestOptions getCustomRequestOptions(Annotation storeAnnotation) {
         RequestOptions requestOptions = new RequestOptions();
