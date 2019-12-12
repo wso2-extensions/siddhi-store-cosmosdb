@@ -49,7 +49,7 @@ public class CosmosTableConstants {
     public static final String ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE = "post.trigger.include";
     public static final String ANNOTATION_ELEMENT_ID_GENERATION = "disable.automatic.id.generation";
 
-    //Configurable parameters associated with feed options
+    //Configurable parameters associated with feed options in queries
     public static final String ANNOTATION_ELEMENT_PARTITION_KEY_RANGE_ID = "partition.key.range.id";
     public static final String ANNOTATION_ELEMENT_ENABLE_SCAN_IN_QUERY = "is.enable.scan.in.query";
     public static final String ANNOTATION_ELEMENT_EMIT_VERBOSE_TRACES_IN_QUERY = "is.emit.verbose.traces.in.query";

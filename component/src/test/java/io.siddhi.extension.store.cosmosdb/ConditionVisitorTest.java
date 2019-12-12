@@ -50,7 +50,8 @@ public class ConditionVisitorTest {
 
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void conditionBuilderTest1() {
-        log.info("conditionBuilderTest1");
+        log.info("conditionBuilderTest1 - Test delete on condition when there's a non-existing attribute as right" +
+                " operand. ");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -75,7 +76,8 @@ public class ConditionVisitorTest {
 
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void conditionBuilderTest2() {
-        log.info("conditionBuilderTest2");
+        log.info("conditionBuilderTest2 - Test delete on condition when there's a non-existing attribute as left" +
+                " operand. ");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
@@ -100,7 +102,8 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest3() throws InterruptedException {
-        log.info("conditionBuilderTest3"); //TODO add meaningful name
+        log.info("conditionBuilderTest3 - Delete an event of a CosmosDB table successfully by having event table" +
+                " attribute as left operand. ");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -140,7 +143,8 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest4() throws InterruptedException {
-        log.info("conditionBuilderTest4");
+        log.info("conditionBuilderTest4 - Delete an event of a CosmosDB table successfully by having event table" +
+                " attribute as right operand. ");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -180,7 +184,8 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest5() throws InterruptedException {
-        log.info("conditionBuilderTest5");
+        log.info("conditionBuilderTest5 - Delete an event of a CosmosDB table successfully when having a " +
+                "constant as left operand. ");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -220,7 +225,8 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest6() throws InterruptedException {
-        log.info("conditionBuilderTest6");
+        log.info("conditionBuilderTest6 - Delete an event of a CosmosDB table successfully when having a constant" +
+                " as right operand. ");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -260,7 +266,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest7() throws InterruptedException {
-        log.info("conditionBuilderTest7");
+        log.info("conditionBuilderTest7 - Test delete on condition when there's a not equals operator. ");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -300,7 +306,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest8() throws InterruptedException {
-        log.info("conditionBuilderTest8");
+        log.info("conditionBuilderTest8 - Test delete on condition when there's a greater than operator. ");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -340,7 +346,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest9() throws InterruptedException {
-        log.info("conditionBuilderTest9");
+        log.info("conditionBuilderTest9 - Test delete on condition when there's a greater than or equal operator. ");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -380,7 +386,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest10() throws InterruptedException {
-        log.info("conditionBuilderTest10");
+        log.info("conditionBuilderTest10 - Test delete on condition when there's a less than operator.");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -420,7 +426,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest11() throws InterruptedException {
-        log.info("conditionBuilderTest11");
+        log.info("conditionBuilderTest11 - Test delete on condition when there's a less than or equal operator.");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -460,7 +466,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest12() throws InterruptedException {
-        log.info("conditionBuilderTest12");
+        log.info("conditionBuilderTest12 - Test delete on condition when there's a logical AND operator.");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -500,7 +506,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest13() throws InterruptedException {
-        log.info("conditionBuilderTest13");
+        log.info("conditionBuilderTest13 - Test delete on condition when there's a logical OR operator.");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -540,7 +546,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest14() throws InterruptedException {
-        log.info("conditionBuilderTest14");
+        log.info("conditionBuilderTest14 - Test delete on condition when there's a logical NOT operator.");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -580,7 +586,7 @@ public class ConditionVisitorTest {
 
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void conditionBuilderTest15() throws InterruptedException {
-        log.info("conditionBuilderTest15");
+        log.info("conditionBuilderTest15 - Test delete on condition when there's an 'in' condition.");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -620,7 +626,7 @@ public class ConditionVisitorTest {
 
     @Test
     public void conditionBuilderTest16() throws InterruptedException {
-        log.info("conditionBuilderTest16");
+        log.info("conditionBuilderTest16 - Test delete on condition when there's a NULL condition.");
 
         String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
@@ -660,7 +666,7 @@ public class ConditionVisitorTest {
 
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void conditionBuilderTest17() {
-        log.info("conditionBuilderTest17");
+        log.info("conditionBuilderTest17 - Test delete on condition when there's an invalid operation. ");
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
