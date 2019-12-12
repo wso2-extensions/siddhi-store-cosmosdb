@@ -35,9 +35,9 @@ import java.util.List;
 public class CosmosTableTestUtils {
 
     private static final Log log = LogFactory.getLog(CosmosTableTestUtils.class);
-    private static final String uri = "https://e2c10094-0ee0-4-231-b9ee.documents.azure.com:443/";
+    private static final String uri = "https://fa9b5b61-0ee0-4-231-b9ee.documents.azure.com:443/";
     private static final String key =
-            "BgkkCoTyUXVSN0wpW6LOjW9Vr9axk5pAFCMo1gB5XEAK1J7XjkVpgoLiCtcLw8UoadMUKqHUw==";
+            "BKZOY5SbzNvyyvzLTDdnCl0s7UJvRfmX1e7B19sZO0yw9tYYZnuRI2K9YceLD26PrFSYYvMFyXROIbCwHoTCbw==";
     private static final String databaseName = "admin";
 
     private CosmosTableTestUtils() {
@@ -69,7 +69,6 @@ public class CosmosTableTestUtils {
         try (DocumentClient documentClient = new DocumentClient(uri, key, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
             SqlQuerySpec query = new SqlQuerySpec();
-            //query.setQueryText("SELECT VALUE COUNT(1) FROM " + collectionName);
             query.setQueryText("SELECT * FROM " + collectionName);
             FeedOptions options = new FeedOptions();
             options.setEnableScanInQuery(true);

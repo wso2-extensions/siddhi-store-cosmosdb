@@ -85,7 +85,7 @@ public class DefineCosmosTableTest {
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
 
-        String databaseLink = String.format("/dbs/%s", "admin");
+        String databaseLink = String.format("/dbs/%s", database);
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
         Assert.assertEquals(doesCollectionExists, true, "Definition failed");

@@ -23,6 +23,7 @@ import com.microsoft.azure.documentdb.AccessCondition;
 import com.microsoft.azure.documentdb.AccessConditionType;
 import com.microsoft.azure.documentdb.ConnectionMode;
 import com.microsoft.azure.documentdb.ConnectionPolicy;
+import com.microsoft.azure.documentdb.FeedOptions;
 import com.microsoft.azure.documentdb.IndexingDirective;
 import com.microsoft.azure.documentdb.MediaReadMode;
 import com.microsoft.azure.documentdb.PartitionKey;
@@ -198,7 +199,8 @@ public class CosmosTableUtils {
                 CosmosTableConstants.ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE)) ? null : Collections.singletonList(
                         storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE)));
 
-        String customOptions = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_REQUEST_OPTIONS);
+        String customOptions = storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_CUSTOM_REQUEST_OPTIONS);
         if (customOptions != null) {
             String[] customOption = customOptions.split(",");
             for (int counter = 0; counter < customOption.length; counter++) {
@@ -209,5 +211,39 @@ public class CosmosTableUtils {
             }
         }
         return requestOptions;
+    }
+
+    public static FeedOptions getFeedOptions(Annotation storeAnnotation) {
+        FeedOptions feedOptions = new FeedOptions();
+
+        feedOptions.setPartitionKeyRangeIdInternal(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY_RANGE_ID)) ? null : storeAnnotation.getElement(
+                        CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY_RANGE_ID));
+        feedOptions.setSessionToken(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_SESSION_TOKEN)) ? null : storeAnnotation.getElement(
+                        CosmosTableConstants.ANNOTATION_ELEMENT_SESSION_TOKEN));
+        feedOptions.setEnableScanInQuery(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_ENABLE_SCAN_IN_QUERY)) || Boolean.parseBoolean(
+                storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_ENABLE_SCAN_IN_QUERY)));
+        feedOptions.setEmitVerboseTracesInQuery(Boolean.valueOf(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_EMIT_VERBOSE_TRACES_IN_QUERY)));
+        feedOptions.setPartitionKey(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)) ? null : PartitionKey.FromJsonString(
+                storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)));
+        feedOptions.setEnableCrossPartitionQuery(Boolean.valueOf(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_ENABLE_CROSS_PARTITION_QUERY)));
+        feedOptions.setMaxDegreeOfParallelism(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_MAX_DEGREE_OF_PARALLELISM)) ? 0 : Integer.parseInt(
+                        storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_MAX_DEGREE_OF_PARALLELISM)));
+        feedOptions.setMaxBufferedItemCount(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_MAX_BUFFERED_ITEM_COUNT)) ? 0 : Integer.parseInt(
+                storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_MAX_BUFFERED_ITEM_COUNT)));
+        feedOptions.setDisableRUPerMinuteUsage(Boolean.parseBoolean(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_RU_PER_MINUTE)));
+        feedOptions.setResponseContinuationTokenLimitInKb(isEmpty(storeAnnotation.getElement(
+                CosmosTableConstants.ANNOTATION_ELEMENT_RESPONSE_TOKEN_LIMIT)) ? 0 : Integer.parseInt(
+                        storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_RESPONSE_TOKEN_LIMIT)));
+
+        return feedOptions;
     }
 }

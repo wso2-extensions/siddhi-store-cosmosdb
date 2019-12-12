@@ -31,7 +31,7 @@ public class CosmosTableConstants {
     public static final String ANNOTATION_ELEMENT_COLLECTION_NAME = "collection.name";
 
     //Configurable parameters associated with request options
-    public static final String ANNOTATION_ELEMENT_REQUEST_OPTIONS = "custom.request.options";
+    public static final String ANNOTATION_ELEMENT_CUSTOM_REQUEST_OPTIONS = "custom.request.options";
     public static final String ANNOTATION_ELEMENT_SCRIPT_LOGGING = "is.script.logging.enabled";
     public static final String ANNOTATION_ELEMENT_POPULATE_QUOTA = "is.populate.quota.info";
     public static final String ANNOTATION_ELEMENT_RU_PER_MINUTE =  "is.disable.ru.per.minute.usage";
@@ -48,6 +48,15 @@ public class CosmosTableConstants {
     public static final String ANNOTATION_ELEMENT_PRE_TRIGGER_INCLUDE = "pre.trigger.include";
     public static final String ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE = "post.trigger.include";
     public static final String ANNOTATION_ELEMENT_ID_GENERATION = "disable.automatic.id.generation";
+
+    //Configurable parameters associated with feed options
+    public static final String ANNOTATION_ELEMENT_PARTITION_KEY_RANGE_ID = "partition.key.range.id";
+    public static final String ANNOTATION_ELEMENT_ENABLE_SCAN_IN_QUERY = "is.enable.scan.in.query";
+    public static final String ANNOTATION_ELEMENT_EMIT_VERBOSE_TRACES_IN_QUERY = "is.emit.verbose.traces.in.query";
+    public static final String ANNOTATION_ELEMENT_ENABLE_CROSS_PARTITION_QUERY = "is.enable.cross.partition.query";
+    public static final String ANNOTATION_ELEMENT_MAX_DEGREE_OF_PARALLELISM = "max.degree.of.parallelism";
+    public static final String ANNOTATION_ELEMENT_MAX_BUFFERED_ITEM_COUNT = "max.buffered.item.count";
+    public static final String ANNOTATION_ELEMENT_RESPONSE_TOKEN_LIMIT = "response.continuation.token.limit.in.kb";
 
     //Miscellaneous SQL constants
     public static final String SQL_MATH_ADD = "+";
