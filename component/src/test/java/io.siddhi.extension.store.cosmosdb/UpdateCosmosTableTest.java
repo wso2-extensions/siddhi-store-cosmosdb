@@ -54,7 +54,7 @@ public class UpdateCosmosTableTest {
     public void updateFromCosmosTableTest1() throws InterruptedException {
         log.info("updateFromCosmosTableTest1 - Update events of a CosmosDB table successfully");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -111,7 +111,7 @@ public class UpdateCosmosTableTest {
         log.info("updateFromCosmosTableTest2 - Updates events of a CosmosDB table when query has less attributes " +
                 "to select from");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -290,7 +290,7 @@ public class UpdateCosmosTableTest {
     public void updateFromCosmosTableTest8() throws InterruptedException {
         log.info("updateFromCosmosTableTest8 - Updates events of a CosmosDB table for non-existing attribute value");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();

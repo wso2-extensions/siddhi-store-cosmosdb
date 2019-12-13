@@ -26,6 +26,8 @@ import com.microsoft.azure.documentdb.DocumentClient;
 import com.microsoft.azure.documentdb.DocumentClientException;
 import com.microsoft.azure.documentdb.DocumentCollection;
 import com.microsoft.azure.documentdb.FeedOptions;
+import com.microsoft.azure.documentdb.PartitionKey;
+import com.microsoft.azure.documentdb.RequestOptions;
 import com.microsoft.azure.documentdb.SqlQuerySpec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,10 +37,10 @@ import java.util.List;
 public class CosmosTableTestUtils {
 
     private static final Log log = LogFactory.getLog(CosmosTableTestUtils.class);
-    private static final String uri = "https://fa9b5b61-0ee0-4-231-b9ee.documents.azure.com:443/";
+    private static final String uri = "https://94c5bde5-0ee0-4-231-b9ee.documents.azure.com:443/";
     private static final String key =
-            "BKZOY5SbzNvyyvzLTDdnCl0s7UJvRfmX1e7B19sZO0yw9tYYZnuRI2K9YceLD26PrFSYYvMFyXROIbCwHoTCbw==";
-    private static final String databaseName = "admin";
+            "91wh3ojEgqrHXpF634AHUbT8kelyEdO7aswv0ZxKCmlA2Y5b9aY6N4MYVJgP2CCWSlZBm5ZuksyoZhK7AXYe0g==";
+    private static final String databaseName = "ToDoList";
 
     private CosmosTableTestUtils() {
     }

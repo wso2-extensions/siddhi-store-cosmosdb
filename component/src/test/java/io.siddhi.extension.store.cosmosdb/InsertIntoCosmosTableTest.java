@@ -55,7 +55,7 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest1() throws InterruptedException {
         log.info("insertIntoCosmosTableTest1 - Insert events to a CosmosDB table successfully");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -174,7 +174,7 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest6() {
         log.info("insertIntoCosmosTableTest6 - " +
                 "Insert events data to CosmosDB table when the table has not defined");
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -192,7 +192,7 @@ public class InsertIntoCosmosTableTest {
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
 
-        String databaseLink = String.format("/dbs/%s", "admin");
+        String databaseLink = String.format("/dbs/%s", database);
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
         Assert.assertEquals(doesCollectionExists, false, "Definition was created");
@@ -202,7 +202,7 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest7() throws InterruptedException {
         log.info("insertIntoCosmosTableTest7");
         //Object inserts
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();

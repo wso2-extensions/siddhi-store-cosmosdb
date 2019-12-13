@@ -52,7 +52,7 @@ public class UpdateOrInsertCosmosTableTest {
     public void updateOrInsertCosmosTableTest1() throws InterruptedException {
         log.info("updateOrInsertCosmosTableTest1 - Configure siddhi to perform insert/update on CosmosDB document");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -107,7 +107,7 @@ public class UpdateOrInsertCosmosTableTest {
         log.info("updateOrInsertCosmosTableTest2 - Configure siddhi to perform insert/update on CosmosDB Document " +
                 "when no matching record exist");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -162,7 +162,7 @@ public class UpdateOrInsertCosmosTableTest {
         log.info("updateOrInsertCosmosTableTest3 - Configure siddhi to perform insert/update when some of " +
                 "matching records exist");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();

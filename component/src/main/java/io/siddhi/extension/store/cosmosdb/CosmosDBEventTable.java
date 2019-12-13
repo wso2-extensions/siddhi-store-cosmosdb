@@ -460,10 +460,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     protected void init(TableDefinition tableDefinition, ConfigReader configReader) {
         this.attributeNames =
                 tableDefinition.getAttributeList().stream().map(Attribute::getName).collect(Collectors.toList());
-
         Annotation storeAnnotation = AnnotationHelper.getAnnotation(ANNOTATION_STORE, tableDefinition.getAnnotations());
         this.createDocumentClient(storeAnnotation, configReader);
         this.databaseId = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_DATABASE_NAME);
+        if (CosmosTableUtils.isEmpty(databaseId)) {
+            throw new SiddhiAppCreationException("database.name is not given or empty. ");
+        }
 
         String customCollectionName =
                 storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
@@ -539,9 +541,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                                 + collectionId);
                     }
                 }
-            } else {
-                throw new SiddhiAppCreationException("Database " + database + " doesn't exist. Please provide a valid" +
-                        " database name. ");
             }
         }
     }
@@ -632,7 +631,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             } catch (SQLException e) {
                 log.error("Failed to find document. ", e);
             }
-
             if (documentList != null) {
                 for (Document toUpdateDocument : documentList) {
                     try {

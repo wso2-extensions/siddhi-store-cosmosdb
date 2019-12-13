@@ -66,7 +66,7 @@ public class JoinCosmosTableTest {
         log.info("testCosmosTableJoinQuery1 -" +
                 "Read events from a CosmosDB collection successfully");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -183,7 +183,7 @@ public class JoinCosmosTableTest {
         log.info("testCosmosTableJoinQuery4 - " +
                 "Read events from a CosmosDB collection for less attributes than total attribute list");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -271,7 +271,7 @@ public class JoinCosmosTableTest {
         log.info("testCosmosTableJoinQuery6");
         //Object reads
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();

@@ -167,7 +167,7 @@ public class CosmosTableUtils {
         requestOptions.setPopulatePartitionKeyRangeStatistics(Boolean.parseBoolean(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_POPULATE_PK_STATS)));
         requestOptions.setPartitionKey(isEmpty(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)) ? null : PartitionKey.FromJsonString(
+                CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)) ? null : new PartitionKey(
                         storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)));
         requestOptions.setOfferThroughput(isEmpty(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_OFFER_THROUGHPUT)) ? null : Integer.valueOf(

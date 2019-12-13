@@ -54,7 +54,7 @@ public class DeleteFromCosmosTableTest {
         log.info("deleteFromCosmosTableTest1 - " +
                 "Delete an event of a CosmosDB table successfully");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -177,7 +177,7 @@ public class DeleteFromCosmosTableTest {
         log.info("deleteFromCosmosTableTest5 - " +
                 "Delete an event from a CosmosDB table based on a non-existing attribute value");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();

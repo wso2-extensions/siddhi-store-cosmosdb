@@ -67,7 +67,7 @@ public class ContainsCosmosTableTest {
         log.info("containsCosmosTableTest1 - " +
                 "Configure siddhi to check whether particular records exist in a CosmosDB Collection");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -130,7 +130,7 @@ public class ContainsCosmosTableTest {
         log.info("containsCosmosTableTest2 - " +
                 "Configure siddhi to check whether record exist when OutputStream already exists");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -196,7 +196,7 @@ public class ContainsCosmosTableTest {
         log.info("containsCosmosTableTest3 - " +
                 "Configure siddhi to check whether record exist when OutputStream already exists");
 
-        String collectionLink = String.format("/dbs/%s/colls/%s", "admin", "FooTable");
+        String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
 
         SiddhiManager siddhiManager = new SiddhiManager();
