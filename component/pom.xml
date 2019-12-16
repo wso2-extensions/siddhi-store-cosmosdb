@@ -73,10 +73,6 @@
             <artifactId>json</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.log4j.wso2</groupId>
             <artifactId>log4j</artifactId>
             <exclusions>
@@ -171,7 +167,6 @@
                         <Private-Package>
                             com.microsoft.azure.documentdb.*,
                             org.apache.http.*,
-                            com.google.gson.*,
                             org.apache.commons.*,
                             org.joda.time.*,
                             com.fasterxml.uuid.*

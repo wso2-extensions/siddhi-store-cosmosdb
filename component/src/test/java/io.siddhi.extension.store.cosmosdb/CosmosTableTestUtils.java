@@ -26,8 +26,6 @@ import com.microsoft.azure.documentdb.DocumentClient;
 import com.microsoft.azure.documentdb.DocumentClientException;
 import com.microsoft.azure.documentdb.DocumentCollection;
 import com.microsoft.azure.documentdb.FeedOptions;
-import com.microsoft.azure.documentdb.PartitionKey;
-import com.microsoft.azure.documentdb.RequestOptions;
 import com.microsoft.azure.documentdb.SqlQuerySpec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

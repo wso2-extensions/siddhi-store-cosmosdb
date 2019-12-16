@@ -35,6 +35,7 @@ import io.siddhi.annotation.Parameter;
 import io.siddhi.annotation.SystemParameter;
 import io.siddhi.annotation.util.DataType;
 import io.siddhi.core.exception.SiddhiAppCreationException;
+import io.siddhi.core.exception.SiddhiAppRuntimeException;
 import io.siddhi.core.table.record.AbstractRecordTable;
 import io.siddhi.core.table.record.ExpressionBuilder;
 import io.siddhi.core.table.record.RecordIterator;
@@ -528,10 +529,11 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                                 collectionCache = documentClient.createCollection(database.getSelfLink(),
                                         collectionDefinition, requestOptions).getResource();
                             } catch (ClassCastException e) {
-                                log.error("Failed to cast from Request Response to Document Collection. ", e);
+                                throw new SiddhiAppCreationException(
+                                        "Failed to cast from Request Response to Document Collection. ", e);
                             }
                         } catch (DocumentClientException e) {
-                            log.error("Failed to create the collection. ", e);
+                            throw new SiddhiAppCreationException("Failed to create the collection. ", e);
                         }
                     }
                     if (collectionCache != null) {
@@ -559,7 +561,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 documentClient.createDocument(collectionLink, insertDocument, requestOptions,
                         disableAutomaticIdGeneration);
             } catch (DocumentClientException e) {
-                log.error("Failed to add document. ", e);
+                throw new SiddhiAppRuntimeException("Failed to add document. ", e);
             }
         }
     }
@@ -567,11 +569,11 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     @Override
     protected RecordIterator<Object[]> find(Map<String, Object> findConditionParameterMap,
                                             CompiledCondition compiledCondition) {
-        List<Document> documentList = null;
+        List<Document> documentList;
         try {
             documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, findConditionParameterMap);
         } catch (SQLException e) {
-            log.error("Failed to find document. ", e);
+            throw new SiddhiAppRuntimeException("Failed to find document. ", e);
         }
         if (documentList != null) {
             return new CosmosIterator(documentList, this.attributeNames);
@@ -583,11 +585,11 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     @Override
     protected boolean contains(Map<String, Object> containsConditionParameterMap,
                                CompiledCondition compiledCondition) {
-        List<Document> documentList = null;
+        List<Document> documentList;
         try {
             documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, containsConditionParameterMap);
         } catch (SQLException e) {
-            log.error("Failed to find document. ", e);
+            throw new SiddhiAppRuntimeException("Failed to find document. ", e);
         }
         if (documentList != null) {
             return documentList.size() > 0;
@@ -607,12 +609,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     try {
                         documentClient.deleteDocument(toDeleteDocument.getSelfLink(), requestOptions);
                     } catch (DocumentClientException e) {
-                        log.error("Failed to delete document. ", e);
+                        throw new SiddhiAppRuntimeException("Failed to delete document. ", e);
                     }
                 }
             }
         } catch (SQLException e) {
-            log.error("Failed to find document. ", e);
+            throw new SiddhiAppRuntimeException("Failed to find document. ", e);
         }
     }
 
@@ -625,11 +627,11 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 updateConditionParameterMap = stringObjectMap;
             }
             int ordinal = updateConditionParameterMaps.indexOf(updateConditionParameterMap);
-            List<Document> documentList = null;
+            List<Document> documentList;
             try {
                 documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, updateConditionParameterMap);
             } catch (SQLException e) {
-                log.error("Failed to find document. ", e);
+                throw new SiddhiAppRuntimeException("Failed to find document. ", e);
             }
             if (documentList != null) {
                 for (Document toUpdateDocument : documentList) {
@@ -640,7 +642,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                         }
                         documentClient.replaceDocument(toUpdateDocument, requestOptions);
                     } catch (DocumentClientException e) {
-                        log.error("Failed to update document. ", e);
+                        throw new SiddhiAppRuntimeException("Failed to update document. ", e);
                     }
                 }
             }
@@ -658,12 +660,12 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 updateOrAddConditionParameterMap = stringObjectMap;
             }
             int ordinal = updateConditionParameterMaps.indexOf(updateOrAddConditionParameterMap);
-            List<Document> documentList = null;
+            List<Document> documentList;
             try {
                 documentList = queryDocuments((CosmosCompiledCondition) compiledCondition,
                         updateOrAddConditionParameterMap);
             } catch (SQLException e) {
-                log.error("Failed to find document. ", e);
+                throw new SiddhiAppRuntimeException("Failed to find document. ", e);
             }
             //update
             if (documentList != null) {
@@ -676,7 +678,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                             }
                             documentClient.replaceDocument(toUpdateDocument, requestOptions);
                         } catch (DocumentClientException e) {
-                            log.error("Failed to update document. ", e);
+                            throw new SiddhiAppRuntimeException("Failed to update document. ", e);
                         }
                     }
                 } else {
