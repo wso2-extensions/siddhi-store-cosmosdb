@@ -82,19 +82,20 @@ public class CosmosTableUtils {
             if (entry.getValue() instanceof Constant) {
                 Constant value = (Constant) entry.getValue();
                 if (value.getType() == STRING) {
-                    condition = condition.replaceFirst("\\?",
+                    condition = condition.replaceFirst(CosmosTableConstants.SQL_QUESTION_MARK,
                             "'" + value.getValue().toString() + "'");
                 } else {
-                    condition = condition.replaceFirst("\\?", value.getValue().toString());
+                    condition = condition.replaceFirst(CosmosTableConstants.SQL_QUESTION_MARK,
+                            value.getValue().toString());
                 }
             } else {
                 Attribute replacingAttribute = (Attribute) entry.getValue();
                 Type type = replacingAttribute.getType();
                 if (type == STRING) {
-                    condition = condition.replaceFirst("\\?",
+                    condition = condition.replaceFirst(CosmosTableConstants.SQL_QUESTION_MARK,
                             "'" + conditionParameterMap.get(replacingAttribute.getName()).toString() + "'");
                 } else {
-                    condition = condition.replaceFirst("\\?",
+                    condition = condition.replaceFirst(CosmosTableConstants.SQL_QUESTION_MARK,
                             String.valueOf(conditionParameterMap.get(replacingAttribute.getName())));
                 }
             }
@@ -198,7 +199,6 @@ public class CosmosTableUtils {
         requestOptions.setPostTriggerInclude(isEmpty(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE)) ? null : Collections.singletonList(
                         storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_POST_TRIGGER_INCLUDE)));
-
         String customOptions = storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_CUSTOM_REQUEST_OPTIONS);
         if (customOptions != null) {

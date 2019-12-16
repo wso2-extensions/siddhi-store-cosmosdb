@@ -15,22 +15,22 @@
  * specific language governing permissions and limitations
  * under the License.
  *
- */
+ *//*
 
 package io.siddhi.extension.store.cosmosdb;
 
 import io.siddhi.core.util.collection.operator.CompiledCondition;
 
-/**
+*//**
  * Implementation class of {@link CompiledCondition} corresponding to the CosmosDB Event Table.
- */
+ *//*
 public class CosmosCompiledClause implements CompiledCondition {
 
-    /**
+    *//**
      * compiledQuery is a portion of a prepared SQL statement. For example, '?,?' is a compiledQuery
      * where '?' is a placeholder for a expression.
      * These placeholders are replaced using the parameters in the parameters Map.
-     */
+     *//*
     private String compiledQuery;
 
     public CosmosCompiledClause(String compiledQuery) {
@@ -46,4 +46,4 @@ public class CosmosCompiledClause implements CompiledCondition {
         return getCompiledQuery();
     }
 
-}
+}*/

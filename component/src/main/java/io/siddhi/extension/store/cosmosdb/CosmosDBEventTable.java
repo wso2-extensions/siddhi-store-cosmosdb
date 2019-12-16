@@ -34,6 +34,7 @@ import io.siddhi.annotation.Extension;
 import io.siddhi.annotation.Parameter;
 import io.siddhi.annotation.SystemParameter;
 import io.siddhi.annotation.util.DataType;
+import io.siddhi.core.exception.ConnectionUnavailableException;
 import io.siddhi.core.exception.SiddhiAppCreationException;
 import io.siddhi.core.exception.SiddhiAppRuntimeException;
 import io.siddhi.core.table.record.AbstractRecordTable;
@@ -467,7 +468,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         if (CosmosTableUtils.isEmpty(databaseId)) {
             throw new SiddhiAppCreationException("database.name is not given or empty. ");
         }
-
         String customCollectionName =
                 storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
         this.collectionId = CosmosTableUtils.isEmpty(customCollectionName) ? tableDefinition.getId() :
@@ -492,33 +492,29 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         ConnectionPolicy connectionPolicy = CosmosTableUtils.getConnectionPolicy(configReader);
         ConsistencyLevel consistencyLevel = ConsistencyLevel.valueOf(configReader.readConfig(
                 CosmosTableConstants.CONSISTENCY_LEVEL, String.valueOf(ConsistencyLevel.Session)));
-
-        if (documentClient == null) {
-            if (CosmosTableUtils.isEmpty(uri)) {
-                throw new SiddhiAppCreationException("URI is not given or empty. ");
-            } else if (CosmosTableUtils.isEmpty(accessKey)) {
-                throw new SiddhiAppCreationException("Access key is not given or empty. ");
-            } else {
-                documentClient = new DocumentClient(uri, accessKey, connectionPolicy, consistencyLevel);
-            }
+        if (CosmosTableUtils.isEmpty(uri)) {
+            throw new SiddhiAppCreationException("URI is not given or empty. ");
+        } else if (CosmosTableUtils.isEmpty(accessKey)) {
+            throw new SiddhiAppCreationException("Access key is not given or empty. ");
+        } else {
+            documentClient = new DocumentClient(uri, accessKey, connectionPolicy, consistencyLevel);
         }
     }
+
     @Override
-    protected void connect() {
+    protected void connect() throws ConnectionUnavailableException {
         if (database == null) {
-            String databaseQuery = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst("\\?",
-                    "'" + databaseId + "'");
+            String databaseQuery = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst(
+                    CosmosTableConstants.SQL_QUESTION_MARK, "'" + databaseId + "'");
             List<Database> databaseList =
                     documentClient.queryDatabases(databaseQuery, feedOptions).getQueryIterable().toList();
-
             if (databaseList.size() > 0) {
                 database = databaseList.get(0);
                 if (collectionCache == null) {
-                    String collectionQuery = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst("\\?",
-                            "'" + collectionId + "'");
+                    String collectionQuery = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst(
+                            CosmosTableConstants.SQL_QUESTION_MARK, "'" + collectionId + "'");
                     List<DocumentCollection> collectionList = documentClient.queryCollections(database.getSelfLink(),
                             collectionQuery, feedOptions).getQueryIterable().toList();
-
                     if (collectionList.size() > 0) {
                         collectionCache = collectionList.get(0);
                     } else {
@@ -543,13 +539,14 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                                 + collectionId);
                     }
                 }
+            } else {
+                throw new ConnectionUnavailableException("Database " + databaseId + " doesn't exist. ");
             }
         }
     }
 
     @Override
     protected void add(List<Object[]> records) {
-
         for (Object[] record : records) {
             Document insertDocument = new Document();
             for (int counter = 0; counter < record.length; counter++) {
@@ -623,8 +620,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                           Map<String, CompiledExpression> map, List<Map<String, Object>> updateSetParameterMaps) {
         for (int i = 0; i < updateConditionParameterMaps.size(); i++) {
             Map<String, Object> updateConditionParameterMap = null;
-            for (Map<String, Object> stringObjectMap : updateConditionParameterMaps) {
-                updateConditionParameterMap = stringObjectMap;
+            for (Map<String, Object> conditionParameters : updateConditionParameterMaps) {
+                updateConditionParameterMap = conditionParameters;
             }
             int ordinal = updateConditionParameterMaps.indexOf(updateConditionParameterMap);
             List<Document> documentList;
@@ -656,8 +653,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                                List<Object[]> addingDocuments) {
         for (int i = 0; i < updateConditionParameterMaps.size(); i++) {
             Map<String, Object> updateOrAddConditionParameterMap = null;
-            for (Map<String, Object> stringObjectMap : updateConditionParameterMaps) {
-                updateOrAddConditionParameterMap = stringObjectMap;
+            for (Map<String, Object> conditionParameters : updateConditionParameterMaps) {
+                updateOrAddConditionParameterMap = conditionParameters;
             }
             int ordinal = updateConditionParameterMaps.indexOf(updateOrAddConditionParameterMap);
             List<Document> documentList;
@@ -667,7 +664,6 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             } catch (SQLException e) {
                 throw new SiddhiAppRuntimeException("Failed to find document. ", e);
             }
-            //update
             if (documentList != null) {
                 if (documentList.size() > 0) {
                     for (Document toUpdateDocument : documentList) {
@@ -705,10 +701,10 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                                           Map<String, Object> conditionParameterMap) throws SQLException {
         String condition = CosmosTableUtils.resolveCondition(compiledCondition, conditionParameterMap);
         SqlQuerySpec query = new SqlQuerySpec();
-        String queryText = CosmosTableConstants.SQL_SELECT.replaceFirst("\\?", collectionId);
-        queryText = queryText.replaceFirst("\\?", condition);
+        String queryText = CosmosTableConstants.SQL_SELECT.replaceFirst(
+                CosmosTableConstants.SQL_QUESTION_MARK, collectionId);
+        queryText = queryText.replaceFirst(CosmosTableConstants.SQL_QUESTION_MARK, condition);
         query.setQueryText(queryText);
-
         return documentClient.queryDocuments(collectionLink, query, feedOptions).getQueryIterable().toList();
     }
 

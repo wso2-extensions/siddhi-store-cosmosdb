@@ -76,7 +76,7 @@ public class CosmosTableConstants {
     public static final String SQL_IN = "IN";
     public static final String SQL_IS_NULL = "= null";
     public static final String SQL_AS = " AS ";
-    public static final String SQL_MAX = "MAX"; // Used for incrementalAggregator:last()
+    public static final String SQL_MAX = "MAX";
     public static final String WHITESPACE = " ";
     public static final String EQUALS = "=";
     public static final String OPEN_PARENTHESIS = "(";
@@ -86,6 +86,7 @@ public class CosmosTableConstants {
     //SQL queries
     public static final String SQL_SELECT_FROM_ROOT = "SELECT * FROM root r WHERE r.id=?";
     public static final String SQL_SELECT = "SELECT * FROM ? WHERE ?";
+    public static final String SQL_QUESTION_MARK = "\\?";
 
     //Configurable System Parameters associated with Connection Policy
     public static final String CONNECTION_MODE = "connectionMode";

@@ -80,7 +80,7 @@ public class DefineCosmosTableTest {
         String streams = "" +
                 "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
                 "database.name='" + database + "')" +
-                "define table FunTable (symbol string, price float, volume long); ";
+                "define table FooTable (symbol string, price float, volume long); ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();

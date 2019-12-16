@@ -35,9 +35,9 @@ import java.util.List;
 public class CosmosTableTestUtils {
 
     private static final Log log = LogFactory.getLog(CosmosTableTestUtils.class);
-    private static final String uri = "https://94c5bde5-0ee0-4-231-b9ee.documents.azure.com:443/";
+    private static final String uri = "https://tikiri.documents.azure.com:443/";
     private static final String key =
-            "91wh3ojEgqrHXpF634AHUbT8kelyEdO7aswv0ZxKCmlA2Y5b9aY6N4MYVJgP2CCWSlZBm5ZuksyoZhK7AXYe0g==";
+            "R2dfUSPCbWCElaOgCfC8QyaUPd3fQyRr9bnFFlne75KFv8acRvuI2HS3NYpShFiGxyGVqlerf7FkT3OdpSC7tQ==";
     private static final String databaseName = "ToDoList";
 
     private CosmosTableTestUtils() {
