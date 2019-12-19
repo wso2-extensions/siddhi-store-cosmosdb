@@ -32,11 +32,8 @@ public class CosmosTableConstants {
 
     //Configurable parameters associated with request options
     public static final String ANNOTATION_ELEMENT_CUSTOM_REQUEST_OPTIONS = "custom.request.options";
-    public static final String ANNOTATION_ELEMENT_SCRIPT_LOGGING = "is.script.logging.enabled";
-    public static final String ANNOTATION_ELEMENT_POPULATE_QUOTA = "is.populate.quota.info";
     public static final String ANNOTATION_ELEMENT_RU_PER_MINUTE =  "is.disable.ru.per.minute.usage";
     public static final String ANNOTATION_ELEMENT_ENABLE_RU_THROUGHPUT = "offer.enable.ru.per.minute.throughput";
-    public static final String ANNOTATION_ELEMENT_POPULATE_PK_STATS = "is.populate.partition.key.range.statistics";
     public static final String ANNOTATION_ELEMENT_PARTITION_KEY = "partition.key";
     public static final String ANNOTATION_ELEMENT_OFFER_THROUGHPUT = "offer.throughput";
     public static final String ANNOTATION_ELEMENT_OFFER_TYPE = "offer.type";

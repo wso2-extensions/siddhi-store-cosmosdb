@@ -157,16 +157,10 @@ public class CosmosTableUtils {
         RequestOptions requestOptions = new RequestOptions();
         AccessCondition accessCondition = new AccessCondition();
 
-        requestOptions.setScriptLoggingEnabled(Boolean.parseBoolean(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_SCRIPT_LOGGING)));
-        requestOptions.setPopulateQuotaInfo(Boolean.parseBoolean(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_POPULATE_QUOTA)));
         requestOptions.setDisableRUPerMinuteUsage(Boolean.parseBoolean(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_RU_PER_MINUTE)));
         requestOptions.setOfferEnableRUPerMinuteThroughput(Boolean.parseBoolean(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_ENABLE_RU_THROUGHPUT)));
-        requestOptions.setPopulatePartitionKeyRangeStatistics(Boolean.parseBoolean(storeAnnotation.getElement(
-                CosmosTableConstants.ANNOTATION_ELEMENT_POPULATE_PK_STATS)));
         requestOptions.setPartitionKey(isEmpty(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)) ? null : new PartitionKey(
                         storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_PARTITION_KEY)));

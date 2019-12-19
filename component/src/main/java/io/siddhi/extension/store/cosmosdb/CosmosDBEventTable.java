@@ -49,8 +49,6 @@ import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.definition.Attribute;
 import io.siddhi.query.api.definition.TableDefinition;
 import io.siddhi.query.api.util.AnnotationHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -93,21 +91,6 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                         type = {DataType.STRING},
                         optional = true,
                         defaultValue = "null"),
-                @Parameter(name = "is.script.logging.enabled",
-                        description = "Sets whether Javascript stored procedure logging is enabled for the requests" +
-                                " in the Azure Cosmos DB database service or not. Possible values are 'true' or " +
-                                "'false'.",
-                        type = {DataType.STRING},
-                        optional = true,
-                        defaultValue = "false"),
-                @Parameter(name = "is.populate.quota.info",
-                        description = "Sets the PopulateQuotaInfo setting for document collection read requests " +
-                                "in the Azure Cosmos DB database service. PopulateQuotaInfo is used to " +
-                                "enable/disable getting document collection quota related stats for document " +
-                                "collection read requests. Possible values are 'true' or 'false'.",
-                        type = {DataType.STRING},
-                        optional = true,
-                        defaultValue = "false"),
                 @Parameter(name = "is.disable.ru.per.minute.usage",
                         description = "is.disable.ru.per.minute.usage is used to enable/disable Request " +
                                 "Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second " +
@@ -118,12 +101,6 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                 @Parameter(name = "offer.enable.ru.per.minute.throughput",
                         description = "Sets offerEnableRUPerMinuteThroughput for a collection in the Azure Cosmos " +
                                 "DB database service. Possible values are 'true' or 'false'.",
-                        type = {DataType.STRING},
-                        optional = true,
-                        defaultValue = "false"),
-                @Parameter(name = "is.populate.partition.key.range.statistics",
-                        description = "Sets populatePartitionKeyRangeStatistics for a collection in the Azure " +
-                                "Cosmos DB database service. Possible values are 'true' or 'false'.",
                         type = {DataType.STRING},
                         optional = true,
                         defaultValue = "false"),
@@ -446,7 +423,6 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
         }
 )
 public class CosmosDBEventTable extends AbstractRecordTable {
-    private static final Log log = LogFactory.getLog(CosmosDBEventTable.class);
     private DocumentClient documentClient;
     private List<String> attributeNames;
     private String databaseId;
