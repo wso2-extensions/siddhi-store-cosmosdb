@@ -37,7 +37,6 @@ public class CosmosIterator implements RecordIterator<Object[]> {
     private List<String> attributes;
     private ListIterator<Document> document;
 
-
     CosmosIterator(List<Document> documents, List<String> attributes) {
         this.attributes = attributes;
         this.document = documents.listIterator();
@@ -90,6 +89,5 @@ public class CosmosIterator implements RecordIterator<Object[]> {
     @Override
     public void close() {
     }
-
 }
 

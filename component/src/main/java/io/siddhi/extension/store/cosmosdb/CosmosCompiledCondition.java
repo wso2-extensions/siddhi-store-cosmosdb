@@ -52,5 +52,4 @@ public class CosmosCompiledCondition implements CompiledCondition {
     public SortedMap<Integer, Object> getParameters() {
         return parameters;
     }
-
 }

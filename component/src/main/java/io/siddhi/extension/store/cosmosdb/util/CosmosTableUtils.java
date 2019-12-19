@@ -106,7 +106,7 @@ public class CosmosTableUtils {
         return condition;
     }
 
-    public static ConnectionPolicy getConnectionPolicy(ConfigReader configReader) {
+    public static ConnectionPolicy generateConnectionPolicy(ConfigReader configReader) {
         ConnectionPolicy connectionPolicy = new ConnectionPolicy();
 
         connectionPolicy.setRequestTimeout(Integer.parseInt(configReader.readConfig(

@@ -38,7 +38,7 @@ public class CosmosTableTestUtils {
     private static final String uri = "https://tikiri.documents.azure.com:443/";
     private static final String key =
             "R2dfUSPCbWCElaOgCfC8QyaUPd3fQyRr9bnFFlne75KFv8acRvuI2HS3NYpShFiGxyGVqlerf7FkT3OdpSC7tQ==";
-    private static final String databaseName = "ToDoList";
+    private static final String databaseName = "Production";
 
     private CosmosTableTestUtils() {
     }

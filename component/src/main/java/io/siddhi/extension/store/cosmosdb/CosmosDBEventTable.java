@@ -87,8 +87,8 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
                         defaultValue = "Name of the siddhi event table.",
                         type = {DataType.STRING}),
                 @Parameter(name = "custom.request.options",
-                        description = "This parameter contains custom options a create, update or delete " +
-                                "request can have." +
+                        description = "This parameter configures custom options for create, update and delete " +
+                                "requests. Expected format '<key>:<value>,<key>:<value>'." +
                                 "e.g., 'offerThroughput:500,scriptLoggingEnabled:true'.",
                         type = {DataType.STRING},
                         optional = true,
@@ -448,12 +448,11 @@ import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
 public class CosmosDBEventTable extends AbstractRecordTable {
     private static final Log log = LogFactory.getLog(CosmosDBEventTable.class);
     private DocumentClient documentClient;
-    private Database database;
-    private DocumentCollection collectionCache;
     private List<String> attributeNames;
     private String databaseId;
     private String collectionId;
     private String collectionLink;
+    private DocumentCollection documentCollection;
     private RequestOptions requestOptions;
     private FeedOptions feedOptions;
     private boolean disableAutomaticIdGeneration;
@@ -463,16 +462,17 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         this.attributeNames =
                 tableDefinition.getAttributeList().stream().map(Attribute::getName).collect(Collectors.toList());
         Annotation storeAnnotation = AnnotationHelper.getAnnotation(ANNOTATION_STORE, tableDefinition.getAnnotations());
-        this.createDocumentClient(storeAnnotation, configReader);
         this.databaseId = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_DATABASE_NAME);
         if (CosmosTableUtils.isEmpty(databaseId)) {
-            throw new SiddhiAppCreationException("database.name is not given or empty. ");
+            throw new SiddhiAppCreationException("Required parameter '" +
+                    CosmosTableConstants.ANNOTATION_ELEMENT_DATABASE_NAME + "' cannot be empty for store '" +
+                    collectionId + "'. ");
         }
         String customCollectionName =
                 storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_COLLECTION_NAME);
         this.collectionId = CosmosTableUtils.isEmpty(customCollectionName) ? tableDefinition.getId() :
                 customCollectionName;
-
+        this.createDocumentClient(storeAnnotation, configReader);
         disableAutomaticIdGeneration = Boolean.parseBoolean(storeAnnotation.getElement(
                 CosmosTableConstants.ANNOTATION_ELEMENT_ID_GENERATION));
         requestOptions = CosmosTableUtils.getCustomRequestOptions(storeAnnotation);
@@ -489,13 +489,16 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     private void createDocumentClient(Annotation storeAnnotation, ConfigReader configReader) {
         String uri = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_URI);
         String accessKey = storeAnnotation.getElement(CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_KEY);
-        ConnectionPolicy connectionPolicy = CosmosTableUtils.getConnectionPolicy(configReader);
+        ConnectionPolicy connectionPolicy = CosmosTableUtils.generateConnectionPolicy(configReader);
         ConsistencyLevel consistencyLevel = ConsistencyLevel.valueOf(configReader.readConfig(
                 CosmosTableConstants.CONSISTENCY_LEVEL, String.valueOf(ConsistencyLevel.Session)));
         if (CosmosTableUtils.isEmpty(uri)) {
-            throw new SiddhiAppCreationException("URI is not given or empty. ");
+            throw new SiddhiAppCreationException("Required parameter '" + CosmosTableConstants.ANNOTATION_ELEMENT_URI
+                    + "' cannot be empty for store '" + collectionId + "'. ");
         } else if (CosmosTableUtils.isEmpty(accessKey)) {
-            throw new SiddhiAppCreationException("Access key is not given or empty. ");
+            throw new SiddhiAppCreationException("Required parameter '" +
+                    CosmosTableConstants.ANNOTATION_ELEMENT_ACCESS_KEY + "' cannot be empty for store '" +
+                    collectionId + "'. ");
         } else {
             documentClient = new DocumentClient(uri, accessKey, connectionPolicy, consistencyLevel);
         }
@@ -503,45 +506,40 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected void connect() throws ConnectionUnavailableException {
-        if (database == null) {
-            String databaseQuery = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst(
-                    CosmosTableConstants.SQL_QUESTION_MARK, "'" + databaseId + "'");
-            List<Database> databaseList =
-                    documentClient.queryDatabases(databaseQuery, feedOptions).getQueryIterable().toList();
-            if (databaseList.size() > 0) {
-                database = databaseList.get(0);
-                if (collectionCache == null) {
-                    String collectionQuery = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst(
-                            CosmosTableConstants.SQL_QUESTION_MARK, "'" + collectionId + "'");
-                    List<DocumentCollection> collectionList = documentClient.queryCollections(database.getSelfLink(),
-                            collectionQuery, feedOptions).getQueryIterable().toList();
-                    if (collectionList.size() > 0) {
-                        collectionCache = collectionList.get(0);
-                    } else {
-                        try {
-                            DocumentCollection collectionDefinition = new DocumentCollection();
-                            collectionDefinition.setId(collectionId);
-                            try {
-                                collectionCache = documentClient.createCollection(database.getSelfLink(),
-                                        collectionDefinition, requestOptions).getResource();
-                            } catch (ClassCastException e) {
-                                throw new SiddhiAppCreationException(
-                                        "Failed to cast from Request Response to Document Collection. ", e);
-                            }
-                        } catch (DocumentClientException e) {
-                            throw new SiddhiAppCreationException("Failed to create the collection. ", e);
-                        }
-                    }
-                    if (collectionCache != null) {
-                        collectionLink = collectionCache.getSelfLink();
-                    } else {
-                        throw new SiddhiAppCreationException("Failed to find or create the Document collection "
-                                + collectionId);
-                    }
-                }
+        String databaseQuery = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst(
+                CosmosTableConstants.SQL_QUESTION_MARK, "'" + databaseId + "'");
+        List<Database> databaseList =
+                documentClient.queryDatabases(databaseQuery, feedOptions).getQueryIterable().toList();
+        if (databaseList.size() == 1) {
+            Database database = databaseList.get(0);
+            String collectionQuery = CosmosTableConstants.SQL_SELECT_FROM_ROOT.replaceFirst(
+                    CosmosTableConstants.SQL_QUESTION_MARK, "'" + collectionId + "'");
+            List<DocumentCollection> collectionList = documentClient.queryCollections(database.getSelfLink(),
+                    collectionQuery, feedOptions).getQueryIterable().toList();
+            if (collectionList.size() == 1) {
+                documentCollection = collectionList.get(0);
             } else {
-                throw new ConnectionUnavailableException("Database " + databaseId + " doesn't exist. ");
+                try {
+                    DocumentCollection collectionDefinition = new DocumentCollection();
+                    collectionDefinition.setId(collectionId);
+                    try {
+                    documentCollection = documentClient.createCollection(database.getSelfLink(),
+                            collectionDefinition, requestOptions).getResource();
+                    } catch (ClassCastException e) {
+                        //Ignored the exception since a Document Collection is returned by createCollection method.
+                    }
+                } catch (DocumentClientException e) {
+                    throw new SiddhiAppCreationException("Failed to create the collection '" + collectionId + "'. ", e);
+                }
             }
+            if (documentCollection != null) {
+                collectionLink = documentCollection.getSelfLink();
+            } else {
+                throw new SiddhiAppCreationException("Failed to find or create the Document collection "
+                        + collectionId);
+            }
+        } else {
+            throw new ConnectionUnavailableException("Database " + databaseId + " doesn't exist. ");
         }
     }
 
@@ -549,7 +547,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
     protected void add(List<Object[]> records) {
         for (Object[] record : records) {
             Document insertDocument = new Document();
-            for (int counter = 0; counter < record.length; counter++) {
+            for (int counter = 0; counter < this.attributeNames.size(); counter++) {
                 String key = this.attributeNames.get(counter);
                 Object value = record[counter];
                 insertDocument.set(key, value);
@@ -558,7 +556,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 documentClient.createDocument(collectionLink, insertDocument, requestOptions,
                         disableAutomaticIdGeneration);
             } catch (DocumentClientException e) {
-                throw new SiddhiAppRuntimeException("Failed to add document. ", e);
+                throw new SiddhiAppRuntimeException("Failed to add document to store: '" + collectionId + "'", e);
             }
         }
     }
@@ -570,13 +568,10 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         try {
             documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, findConditionParameterMap);
         } catch (SQLException e) {
-            throw new SiddhiAppRuntimeException("Failed to find document. ", e);
+            throw new SiddhiAppRuntimeException("Error retrieving documents from store '" + collectionId + "'. ",
+                    e);
         }
-        if (documentList != null) {
-            return new CosmosIterator(documentList, this.attributeNames);
-        } else {
-            return null;
-        }
+        return new CosmosIterator(documentList, this.attributeNames);
     }
 
     @Override
@@ -586,7 +581,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
         try {
             documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, containsConditionParameterMap);
         } catch (SQLException e) {
-            throw new SiddhiAppRuntimeException("Failed to find document. ", e);
+            throw new SiddhiAppRuntimeException("Error performing contains check for store '" + collectionId +
+                    "'. ", e);
         }
         if (documentList != null) {
             return documentList.size() > 0;
@@ -606,12 +602,14 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                     try {
                         documentClient.deleteDocument(toDeleteDocument.getSelfLink(), requestOptions);
                     } catch (DocumentClientException e) {
-                        throw new SiddhiAppRuntimeException("Failed to delete document. ", e);
+                        throw new SiddhiAppRuntimeException("Error performing document deletion for store: '" +
+                                collectionId + "'. ", e);
                     }
                 }
             }
         } catch (SQLException e) {
-            throw new SiddhiAppRuntimeException("Failed to find document. ", e);
+            throw new SiddhiAppRuntimeException("Error performing document deletion for store: '" +
+                    collectionId + "'. ", e);
         }
     }
 
@@ -628,7 +626,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
             try {
                 documentList = queryDocuments((CosmosCompiledCondition) compiledCondition, updateConditionParameterMap);
             } catch (SQLException e) {
-                throw new SiddhiAppRuntimeException("Failed to find document. ", e);
+                throw new SiddhiAppRuntimeException("Error performing document update operations for store '" +
+                        collectionId + "'. ", e);
             }
             if (documentList != null) {
                 for (Document toUpdateDocument : documentList) {
@@ -639,7 +638,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                         }
                         documentClient.replaceDocument(toUpdateDocument, requestOptions);
                     } catch (DocumentClientException e) {
-                        throw new SiddhiAppRuntimeException("Failed to update document. ", e);
+                        throw new SiddhiAppRuntimeException("Error performing document update operations for store '" +
+                                collectionId + "'. ", e);
                     }
                 }
             }
@@ -662,7 +662,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                 documentList = queryDocuments((CosmosCompiledCondition) compiledCondition,
                         updateOrAddConditionParameterMap);
             } catch (SQLException e) {
-                throw new SiddhiAppRuntimeException("Failed to find document. ", e);
+                throw new SiddhiAppRuntimeException("Error performing update/insert operations for store '" +
+                        collectionId + "'. ", e);
             }
             if (documentList != null) {
                 if (documentList.size() > 0) {
@@ -674,7 +675,8 @@ public class CosmosDBEventTable extends AbstractRecordTable {
                             }
                             documentClient.replaceDocument(toUpdateDocument, requestOptions);
                         } catch (DocumentClientException e) {
-                            throw new SiddhiAppRuntimeException("Failed to update document. ", e);
+                            throw new SiddhiAppRuntimeException("Error performing update/insert operations for " +
+                                    "store '" + collectionId + "'. ", e);
                         }
                     }
                 } else {
@@ -710,6 +712,7 @@ public class CosmosDBEventTable extends AbstractRecordTable {
 
     @Override
     protected void disconnect() {
+        documentCollection = null;
         if (documentClient != null) {
             documentClient.close();
         }
