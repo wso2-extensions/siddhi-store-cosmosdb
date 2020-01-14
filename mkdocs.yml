@@ -1,0 +1,37 @@
+site_name: Siddhi Store CosmosDB
+site_description: Siddhi Store CosmosDB Extension
+repo_name: Siddhi Store CosmosDB
+repo_url: https://github.com/wso2-extensions/siddhi-store-cosmosdb/
+edit_uri: https://github.com/siddhi-io/siddhi-store-cosmosdb/blob/master/
+copyright: Siddhi - Documentation
+theme:
+  name: material
+  logo: images/siddhi-logo.svg
+  favicon: images/favicon.ico
+  palette:
+    primary: teal
+    accent: teal
+extra_css:
+  - assets/stylesheets/extra.css
+extra_javascript:
+  - assets/javascripts/extra.js
+extra:
+  social:
+    - type: github
+      link: https://github.com/siddhi-io/siddhi
+    - type: medium
+      link: https://medium.com/siddhi-io
+    - type: twitter
+      link: https://twitter.com/siddhi_io
+    - type: linkedin
+      link: https://www.linkedin.com/groups/13553064
+google_analytics:
+  - UA-103065-28
+  - auto
+markdown_extensions:
+  - markdown.extensions.admonition
+pages:
+  - Information: index.md
+  - API Docs:
+      - latest: api/latest.md
+  - License: license.md

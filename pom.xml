@@ -32,7 +32,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Siddhi Store Cosmosdb Extension Parent</name>
-    <url>https://github.com/Tikiri16/siddhi-store-cosmosdb</url>
+    <url>https://github.com/wso2-extensions/siddhi-store-cosmosdb</url>
 
     <profiles>
         <profile>
@@ -149,9 +149,9 @@
     </properties>
 
     <scm>
-        <connection>git@github.com:Tikiri16/siddhi-store-cosmosdb.git</connection>
-        <url>https://github.com/Tikiri16/siddhi-store-cosmosdb.git</url>
-        <developerConnection>git@github.com:Tikiri16/siddhi-store-cosmosdb.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2-extensions/siddhi-store-cosmosdb.git</connection>
+        <url>https://github.com/wso2-extensions/siddhi-store-cosmosdb.git</url>
+        <developerConnection>scm:git:https://github.com/wso2-extensions/siddhi-store-cosmosdb.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
