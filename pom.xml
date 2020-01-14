@@ -54,7 +54,6 @@
         <commons.logging.version>1.1.1</commons.logging.version>
         <commons.logging.version.range>[1.1.1,2.0)</commons.logging.version.range>
         <testng.version>6.11</testng.version>
-        <cosmosdb.driver.version>3.4.2</cosmosdb.driver.version>
         <fabric8.docker.version>0.21.0</fabric8.docker.version>
         <jacoco.plugin.version>0.7.9</jacoco.plugin.version>
         <jacoco.ant.version>0.7.9</jacoco.ant.version>
