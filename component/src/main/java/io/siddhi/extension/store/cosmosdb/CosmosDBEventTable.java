@@ -58,14 +58,13 @@ import java.util.stream.Collectors;
 import static io.siddhi.core.util.SiddhiConstants.ANNOTATION_STORE;
 
 /**
- * Class representing CosmosDB Event Table implementation.
+ * Class representing Cosmos DB Event Table implementation.
  */
 @Extension(
         name = "cosmosdb",
         namespace = "store",
-        description = "Using this extension a Cosmos DB Event Table can be configured to persist events " +
-                "in a Cosmos DB of user's choice. Create, update, delete, find and contains operations can be " +
-                "performed on document collections in Cosmos DB using this extension.",
+        description = "This extension will be used to execute Create, Update, Delete, Find and Contains operations on" +
+                " document collections in Cosmos DB.",
         parameters = {
                 @Parameter(name = "uri",
                         description = "The Cosmos DB uri for the Cosmos DB data store. The uri must be of the " +
