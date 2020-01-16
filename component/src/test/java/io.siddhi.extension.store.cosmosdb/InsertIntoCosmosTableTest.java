@@ -36,7 +36,6 @@ import java.util.HashMap;
 public class InsertIntoCosmosTableTest {
 
     private static final Logger log = Logger.getLogger(InsertIntoCosmosTableTest.class);
-
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static final String key = CosmosTableTestUtils.resolveMasterKey();
     private static final String database = CosmosTableTestUtils.resolveDatabase();
@@ -54,10 +53,8 @@ public class InsertIntoCosmosTableTest {
     @Test
     public void insertIntoCosmosTableTest1() throws InterruptedException {
         log.info("insertIntoCosmosTableTest1 - Insert events to a CosmosDB table successfully");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
@@ -73,11 +70,8 @@ public class InsertIntoCosmosTableTest {
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         fooStream.send(new Object[]{"WSO2", 55.6f, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Insertion failed");
@@ -87,7 +81,6 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest2() {
         log.info("insertIntoCosmosTableTest2 - " +
                 "Insert events to a CosmosDB table when query has less attributes to select from");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
@@ -109,7 +102,6 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest3() {
         log.info("insertIntoCosmosTableTest3 - " +
                 "Insert events to a CosmosDB table when query has more attributes to select from");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
@@ -131,7 +123,6 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest4() {
         log.info("insertIntoCosmosTableTest4 - " +
                 "Insert events to a CosmosDB table by selecting from non existing stream");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
@@ -153,7 +144,6 @@ public class InsertIntoCosmosTableTest {
     public void insertIntoCosmosTableTest5() {
         log.info("insertIntoCosmosTableTest5 - " +
                 "Insert events to a CosmosDB table when the stream has not defined");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
@@ -176,7 +166,6 @@ public class InsertIntoCosmosTableTest {
                 "Insert events data to CosmosDB table when the table has not defined");
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
@@ -191,7 +180,6 @@ public class InsertIntoCosmosTableTest {
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
-
         String databaseLink = String.format("/dbs/%s", database);
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
@@ -204,7 +192,6 @@ public class InsertIntoCosmosTableTest {
         //Object inserts
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@source(type='inMemory', topic='stock') " +
@@ -220,16 +207,12 @@ public class InsertIntoCosmosTableTest {
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         HashMap<String, String> input = new HashMap<>();
         input.put("symbol", "IBM");
         fooStream.send(new Object[]{"WSO2", 55.6f, input});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Insertion failed");
-
     }
 }

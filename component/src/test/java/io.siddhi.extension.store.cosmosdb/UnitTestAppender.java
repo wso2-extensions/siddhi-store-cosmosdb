@@ -36,7 +36,6 @@ public class UnitTestAppender extends AppenderSkeleton {
 
     @Override
     public void close() {
-
     }
 
     @Override

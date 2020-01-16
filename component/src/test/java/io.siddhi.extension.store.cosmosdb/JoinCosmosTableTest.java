@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class JoinCosmosTableTest {
 
     private static final Logger log = Logger.getLogger(JoinCosmosTableTest.class);
-
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static String key = CosmosTableTestUtils.resolveMasterKey();
     private static String database = CosmosTableTestUtils.resolveDatabase();
@@ -65,10 +64,8 @@ public class JoinCosmosTableTest {
     public void testCosmosTableJoinQuery1() throws InterruptedException {
         log.info("testCosmosTableJoinQuery1 -" +
                 "Read events from a CosmosDB collection successfully");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -86,7 +83,6 @@ public class JoinCosmosTableTest {
                 "select FooStream.symbol as checkSymbol, FooTable.symbol as symbol, " +
                 "FooTable.volume as volume  " +
                 "insert into OutputStream ;";
-
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         siddhiAppRuntime.addCallback("query2", new QueryCallback() {
             @Override
@@ -109,25 +105,20 @@ public class JoinCosmosTableTest {
             }
 
         });
-
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 5.6f, 100L});
         stockStream.send(new Object[]{"IBM", 7.6f, 10L});
         fooStream.send(new Object[]{"WSO2_check"});
         SiddhiTestHelper.waitForEvents(waitTime, 2, eventCount, timeout);
-
         siddhiAppRuntime.shutdown();
-
         Assert.assertEquals(eventCount.intValue(), 2, "Read events failed");
     }
 
     @Test(expectedExceptions = SiddhiParserException.class)
     public void testCosmosTableJoinQuery2() {
         log.info("testCosmosTableJoinQuery - Read events from a non existing CosmosDB collection");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -154,7 +145,6 @@ public class JoinCosmosTableTest {
     public void testCosmosTableJoinQuery3() {
         log.info("testCosmosTableJoinQuery3 - " +
                 "Read events from a CosmosDB collection by sending through non existing stream");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -172,7 +162,6 @@ public class JoinCosmosTableTest {
                 "select FooStream.symbol as checkSymbol, FooTable.symbol as symbol, " +
                 "FooTable.volume as volume  " +
                 "insert into OutputStream ;";
-
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
@@ -182,10 +171,8 @@ public class JoinCosmosTableTest {
     public void testCosmosTableJoinQuery4() throws InterruptedException {
         log.info("testCosmosTableJoinQuery4 - " +
                 "Read events from a CosmosDB collection for less attributes than total attribute list");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -224,18 +211,14 @@ public class JoinCosmosTableTest {
             }
 
         });
-
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 5.6f, 100L});
         stockStream.send(new Object[]{"IBM", 7.6f, 10L});
         fooStream.send(new Object[]{"WSO2_check"});
         SiddhiTestHelper.waitForEvents(waitTime, 2, eventCount, timeout);
-
         siddhiAppRuntime.shutdown();
-
         Assert.assertEquals(eventCount.intValue(), 2, "Read events failed");
     }
 
@@ -243,7 +226,6 @@ public class JoinCosmosTableTest {
     public void testCosmosTableJoinQuery5() {
         log.info("testCosmosTableJoinQuery5 - " +
                 "DASC5-919:Read events from a CosmosDB collection for non existing attributes");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -270,10 +252,8 @@ public class JoinCosmosTableTest {
     public void testCosmosTableJoinQuery6() throws InterruptedException {
         log.info("testCosmosTableJoinQuery6");
         //Object reads
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, input Object); " +
@@ -291,7 +271,6 @@ public class JoinCosmosTableTest {
                 "select FooStream.symbol as checkSymbol, FooTable.symbol as symbol, " +
                 "FooTable.input as input  " +
                 "insert into OutputStream ;";
-
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         siddhiAppRuntime.addCallback("query2", new QueryCallback() {
             @Override
@@ -308,18 +287,14 @@ public class JoinCosmosTableTest {
             }
 
         });
-
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         String input = "{symbol=IBM}";
         stockStream.send(new Object[]{"WSO2", 5.6f, input});
         fooStream.send(new Object[]{"WSO2_check"});
         SiddhiTestHelper.waitForEvents(waitTime, 1, eventCount, timeout);
-
         siddhiAppRuntime.shutdown();
-
         Assert.assertEquals(eventCount.intValue(), 1, "Read events failed");
     }
 }

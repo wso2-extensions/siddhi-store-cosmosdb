@@ -55,7 +55,6 @@ public class CosmosTableTestUtils {
         return databaseName;
     }
 
-
     public static void dropCollection(String uri, String key, String collectionName) {
         try (DocumentClient documentClient = new DocumentClient(uri, key, ConnectionPolicy.GetDefault(),
                 ConsistencyLevel.Session)) {
@@ -88,7 +87,6 @@ public class CosmosTableTestUtils {
             List<DocumentCollection> collectionList = documentClient.queryCollections(databaseName,
                     "SELECT * FROM root r WHERE r.id='" + customCollectionName + "'",
                     null).getQueryIterable().toList();
-
             return collectionList.size() > 0;
         } catch (Exception e) {
             log.debug("Checking whether collection was created failed due to" + e.getMessage(), e);

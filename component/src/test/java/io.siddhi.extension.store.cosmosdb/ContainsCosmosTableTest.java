@@ -39,7 +39,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ContainsCosmosTableTest {
 
     private static final Log log = LogFactory.getLog(ContainsCosmosTableTest.class);
-
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static String key = CosmosTableTestUtils.resolveMasterKey();
     private static String database = CosmosTableTestUtils.resolveDatabase();
@@ -66,10 +65,8 @@ public class ContainsCosmosTableTest {
     public void containsCosmosTableTest1() throws InterruptedException {
         log.info("containsCosmosTableTest1 - " +
                 "Configure siddhi to check whether particular records exist in a CosmosDB Collection");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -87,7 +84,6 @@ public class ContainsCosmosTableTest {
                 "from FooStream[(FooTable.symbol == symbol) in FooTable]" +
                 "insert into OutputStream ;";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
-
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.addCallback("OutputStream", new StreamCallback() {
@@ -111,7 +107,6 @@ public class ContainsCosmosTableTest {
             }
         });
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2_2", 57.6F, 100L});
@@ -119,9 +114,7 @@ public class ContainsCosmosTableTest {
         fooStream.send(new Object[]{"IBM", 7.56, 200});
         fooStream.send(new Object[]{"IBM_2", 70.56, 200});
         SiddhiTestHelper.waitForEvents(waitTime, 2, eventCount, timeout);
-
         siddhiAppRuntime.shutdown();
-
         Assert.assertEquals(eventCount.intValue(), 2, "Number of success events");
     }
 
@@ -129,10 +122,8 @@ public class ContainsCosmosTableTest {
     public void containsCosmosTableTest2() throws InterruptedException {
         log.info("containsCosmosTableTest2 - " +
                 "Configure siddhi to check whether record exist when OutputStream already exists");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -150,9 +141,7 @@ public class ContainsCosmosTableTest {
                 "@info(name='query2')" +
                 "from FooStream[(FooTable.symbol == symbol) in FooTable]" +
                 "insert into OutputStream ;";
-
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
-
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.addCallback("OutputStream", new StreamCallback() {
@@ -177,7 +166,6 @@ public class ContainsCosmosTableTest {
             }
         });
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2_2", 57.6F, 100L});
@@ -185,9 +173,7 @@ public class ContainsCosmosTableTest {
         fooStream.send(new Object[]{"IBM", 70.56, 200});
         fooStream.send(new Object[]{"IBM_2", 70.56, 200});
         SiddhiTestHelper.waitForEvents(waitTime, 2, eventCount, timeout);
-
         siddhiAppRuntime.shutdown();
-
         Assert.assertEquals(eventCount.intValue(), 2, "Number of success events");
     }
 
@@ -195,10 +181,8 @@ public class ContainsCosmosTableTest {
     public void containsCosmosTableTest3() throws InterruptedException {
         log.info("containsCosmosTableTest3 - " +
                 "Configure siddhi to check whether record exist when OutputStream already exists");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -217,9 +201,7 @@ public class ContainsCosmosTableTest {
                 "from FooStream " +
                 "[(FooTable.symbol == symbol and FooTable.price == price) in FooTable]" +
                 "insert into OutputStream ;";
-
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
-
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.addCallback("OutputStream", new StreamCallback() {
@@ -244,7 +226,6 @@ public class ContainsCosmosTableTest {
             }
         });
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 50.56F, 100L});
         stockStream.send(new Object[]{"IBM", 70.56F, 100L});
         stockStream.send(new Object[]{"WSO2_2", 57.6F, 100L});
@@ -252,9 +233,7 @@ public class ContainsCosmosTableTest {
         fooStream.send(new Object[]{"IBM", 70.56, 200});
         fooStream.send(new Object[]{"IBM_2", 70.56, 200});
         SiddhiTestHelper.waitForEvents(waitTime, 2, eventCount, timeout);
-
         siddhiAppRuntime.shutdown();
-
         Assert.assertEquals(eventCount.intValue(), 2, "Number of success events");
     }
 }

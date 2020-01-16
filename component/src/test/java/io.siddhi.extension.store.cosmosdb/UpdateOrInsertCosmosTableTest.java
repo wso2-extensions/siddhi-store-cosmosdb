@@ -33,7 +33,6 @@ import org.testng.annotations.Test;
 public class UpdateOrInsertCosmosTableTest {
 
     private static final Logger log = Logger.getLogger(UpdateOrInsertCosmosTableTest.class);
-
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static String key = CosmosTableTestUtils.resolveMasterKey();
     private static String database = CosmosTableTestUtils.resolveDatabase();
@@ -51,10 +50,8 @@ public class UpdateOrInsertCosmosTableTest {
     @Test
     public void updateOrInsertCosmosTableTest1() throws InterruptedException {
         log.info("updateOrInsertCosmosTableTest1 - Configure siddhi to perform insert/update on CosmosDB document");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -75,25 +72,20 @@ public class UpdateOrInsertCosmosTableTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"GOOG", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6F, 100L});
         fooStream.send(new Object[]{"GOOG", 10.6, 100});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 3, "Update failed");
-
         Document expectedUpdatedDocument = new Document();
         expectedUpdatedDocument.set("symbol", "GOOG");
         expectedUpdatedDocument.set("price", 10.6);
         expectedUpdatedDocument.set("volume", 100);
         Document updatedDocument = CosmosTableTestUtils.getDocument(uri, key, collectionLink, "FooTable",
                 "FooTable.symbol='GOOG'");
-
         Assert.assertEquals(updatedDocument.get("symbol"), expectedUpdatedDocument.get("symbol"),
                 "Update Failed");
         Assert.assertEquals(updatedDocument.get("price"), expectedUpdatedDocument.get("price"),
@@ -106,10 +98,8 @@ public class UpdateOrInsertCosmosTableTest {
     public void updateOrInsertCosmosTableTest2() throws InterruptedException {
         log.info("updateOrInsertCosmosTableTest2 - Configure siddhi to perform insert/update on CosmosDB Document " +
                 "when no matching record exist");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -130,25 +120,20 @@ public class UpdateOrInsertCosmosTableTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"GOOG", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6F, 100L});
         fooStream.send(new Object[]{"GOOG_2", 10.6, 100});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 4, "Update failed");
-
         Document expectedUpdatedDocument = new Document();
         expectedUpdatedDocument.set("symbol", "GOOG_2");
         expectedUpdatedDocument.set("price", 10.6);
         expectedUpdatedDocument.set("volume", 100);
         Document updatedDocument = CosmosTableTestUtils.getDocument(uri, key, collectionLink, "FooTable",
                 "FooTable.symbol='GOOG_2'");
-
         Assert.assertEquals(updatedDocument.get("symbol"), expectedUpdatedDocument.get("symbol"),
                 "Update Failed");
         Assert.assertEquals(updatedDocument.get("price"), expectedUpdatedDocument.get("price"),
@@ -161,10 +146,8 @@ public class UpdateOrInsertCosmosTableTest {
     public void updateOrInsertCosmosTableTest3() throws InterruptedException {
         log.info("updateOrInsertCosmosTableTest3 - Configure siddhi to perform insert/update when some of " +
                 "matching records exist");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -185,25 +168,20 @@ public class UpdateOrInsertCosmosTableTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"GOOG", 75.6F, 100L});
         fooStream.send(new Object[]{"WSO2", 57.6, 100});
         fooStream.send(new Object[]{"GOOG_2", 10.6, 100});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 3, "Update failed");
-
         Document expectedUpdatedDocument = new Document();
         expectedUpdatedDocument.set("symbol", "WSO2");
         expectedUpdatedDocument.set("price", 57.6);
         expectedUpdatedDocument.set("volume", 100);
         Document updatedDocument = CosmosTableTestUtils.getDocument(uri, key, collectionLink, "FooTable",
                 "FooTable.symbol='WSO2'");
-
         Assert.assertEquals(updatedDocument.get("symbol"), expectedUpdatedDocument.get("symbol"),
                 "Update Failed");
         Assert.assertEquals(updatedDocument.get("price"), expectedUpdatedDocument.get("price"),
@@ -216,7 +194,6 @@ public class UpdateOrInsertCosmosTableTest {
     public void updateOrInsertCosmosTableTest4() {
         log.info("updateOrInsertCosmosTableTest4 - Configure siddhi to perform insert/update with a non existing " +
                 "stream");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -242,7 +219,6 @@ public class UpdateOrInsertCosmosTableTest {
     public void updateOrInsertCosmosTableTest5() {
         log.info("updateOrInsertCosmosTableTest5 - Configure siddhi to perform insert/update with an undefined " +
                 "CosmosDB Document");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -268,7 +244,6 @@ public class UpdateOrInsertCosmosTableTest {
     public void updateOrInsertCosmosTableTest6() {
         log.info("updateOrInsertCosmosTableTest6 - Configure siddhi to perform insert/update on CosmosDB Document " +
                 "with a non-existing attribute");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -294,7 +269,6 @@ public class UpdateOrInsertCosmosTableTest {
     public void updateOrInsertCosmosTableTest7() {
         log.info("updateOrInsertCosmosTableTest7 - Configure siddhi to perform insert/update on CosmosDB Document " +
                 "incorrect siddhi query");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +

@@ -33,7 +33,6 @@ import org.testng.annotations.Test;
 public class ConditionVisitorTest {
 
     private final Log log = LogFactory.getLog(ConditionVisitorTest.class);
-
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static final String key = CosmosTableTestUtils.resolveMasterKey();
     private static final String database = CosmosTableTestUtils.resolveDatabase();
@@ -52,7 +51,6 @@ public class ConditionVisitorTest {
     public void conditionBuilderTest1() {
         log.info("conditionBuilderTest1 - Test delete on condition when there's a non-existing attribute as right" +
                 " operand. ");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -78,7 +76,6 @@ public class ConditionVisitorTest {
     public void conditionBuilderTest2() {
         log.info("conditionBuilderTest2 - Test delete on condition when there's a non-existing attribute as left" +
                 " operand. ");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -104,10 +101,8 @@ public class ConditionVisitorTest {
     public void conditionBuilderTest3() throws InterruptedException {
         log.info("conditionBuilderTest3 - Delete an event of a CosmosDB table successfully by having event table" +
                 " attribute as left operand. ");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -128,14 +123,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"IBM", 57.6F, 100L});
         deleteStockStream.send(new Object[]{"IBM", 57.6F, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Deletion failed");
@@ -145,10 +137,8 @@ public class ConditionVisitorTest {
     public void conditionBuilderTest4() throws InterruptedException {
         log.info("conditionBuilderTest4 - Delete an event of a CosmosDB table successfully by having event table" +
                 " attribute as right operand. ");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -169,14 +159,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"IBM", 57.6F, 100L});
         deleteStockStream.send(new Object[]{"IBM", 57.6F, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Deletion failed");
@@ -186,10 +173,8 @@ public class ConditionVisitorTest {
     public void conditionBuilderTest5() throws InterruptedException {
         log.info("conditionBuilderTest5 - Delete an event of a CosmosDB table successfully when having a " +
                 "constant as left operand. ");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -210,14 +195,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6F, 100L});
         deleteStockStream.send(new Object[]{"WSO2", 57.6F, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 2, "Deletion failed");
@@ -227,10 +209,8 @@ public class ConditionVisitorTest {
     public void conditionBuilderTest6() throws InterruptedException {
         log.info("conditionBuilderTest6 - Delete an event of a CosmosDB table successfully when having a constant" +
                 " as right operand. ");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -251,14 +231,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6F, 100L});
         deleteStockStream.send(new Object[]{"IBM", 57.6F, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 2, "Deletion failed");
@@ -267,10 +244,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest7() throws InterruptedException {
         log.info("conditionBuilderTest7 - Test delete on condition when there's a not equals operator. ");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -291,14 +266,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6F, 100L});
         deleteStockStream.send(new Object[]{"IBM", 57.6F, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Deletion failed");
@@ -307,10 +279,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest8() throws InterruptedException {
         log.info("conditionBuilderTest8 - Test delete on condition when there's a greater than operator. ");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -331,14 +301,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6F, 100L});
         deleteStockStream.send(new Object[]{"IBM", 57.6F, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 2, "Deletion failed");
@@ -347,10 +314,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest9() throws InterruptedException {
         log.info("conditionBuilderTest9 - Test delete on condition when there's a greater than or equal operator. ");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -371,14 +336,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6, 100L});
         stockStream.send(new Object[]{"IBM", 75.6, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6, 100L});
         deleteStockStream.send(new Object[]{"IBM", 57.6, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Deletion failed");
@@ -387,10 +349,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest10() throws InterruptedException {
         log.info("conditionBuilderTest10 - Test delete on condition when there's a less than operator.");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -411,14 +371,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6, 100L});
         stockStream.send(new Object[]{"IBM", 75.6, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6, 100L});
         deleteStockStream.send(new Object[]{"IBM", 57.6, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 2, "Deletion failed");
@@ -427,10 +384,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest11() throws InterruptedException {
         log.info("conditionBuilderTest11 - Test delete on condition when there's a less than or equal operator.");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -451,14 +406,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6, 100L});
         stockStream.send(new Object[]{"IBM", 75.6, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6, 100L});
         deleteStockStream.send(new Object[]{"IBM", 57.6, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Deletion failed");
@@ -467,10 +419,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest12() throws InterruptedException {
         log.info("conditionBuilderTest12 - Test delete on condition when there's a logical AND operator.");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -491,14 +441,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6, 100L});
         stockStream.send(new Object[]{"IBM", 55.6, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6, 100L});
         deleteStockStream.send(new Object[]{"WSO2", 57.6, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Deletion failed");
@@ -507,10 +454,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest13() throws InterruptedException {
         log.info("conditionBuilderTest13 - Test delete on condition when there's a logical OR operator.");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -531,14 +476,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6, 100L});
         stockStream.send(new Object[]{"IBM", 55.6, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6, 100L});
         deleteStockStream.send(new Object[]{"WSO2", 57.6, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 0, "Deletion failed");
@@ -547,10 +489,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest14() throws InterruptedException {
         log.info("conditionBuilderTest14 - Test delete on condition when there's a logical NOT operator.");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -571,14 +511,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6, 100L});
         stockStream.send(new Object[]{"IBM", 55.6, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6, 100L});
         deleteStockStream.send(new Object[]{"WSO2", 57.6, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 2, "Deletion failed");
@@ -587,10 +524,8 @@ public class ConditionVisitorTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void conditionBuilderTest15() throws InterruptedException {
         log.info("conditionBuilderTest15 - Test delete on condition when there's an 'in' condition.");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -611,14 +546,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6, 100L});
         stockStream.send(new Object[]{"IBM", 55.6, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6, 100L});
         deleteStockStream.send(new Object[]{"WSO2", 57.6, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 2, "Deletion failed");
@@ -627,10 +559,8 @@ public class ConditionVisitorTest {
     @Test
     public void conditionBuilderTest16() throws InterruptedException {
         log.info("conditionBuilderTest16 - Test delete on condition when there's a NULL condition.");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -651,14 +581,11 @@ public class ConditionVisitorTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6, 100L});
         stockStream.send(new Object[]{"IBM", 55.6, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6, 100L});
         deleteStockStream.send(new Object[]{"WSO2", 57.6, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 0, "Deletion failed");
@@ -667,7 +594,6 @@ public class ConditionVisitorTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void conditionBuilderTest17() {
         log.info("conditionBuilderTest17 - Test delete on condition when there's an invalid operation. ");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +

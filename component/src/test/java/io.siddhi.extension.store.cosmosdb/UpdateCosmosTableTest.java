@@ -31,11 +31,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-
 public class UpdateCosmosTableTest {
 
     private static final Logger log = Logger.getLogger(UpdateCosmosTableTest.class);
-
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static final String key = CosmosTableTestUtils.resolveMasterKey();
     private static final String database = CosmosTableTestUtils.resolveDatabase();
@@ -53,10 +51,8 @@ public class UpdateCosmosTableTest {
     @Test
     public void updateFromCosmosTableTest1() throws InterruptedException {
         log.info("updateFromCosmosTableTest1 - Update events of a CosmosDB table successfully");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -79,25 +75,20 @@ public class UpdateCosmosTableTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6f, 100L});
         stockStream.send(new Object[]{"IBM", 74.6f, 100L});
         stockStream.send(new Object[]{"WSO2_2", 57.6f, 100L});
         fooStream.send(new Object[]{"IBM", 575.6, 500});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 3, "Update failed");
-
         Document expectedUpdatedDocument = new Document();
         expectedUpdatedDocument.set("symbol", "IBM");
         expectedUpdatedDocument.set("price", 575.6);
         expectedUpdatedDocument.set("volume", 500);
         Document updatedDocument = CosmosTableTestUtils.getDocument(uri, key, collectionLink, "FooTable",
                 "FooTable.symbol='IBM'");
-
         Assert.assertEquals(updatedDocument.get("symbol"), expectedUpdatedDocument.get("symbol"),
                 "Update Failed");
         Assert.assertEquals(updatedDocument.get("price"), expectedUpdatedDocument.get("price"),
@@ -110,10 +101,8 @@ public class UpdateCosmosTableTest {
     public void updateFromCosmosTableTest2() throws InterruptedException {
         log.info("updateFromCosmosTableTest2 - Updates events of a CosmosDB table when query has less attributes " +
                 "to select from");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -136,14 +125,11 @@ public class UpdateCosmosTableTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6f, 100L});
         stockStream.send(new Object[]{"IBM", 74.6f, 100L});
         stockStream.send(new Object[]{"WSO2_2", 57.6f, 100L});
         fooStream.send(new Object[]{"IBM_2", 575.6f, 500L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 3, "Update failed");
@@ -153,7 +139,6 @@ public class UpdateCosmosTableTest {
     public void updateFromCosmosTableTest3() {
         log.info("updateFromCosmosTableTest3 - Update events of a CosmosDB table when query has more attributes " +
                 "to select from");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -180,7 +165,6 @@ public class UpdateCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void updateFromCosmosTableTest4() {
         log.info("updateFromCosmosTableTest4 - Updates events of a non existing CosmosDB table");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -208,7 +192,6 @@ public class UpdateCosmosTableTest {
     public void updateFromCosmosTableTest5() {
         log.info("updateFromCosmosTableTest5 - Updates events of a CosmosDB table by selecting from non existing " +
                 "stream");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -235,7 +218,6 @@ public class UpdateCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void updateFromCosmosTableTest6() {
         log.info("updateFromCosmosTableTest6 - Updates events of a CosmosDB table based on a non-existing attribute");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -262,7 +244,6 @@ public class UpdateCosmosTableTest {
     @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void updateFromCosmosTableTest7() {
         log.info("updateFromCosmosTableTest7 - Updates events of CosmosDB table for non-existing attributes");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -289,10 +270,8 @@ public class UpdateCosmosTableTest {
     @Test
     public void updateFromCosmosTableTest8() throws InterruptedException {
         log.info("updateFromCosmosTableTest8 - Updates events of a CosmosDB table for non-existing attribute value");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -315,14 +294,11 @@ public class UpdateCosmosTableTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6f, 100L});
         stockStream.send(new Object[]{"IBM", 74.6f, 100L});
         stockStream.send(new Object[]{"WSO2_2", 57.6f, 100L});
         fooStream.send(new Object[]{"IBM_2", 575.6});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 3, "Update failed");

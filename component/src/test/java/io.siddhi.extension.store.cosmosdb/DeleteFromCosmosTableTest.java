@@ -30,11 +30,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-
 public class DeleteFromCosmosTableTest {
 
     private static final Log log = LogFactory.getLog(DeleteFromCosmosTableTest.class);
-
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static final String key = CosmosTableTestUtils.resolveMasterKey();
     private static final String database = CosmosTableTestUtils.resolveDatabase();
@@ -53,10 +51,8 @@ public class DeleteFromCosmosTableTest {
     public void deleteFromCosmosTableTest1() throws InterruptedException {
         log.info("deleteFromCosmosTableTest1 - " +
                 "Delete an event of a CosmosDB table successfully");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -77,15 +73,12 @@ public class DeleteFromCosmosTableTest {
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO52", 57.6F, 100L});
         deleteStockStream.send(new Object[]{"IBM", 75.6F, 100L});
         deleteStockStream.send(new Object[]{"WSO2", 55.6F, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 1, "Deletion failed");
@@ -96,7 +89,6 @@ public class DeleteFromCosmosTableTest {
     public void deleteFromCosmosTableTest2() {
         log.info("deleteFromCosmosTableTest2 - " +
                 "Delete an event from a non existing CosmosDB table");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -123,7 +115,6 @@ public class DeleteFromCosmosTableTest {
     public void deleteFromCosmosTableTest3() {
         log.info("deleteFromCosmosTableTest3 - " +
                 "Delete an event from a CosmosDB table by selecting from non existing stream");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -140,7 +131,6 @@ public class DeleteFromCosmosTableTest {
                 "from DeleteStockStream345 " +
                 "delete FooTable " +
                 "on FooTable.symbol == symbol;";
-
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
@@ -150,7 +140,6 @@ public class DeleteFromCosmosTableTest {
     public void deleteFromCosmosTableTest4() {
         log.info("deleteFromCosmosTableTest4 - " +
                 "Delete an event from a CosmosDB table based on a non-existing attribute");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -176,10 +165,8 @@ public class DeleteFromCosmosTableTest {
     public void deleteFromCosmosTableTest5() throws InterruptedException {
         log.info("deleteFromCosmosTableTest5 - " +
                 "Delete an event from a CosmosDB table based on a non-existing attribute value");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "define stream StockStream (symbol string, price float, volume long); " +
@@ -197,19 +184,15 @@ public class DeleteFromCosmosTableTest {
                 "delete FooTable " +
                 "   on (FooTable.symbol == symbol) ";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams + query);
-
         InputHandler stockStream = siddhiAppRuntime.getInputHandler("StockStream");
         InputHandler deleteStockStream = siddhiAppRuntime.getInputHandler("DeleteStockStream");
         siddhiAppRuntime.start();
-
         stockStream.send(new Object[]{"WSO2", 55.6F, 100L});
         stockStream.send(new Object[]{"IBM", 75.6F, 100L});
         stockStream.send(new Object[]{"WSO2", 57.6F, 100L});
         deleteStockStream.send(new Object[]{"IBM_v2", 75.6F, 100L});
         deleteStockStream.send(new Object[]{"WSO2_v2", 55.6F, 100L});
-
         siddhiAppRuntime.shutdown();
-
         long totalDocumentsInCollection = CosmosTableTestUtils.getDocumentsCount(uri, key, "FooTable",
                 collectionLink);
         Assert.assertEquals(totalDocumentsInCollection, 3, "Deletion failed");

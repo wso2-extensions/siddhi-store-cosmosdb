@@ -31,7 +31,6 @@ import org.testng.annotations.Test;
 public class DefineCosmosTableTest {
 
     private static final Logger log = Logger.getLogger(DefineCosmosTableTest.class);
-
     private static String uri = CosmosTableTestUtils.resolveBaseUri();
     private static final String key = CosmosTableTestUtils.resolveMasterKey();
     private static final String database = CosmosTableTestUtils.resolveDatabase();
@@ -50,10 +49,8 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest1() {
         log.info("cosmosTableDefinitionTest1 - " +
                 "Defining a CosmosDB event table with a non existing collection.");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
@@ -62,7 +59,6 @@ public class DefineCosmosTableTest {
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
-
         String databaseLink = String.format("/dbs/%s", database);
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
@@ -73,9 +69,7 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest2() {
         log.info("cosmosTableDefinitionTest2 - " +
                 "Defining a CosmosDB event table with an existing collection");
-
         CosmosTableTestUtils.createCollection(uri, key, database, "FooTable");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
@@ -84,7 +78,6 @@ public class DefineCosmosTableTest {
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
-
         String databaseLink = String.format("/dbs/%s", database);
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "FooTable");
@@ -95,7 +88,6 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest3() {
         log.info("cosmosTableDefinitionTest3 - " +
                 "Defining a CosmosDB table without having a cosmosdb uri field");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , access.key='" + key + "', " +
@@ -110,7 +102,6 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest4() {
         log.info("cosmosTableDefinitionTest4 - " +
                 "Defining a CosmosDB table without defining a value for cosmosdb uri field");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb', uri='', access.key='" + key + "', " +
@@ -125,7 +116,6 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest5() {
         log.info("cosmosTableDefinitionTest5 - " +
                 "Defining a CosmosDBS table with an invalid value for cosmosdb uri field");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb', uri='123456', access.key='" + key + "', " +
@@ -140,10 +130,8 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest6() {
         log.info("cosmosTableDefinitionTest6 - " +
                 "Defining a CosmosDB event table with a new collection name");
-
         String collectionLink = String.format("/dbs/%s/colls/%s", database, "FooTable");
         CosmosTableTestUtils.dropCollection(uri, key, collectionLink);
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
@@ -152,7 +140,6 @@ public class DefineCosmosTableTest {
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(streams);
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
-
         String databaseLink = String.format("/dbs/%s", database);
         boolean doesCollectionExists = CosmosTableTestUtils.doesCollectionExists(uri, key, databaseLink,
                 "newCollection");
@@ -163,7 +150,6 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest7() {
         log.info("cosmosTableDefinitionTest7 - " +
                 "Defining a CosmosDB table without having a cosmosdb access.key field");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , uri='" + uri + "', " +
@@ -178,7 +164,6 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest8() {
         log.info("cosmosTableDefinitionTest8 - " +
                 "Defining a CosmosDB table without defining a value for cosmosdb access.key field");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb', uri='" + uri + "', access.key='', " +
@@ -193,7 +178,6 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest9() {
         log.info("cosmosTableDefinitionTest9 - " +
                 "Defining a CosmosDB table without having a database name field");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "')" +
@@ -207,7 +191,6 @@ public class DefineCosmosTableTest {
     public void cosmosTableDefinitionTest10() {
         log.info("cosmosTableDefinitionTest10 - " +
                 "Defining a CosmosDB table without defining a value for database name field");
-
         SiddhiManager siddhiManager = new SiddhiManager();
         String streams = "" +
                 "@store(type = 'cosmosdb' , uri='" + uri + "', access.key='" + key + "', " +
