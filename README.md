@@ -17,7 +17,7 @@ Find some useful links below:
 
 ## Latest API Docs 
 
- * Latest API Docs is <a target="_blank" href="https://wso2-extensions.github.io/siddhi-store-cosmosdb/api/1.0.0-SNAPSHOT">1.0.0</a>.
+
 
 ## Prerequisites
 
@@ -29,7 +29,7 @@ Find some useful links below:
 
 ## Features
 
- * Read-write operations such as create, update, delete, find and contains operations can be performed on document collections in Cosmos DB using this extension.
+
 
 ## How to Contribute
  
