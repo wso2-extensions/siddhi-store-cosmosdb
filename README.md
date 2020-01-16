@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 siddhi-store-cosmosdb
 ======================================
 
@@ -54,7 +53,3 @@ Find some useful links below:
 
 * For more details and to take advantage of this unique opportunity contact us via <a target="_blank" href="http://wso2.com/support?utm_source=gitanalytics&utm_campaign=gitanalytics_Jul17">http://wso2.com/support/</a>. 
 
-=======
-# siddhi-store-cosmosdb
-Extension that can be used to perform Document DB operations with Cosmos DB.
->>>>>>> Initial commit

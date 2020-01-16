@@ -1,16 +1,11 @@
-<<<<<<< HEAD
 *.class
 target/
-=======
-# Compiled class file
-*.class
 
 # Log file
 *.log
 
 # BlueJ files
 *.ctxt
->>>>>>> Initial commit
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -18,10 +13,7 @@ target/
 # Package Files #
 *.jar
 *.war
-<<<<<<< HEAD
-=======
 *.nar
->>>>>>> Initial commit
 *.ear
 *.zip
 *.tar.gz
@@ -29,7 +21,6 @@ target/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-<<<<<<< HEAD
 
 #idea files
 .idea/
@@ -42,5 +33,3 @@ hs_err_pid*
 .cache-main
 
 site/
-=======
->>>>>>> Initial commit
