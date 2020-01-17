@@ -1,0 +1,16 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="CosmosStoreTestSuite" verbose="1">
+    <test name="CosmosStoreTest - Standalone">
+        <classes>
+            <class name="io.siddhi.extension.store.cosmosdb.DefineCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.ConditionVisitorTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.ContainsCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.DeleteFromCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.InsertIntoCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.JoinCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.UpdateCosmosTableTest"/>
+            <class name="io.siddhi.extension.store.cosmosdb.UpdateOrInsertCosmosTableTest"/>
+        </classes>
+    </test>
+</suite>
